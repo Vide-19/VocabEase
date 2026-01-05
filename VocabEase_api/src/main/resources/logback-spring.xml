@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 minutes">
+    <appender name="stdot" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss,GMT+8} [%p] [%c] [%M] [%L] -> %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <springProperty scope="context" name="log.path" source="project.folder"/>
+    <springProperty scope="context" name="log.root.level" source="log.root.level"/>
+
+    <property name="LOG_FOLDER" value="logs"/>
+    <property name="LOG_FILE_NAME" value="vocabEase_api.log"/>
+
+    <!-- 文件滚动 Appender -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/${LOG_FOLDER}/${LOG_FILE_NAME}</file>
+
+        <!-- 使用 SizeAndTimeBasedRollingPolicy 同时按时间和大小滚动 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 必须包含 %d（日期）和 %i（索引） -->
+            <fileNamePattern>${log.path}/${LOG_FOLDER}/${LOG_FILE_NAME}.%d{yyyyMMdd}.%i</fileNamePattern>
+            <maxFileSize>20MB</maxFileSize>     <!-- 单个文件最大 20MB -->
+            <maxHistory>35</maxHistory>         <!-- 保留 35 天 -->
+            <totalSizeCap>10GB</totalSizeCap>   <!-- 可选：总日志大小上限 -->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>utf-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss,GMT+8} [%p] [%c] [%M] [%L] -> %m%n</pattern>
+        </encoder>
+
+        <!-- append 和 prudent 通常不需要显式设为 false -->
+        <!-- <append>true</append> -->
+        <!-- <prudent>false</prudent> -->
+    </appender>
+
+    <!-- 设置 root 日志级别 -->
+    <root level="${log.root.level}">
+        <appender-ref ref="stdot"/>
+        <appender-ref ref="file"/>
+    </root>
+</configuration>

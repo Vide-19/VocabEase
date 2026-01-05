@@ -1,0 +1,16 @@
+2025-12-19 18:12:20 [INFO] [com.javastudy.vocabease_admin.VocabEaseAdminApplication] [logStarting] [54] -> Starting VocabEaseAdminApplication using Java 21.0.5 with PID 15784 (D:\IdeaProject\VocabEase\VocabEase_admin\target\classes started by qwy27 in D:\IdeaProject\VocabEase)
+2025-12-19 18:12:20 [INFO] [com.javastudy.vocabease_admin.VocabEaseAdminApplication] [logStartupProfileInfo] [661] -> No active profile set, falling back to 1 default profile: "default"
+2025-12-19 18:12:21 [INFO] [org.springframework.data.repository.config.RepositoryConfigurationDelegate] [multipleStoresDetected] [291] -> Multiple Spring Data modules found, entering strict repository configuration mode
+2025-12-19 18:12:21 [INFO] [org.springframework.data.repository.config.RepositoryConfigurationDelegate] [registerRepositoriesIn] [145] -> Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-12-19 18:12:21 [INFO] [org.springframework.data.repository.config.RepositoryConfigurationDelegate] [registerRepositoriesIn] [213] -> Finished Spring Data repository scanning in 13 ms. Found 0 Redis repository interfaces.
+2025-12-19 18:12:21 [INFO] [org.springframework.boot.tomcat.TomcatWebServer] [initialize] [114] -> Tomcat initialized with port 9090 (http)
+2025-12-19 18:12:21 [INFO] [org.apache.coyote.http11.Http11NioProtocol] [log] [168] -> Initializing ProtocolHandler ["http-nio-9090"]
+2025-12-19 18:12:21 [INFO] [org.apache.catalina.core.StandardService] [log] [168] -> Starting service [Tomcat]
+2025-12-19 18:12:21 [INFO] [org.apache.catalina.core.StandardEngine] [log] [168] -> Starting Servlet engine: [Apache Tomcat/11.0.14]
+2025-12-19 18:12:21 [INFO] [org.springframework.boot.web.context.servlet.WebApplicationContextInitializer] [prepareWebApplicationContext] [77] -> Root WebApplicationContext: initialization completed in 1535 ms
+2025-12-19 18:12:22 [WARN] [org.springframework.boot.freemarker.autoconfigure.FreeMarkerAutoConfiguration] [checkTemplateLocationExists] [66] -> Cannot find template location: [classpath:/templates/] (please add some templates, check your FreeMarker configuration, or set spring.freemarker.check-template-location=false)
+2025-12-19 18:12:23 [INFO] [org.apache.coyote.http11.Http11NioProtocol] [log] [168] -> Starting ProtocolHandler ["http-nio-9090"]
+2025-12-19 18:12:23 [INFO] [org.springframework.boot.tomcat.TomcatWebServer] [start] [240] -> Tomcat started on port 9090 (http) with context path '/'
+2025-12-19 18:12:23 [INFO] [com.javastudy.vocabease_admin.VocabEaseAdminApplication] [logStarted] [60] -> Started VocabEaseAdminApplication in 3.476 seconds (process running for 4.259)
+2025-12-19 18:13:56 [INFO] [org.springframework.boot.tomcat.GracefulShutdown] [shutDownGracefully] [54] -> Commencing graceful shutdown. Waiting for active requests to complete
+2025-12-19 18:13:56 [INFO] [org.springframework.boot.tomcat.GracefulShutdown] [doShutdown] [76] -> Graceful shutdown complete
