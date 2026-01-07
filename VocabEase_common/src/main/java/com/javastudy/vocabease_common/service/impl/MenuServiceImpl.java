@@ -44,6 +44,7 @@ public class MenuServiceImpl implements MenuService {
 	/**
 	 * 线型转为树型
 	 */
+	@Override
 	public List<Menu> convertLine2Tree4Menu(List<Menu> dataList, Integer pid) {
 		List<Menu> children = new ArrayList<>();
 		for (Menu menu : dataList) {
@@ -53,6 +54,18 @@ public class MenuServiceImpl implements MenuService {
 			}
 		}
 		return children;
+	}
+
+	/**
+	 * 保存修改的菜单
+	 * @param menu
+	 */
+	@Override
+	public void saveMenu(Menu menu) {
+		if (menu.getMenuId() == null)
+			this.menuMapper.insert(menu);
+		else
+			this.menuMapper.updateByMenuId(menu, menu.getMenuId());
 	}
 
 	/**

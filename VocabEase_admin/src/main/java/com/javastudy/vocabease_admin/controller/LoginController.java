@@ -45,6 +45,6 @@ public class LoginController extends ABaseController {
             throw new BusinessException("验证码错误");
         SessionUserAdminDto sessionUserAdminDto = this.accountService.login(phone, password);
         session.setAttribute(Constants.SESSION_KEY, sessionUserAdminDto);
-        return getSuccessResponseVO(null);
+        return getSuccessResponseVO(sessionUserAdminDto);
     }
 }

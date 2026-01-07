@@ -1,21 +1,20 @@
 package com.javastudy.vocabease_admin.controller;
 
+import com.javastudy.vocabease_admin.annotation.GlobalInterceptor;
+import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 import com.javastudy.vocabease_common.entity.po.Role;
 import com.javastudy.vocabease_common.entity.query.RoleQuery;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.service.RoleService;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  *  Controller
  */
 @RestController("roleController")
-@RequestMapping("/role")
+@RequestMapping("/settings")
 public class RoleController extends ABaseController {
 
 	@Resource
@@ -23,61 +22,63 @@ public class RoleController extends ABaseController {
 	/**
 	 * 根据条件分页查询
 	 */
-	@RequestMapping("/loadDataList")
+	@RequestMapping("/loadRoles")
+	@GlobalInterceptor
 	public ResponseVO loadDataList(RoleQuery query){
+		query.setOrderBy("create_time desc");
 		return getSuccessResponseVO(roleService.findListByPage(query));
 	}
 
 	/**
-	 * 新增
+	 * 保存新增的角色
 	 */
-	@RequestMapping("/add")
-	public ResponseVO add(Role bean) {
-		roleService.add(bean);
+	@RequestMapping("/saveRole")
+	@GlobalInterceptor
+	public ResponseVO saveRole(@VerifyParam Role role,
+							   String menuIds,
+							   String halfMenuIds) {
+		roleService.savaRole(role, menuIds, halfMenuIds);
 		return getSuccessResponseVO(null);
 	}
 
 	/**
-	 * 批量新增
+	 * 保存修改的角色对应的菜单
 	 */
-	@RequestMapping("/addBatch")
-	public ResponseVO addBatch(@RequestBody List<Role> listBean) {
-		roleService.addBatch(listBean);
+	@RequestMapping("/saveRole2Menu")
+	@GlobalInterceptor
+	public ResponseVO saveRole2Menu(@VerifyParam(required = true) Integer roleId,
+									@VerifyParam(required = true) String menuIds,
+							   String halfMenuIds) {
+		roleService.saveRole2Menu(roleId, menuIds, halfMenuIds);
 		return getSuccessResponseVO(null);
 	}
 
 	/**
-	 * 批量新增/修改
-	 */
-	@RequestMapping("/addOrUpdateBatch")
-	public ResponseVO addOrUpdateBatch(@RequestBody List<Role> listBean) {
-		roleService.addBatch(listBean);
-		return getSuccessResponseVO(null);
-	}
-
-	/**
-	 * 根据RoleId查询对象
+	 * 找到用户角色
 	 */
 	@RequestMapping("/getRoleByRoleId")
-	public ResponseVO getRoleByRoleId(Integer roleId) {
-		return getSuccessResponseVO(roleService.getRoleByRoleId(roleId));
+	@GlobalInterceptor
+	public ResponseVO getRoleByRoleId(@VerifyParam(required = true) Integer roleId) {
+		Role role = roleService.getRoleByRoleId(roleId);
+		return getSuccessResponseVO(role);
 	}
-
 	/**
-	 * 根据RoleId修改对象
+	 * 删除角色
 	 */
-	@RequestMapping("/updateRoleByRoleId")
-	public ResponseVO updateRoleByRoleId(Role bean,Integer roleId) {
-		roleService.updateRoleByRoleId(bean,roleId);
-		return getSuccessResponseVO(null);
-	}
-
-	/**
-	 * 根据RoleId删除
-	 */
-	@RequestMapping("/deleteRoleByRoleId")
-	public ResponseVO deleteRoleByRoleId(Integer roleId) {
+	@RequestMapping("/deleteRole")
+	@GlobalInterceptor
+	public ResponseVO deleteRole(@VerifyParam(required = true) Integer roleId) {
 		roleService.deleteRoleByRoleId(roleId);
 		return getSuccessResponseVO(null);
+	}
+	/**
+	 * 获取所有角色
+	 */
+	@RequestMapping("/loadRolesList")
+	@GlobalInterceptor
+	public ResponseVO loadRolesList(){
+		RoleQuery roleQuery = new RoleQuery();
+		roleQuery.setOrderBy("create_time desc");
+		return getSuccessResponseVO(this.roleService.findListByPage(roleQuery));
 	}
 }

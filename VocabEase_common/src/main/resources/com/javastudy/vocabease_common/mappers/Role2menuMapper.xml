@@ -200,4 +200,11 @@
 		select <include refid="base_column_list" /> from role2menu r where role_id=#{roleId} and menu_id=#{menuId}
 	</select>
 
+	<!-- 根据 roleIds 查询对应的 menu_id 列表 -->
+	<select id="selectMenuIdsByRoleIds" resultType="java.lang.Integer" >
+		select menu_id from role2menu r where role_id in(
+		    <foreach collection="roleIds" separator="," item="item">#{item}</foreach>
+			) and check_type = 1
+	</select>
+
 </mapper>

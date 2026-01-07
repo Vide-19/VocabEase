@@ -57,16 +57,21 @@ public interface MenuService {
 	 */
 	Menu getMenuByMenuId(Integer menuId);
 
-
 	/**
 	 * 根据MenuId修改
 	 */
 	Integer updateMenuByMenuId(Menu bean,Integer menuId);
 
-
 	/**
 	 * 根据MenuId删除
 	 */
 	Integer deleteMenuByMenuId(Integer menuId);
+
+	/**
+	 *线型转为树型
+	 */
+	List<Menu> convertLine2Tree4Menu(List<Menu> dataList, Integer pid);
+
+	void saveMenu(Menu menu);
 
 }

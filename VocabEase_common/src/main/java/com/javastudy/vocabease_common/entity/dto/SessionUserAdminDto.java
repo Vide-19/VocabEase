@@ -9,6 +9,7 @@ public class SessionUserAdminDto {
     private String userName;
     private Boolean superAdmin;
     private List<MenuVO> menuList;
+    private List<String> permissionCodeList;
 
     public List<MenuVO> getMenuList() {
         return menuList;
@@ -37,9 +38,11 @@ public class SessionUserAdminDto {
         this.userId = userId;
     }
 
+    public List<String> getPermissionCodeList() {
+        return permissionCodeList;
+    }
 
-
-
-
-
+    public void setPermissionCodeList(List<String> permissionCodeList) {
+        this.permissionCodeList = permissionCodeList;
+    }
 }

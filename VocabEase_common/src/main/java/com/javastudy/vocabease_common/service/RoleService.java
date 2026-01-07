@@ -69,4 +69,11 @@ public interface RoleService {
 	 */
 	Integer deleteRoleByRoleId(Integer roleId);
 
+	/**
+	 * 保存新增的角色
+	 */
+	void savaRole(Role role, String menuIds, String halfMenuIds);
+
+	void saveRole2Menu(Integer roleId, String menuIds, String halfMenuIds);
+
 }

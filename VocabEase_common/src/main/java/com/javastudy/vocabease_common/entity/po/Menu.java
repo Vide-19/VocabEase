@@ -1,5 +1,7 @@
 package com.javastudy.vocabease_common.entity.po;
 
+import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -18,11 +20,13 @@ public class Menu implements Serializable {
 	/**
 	 * 菜单名
 	 */
+	@VerifyParam(required = true, max = 32)
 	private String menuName;
 
 	/**
 	 * 菜单类型
 	 */
+	@VerifyParam(required = true)
 	private Integer menuType;
 
 	/**
@@ -33,21 +37,25 @@ public class Menu implements Serializable {
 	/**
 	 * 上级菜单id
 	 */
+	@VerifyParam(required = true)
 	private Integer pId;
 
 	/**
 	 * 菜单排序
 	 */
+	@VerifyParam(required = true)
 	private Integer sort;
 
 	/**
 	 * 权限编码
 	 */
+	@VerifyParam(required = true, max = 50)
 	private String permissionCode;
 
 	/**
 	 * 图标
 	 */
+	@VerifyParam(max = 50)
 	private String icon;
 
 	private List<Menu> children;

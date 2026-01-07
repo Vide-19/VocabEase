@@ -1,5 +1,7 @@
 package com.javastudy.vocabease_admin.controller;
 
+import com.javastudy.vocabease_admin.annotation.GlobalInterceptor;
+import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 import com.javastudy.vocabease_common.entity.po.Menu;
 import com.javastudy.vocabease_common.entity.query.MenuQuery;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
@@ -23,12 +25,31 @@ public class MenuController extends ABaseController{
 	 * 根据条件分页查询
 	 */
 	@RequestMapping("/menuList")
+	@GlobalInterceptor
 	public ResponseVO loadDataList(){
 		MenuQuery query = new MenuQuery();
 		query.setFormatter2Tree(true);
 		query.setOrderBy("sort asc");
 		List<Menu> menuList = menuService.findListByParam(query);
 		return getSuccessResponseVO(menuList);
+	}
+	/**
+	 * 保存更改的菜单
+	 */
+	@RequestMapping("/saveMenu")
+	@GlobalInterceptor
+	public ResponseVO saveMenu(@VerifyParam Menu menu){
+		this.menuService.saveMenu(menu);
+		return getSuccessResponseVO(null);
+	}
+	/**
+	 * 删除菜单
+	 */
+	@RequestMapping("/deleteMenu")
+	@GlobalInterceptor
+	public ResponseVO deleteMenu(@VerifyParam(required = true) Integer menuId){
+		this.menuService.deleteMenuByMenuId(menuId);
+		return getSuccessResponseVO(null);
 	}
 
 }

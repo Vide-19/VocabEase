@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -43,6 +44,8 @@ public class Role implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date lastUpdateTime;
+
+	private List<Integer> menuIds;
 
 
 	public void setRoleId(Integer roleId){
@@ -88,5 +91,13 @@ public class Role implements Serializable {
 	@Override
 	public String toString (){
 		return "角色id:"+(roleId == null ? "空" : roleId)+"，角色名:"+(roleName == null ? "空" : roleName)+"，角色描述:"+(roleDesc == null ? "空" : roleDesc)+"，创建时间:"+(createTime == null ? "空" : DateUtil.format(createTime, DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern()))+"，最后更新时间:"+(lastUpdateTime == null ? "空" : DateUtil.format(lastUpdateTime, DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern()));
+	}
+
+	public List<Integer> getMenuIds() {
+		return menuIds;
+	}
+
+	public void setMenuIds(List<Integer> menuIds) {
+		this.menuIds = menuIds;
 	}
 }

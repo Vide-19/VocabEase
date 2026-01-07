@@ -172,22 +172,26 @@ public class AccountServiceImpl implements AccountService {
 		if (!password.equals(account.getPassword()))
 			throw new BusinessException("账号或密码错误");
 		MenuQuery query = new MenuQuery();
-		query.setFormatter2Tree(true);
+		query.setFormatter2Tree(false);
 		query.setOrderBy("sort asc");
 		List<Menu> menuList = this.menuService.findListByParam(query);
+		List<String> permissionCodeList = new ArrayList<>();
+		menuList.forEach(menu -> {
+			permissionCodeList.add(menu.getPermissionCode());
+		});
 		List<MenuVO> menuVOList = new ArrayList<>();
-
+		menuList = this.menuService.convertLine2Tree4Menu(menuList, 0);
 		menuList.forEach(menu -> {
 			MenuVO menuVO = CopyUtil.copy(menu, MenuVO.class);
 			menuVO.setChildren(CopyUtil.copyList(menu.getChildren(), MenuVO.class));
 			menuVOList.add(menuVO);
 		});
-
 		SessionUserAdminDto sessionUserAdminDto = new SessionUserAdminDto();
 		sessionUserAdminDto.setSuperAdmin(true);
 		sessionUserAdminDto.setUserId(account.getUserId());
 		sessionUserAdminDto.setUserName(account.getUserName());
 		sessionUserAdminDto.setMenuList(menuVOList);
+		sessionUserAdminDto.setPermissionCodeList(permissionCodeList);
 		return sessionUserAdminDto;
 	}
 }
