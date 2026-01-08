@@ -1,6 +1,7 @@
 package com.javastudy.vocabease_common.entity.po;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 import com.javastudy.vocabease_common.entity.enums.DateTimePatternEnum;
 import com.javastudy.vocabease_common.utils.DateUtil;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,11 +25,13 @@ public class Role implements Serializable {
 	/**
 	 * 角色名
 	 */
+	@VerifyParam(required = true, max = 100)
 	private String roleName;
 
 	/**
 	 * 角色描述
 	 */
+	@VerifyParam(max = 300)
 	private String roleDesc;
 
 	/**

@@ -13,6 +13,13 @@ public enum AccountStatusEnum {
         this.description = description;
     }
 
+    public static AccountStatusEnum getByStatus(Integer status) {
+        for (AccountStatusEnum accountStatusEnum : AccountStatusEnum.values())
+            if (accountStatusEnum.getStatus().equals(status))
+                return accountStatusEnum;
+        return null;
+    }
+
     public Integer getStatus() {
         return status;
     }

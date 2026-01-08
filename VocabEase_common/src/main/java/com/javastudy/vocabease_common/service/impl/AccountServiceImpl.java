@@ -20,6 +20,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -169,7 +170,7 @@ public class AccountServiceImpl implements AccountService {
 			throw new BusinessException("账号或密码错误");
 		if (account.getStatus().equals(AccountStatusEnum.DISABLED.getStatus()))
 			throw new BusinessException("账号已禁用，请联系管理员");
-		if (!password.equals(account.getPassword()))
+		if (!StringTools.encodeByMd5(password).equals(account.getPassword()))
 			throw new BusinessException("账号或密码错误");
 		MenuQuery query = new MenuQuery();
 		query.setFormatter2Tree(false);
@@ -193,5 +194,25 @@ public class AccountServiceImpl implements AccountService {
 		sessionUserAdminDto.setMenuList(menuVOList);
 		sessionUserAdminDto.setPermissionCodeList(permissionCodeList);
 		return sessionUserAdminDto;
+	}
+
+	@Override
+	public void saveAccount(Account account) {
+		Account accountWithPhone = this.accountMapper.selectByPhone(account.getPhone());
+		if (accountWithPhone != null && (account.getUserId() == null || !account.getUserId().equals(accountWithPhone.getUserId())))
+			throw new BusinessException("该手机号码已被使用");
+		//新增
+		if (account.getUserId() == null){
+			account.setPassword(StringTools.encodeByMd5(account.getPassword()));
+			account.setStatus(AccountStatusEnum.ENABLED.getStatus());
+			account.setCreateTime(new Date());
+			this.accountMapper.insert(account);
+		}
+		//修改
+		else {
+			account.setPassword(null);
+			account.setStatus(null);
+			this.accountMapper.updateByUserId(account, account.getUserId());
+		}
 	}
 }

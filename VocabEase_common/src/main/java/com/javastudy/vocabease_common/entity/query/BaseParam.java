@@ -1,11 +1,11 @@
 package com.javastudy.vocabease_common.entity.query;
 
-
 public class BaseParam {
 	private SimplePage simplePage;
 	private Integer pageNo;
 	private Integer pageSize;
 	private String orderBy;
+
 	public SimplePage getSimplePage() {
 		return simplePage;
 	}
@@ -30,11 +30,11 @@ public class BaseParam {
 		this.pageSize = pageSize;
 	}
 
-	public void setOrderBy(String orderBy){
-		this.orderBy = orderBy;
+	public String getOrderBy() {
+		return orderBy;
 	}
 
-	public String getOrderBy(){
-		return this.orderBy;
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
 	}
 }

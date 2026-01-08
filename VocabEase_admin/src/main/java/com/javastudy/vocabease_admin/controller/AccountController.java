@@ -1,111 +1,86 @@
 package com.javastudy.vocabease_admin.controller;
 
-import java.util.List;
-
-import com.javastudy.vocabease_common.entity.query.AccountQuery;
+import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
+import com.javastudy.vocabease_common.entity.config.AppConfig;
+import com.javastudy.vocabease_common.entity.enums.AccountStatusEnum;
+import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
+import com.javastudy.vocabease_common.entity.enums.VerifyRegexEnum;
 import com.javastudy.vocabease_common.entity.po.Account;
+import com.javastudy.vocabease_common.entity.query.AccountQuery;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
+import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.service.AccountService;
+import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-
 
 /**
  *  Controller
  */
 @RestController("accountController")
-@RequestMapping("/account")
+@RequestMapping("/settings")
 public class AccountController extends com.javastudy.vocabease_admin.controller.ABaseController {
 
 	@Resource
 	private AccountService accountService;
+	@Resource
+	private AppConfig appConfig;
 	/**
 	 * 根据条件分页查询
 	 */
-	@RequestMapping("/loadDataList")
-	public ResponseVO loadDataList(AccountQuery query){
+	@RequestMapping("/loadAccountList")
+	public ResponseVO loadAccountList(AccountQuery query){
+		query.setOrderBy("create_time desc");
+		query.setRolesQuery(true);
 		return getSuccessResponseVO(accountService.findListByPage(query));
 	}
-
 	/**
-	 * 新增
+	 * 保存新增或更改的用户
 	 */
-	@RequestMapping("/add")
-	public ResponseVO add(Account bean) {
-		accountService.add(bean);
+	@RequestMapping("/saveAccount")
+	public ResponseVO saveAccount(@VerifyParam Account account){
+		this.accountService.saveAccount(account);
 		return getSuccessResponseVO(null);
 	}
-
 	/**
-	 * 批量新增
+	 * 删除用户
 	 */
-	@RequestMapping("/addBatch")
-	public ResponseVO addBatch(@RequestBody List<Account> listBean) {
-		accountService.addBatch(listBean);
+	@DeleteMapping("/deleteAccount")
+	public ResponseVO deleteAccount(@VerifyParam(required = true) Integer userId){
+		Account account = this.accountService.getAccountByUserId(userId);
+		if (!StringTools.isEmpty(appConfig.getSuperAdminPhone()) &&
+				ArrayUtils.contains(appConfig.getSuperAdminPhone().split(","), account.getPhone()))
+			throw new BusinessException("超管无法被删除！");
+		this.accountService.deleteAccountByUserId(userId);
 		return getSuccessResponseVO(null);
 	}
-
 	/**
-	 * 批量新增/修改
+	 * 修改密码
 	 */
-	@RequestMapping("/addOrUpdateBatch")
-	public ResponseVO addOrUpdateBatch(@RequestBody List<Account> listBean) {
-		accountService.addBatch(listBean);
+	@PostMapping("/updatePassword")
+	public ResponseVO updatePassword(@VerifyParam Integer userId,
+									 @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password){
+		Account account = new Account();
+		account.setPassword(StringTools.encodeByMd5(password));
+		this.accountService.updateAccountByUserId(account, userId);
 		return getSuccessResponseVO(null);
 	}
-
 	/**
-	 * 根据UserId查询对象
+	 * 修改状态
 	 */
-	@RequestMapping("/getAccountByUserId")
-	public ResponseVO getAccountByUserId(Integer userId) {
-		return getSuccessResponseVO(accountService.getAccountByUserId(userId));
-	}
-
-	/**
-	 * 根据UserId修改对象
-	 */
-	@RequestMapping("/updateAccountByUserId")
-	public ResponseVO updateAccountByUserId(Account bean,Integer userId) {
-		accountService.updateAccountByUserId(bean,userId);
-		return getSuccessResponseVO(null);
-	}
-
-	/**
-	 * 根据UserId删除
-	 */
-	@RequestMapping("/deleteAccountByUserId")
-	public ResponseVO deleteAccountByUserId(Integer userId) {
-		accountService.deleteAccountByUserId(userId);
-		return getSuccessResponseVO(null);
-	}
-
-	/**
-	 * 根据Phone查询对象
-	 */
-	@RequestMapping("/getAccountByPhone")
-	public ResponseVO getAccountByPhone(String phone) {
-		return getSuccessResponseVO(accountService.getAccountByPhone(phone));
-	}
-
-	/**
-	 * 根据Phone修改对象
-	 */
-	@RequestMapping("/updateAccountByPhone")
-	public ResponseVO updateAccountByPhone(Account bean,String phone) {
-		accountService.updateAccountByPhone(bean,phone);
-		return getSuccessResponseVO(null);
-	}
-
-	/**
-	 * 根据Phone删除
-	 */
-	@RequestMapping("/deleteAccountByPhone")
-	public ResponseVO deleteAccountByPhone(String phone) {
-		accountService.deleteAccountByPhone(phone);
+	@PostMapping("/updateStatus")
+	public ResponseVO updateStatus(@VerifyParam Integer userId,
+									 @VerifyParam(required = true) Integer status){
+		AccountStatusEnum accountStatusEnum = AccountStatusEnum.getByStatus(status);
+		if (accountStatusEnum == null)
+			throw new BusinessException(ResponseCodeEnum.CODE_600);
+		Account account = new Account();
+		account.setStatus(status);
+		this.accountService.updateAccountByUserId(account, userId);
 		return getSuccessResponseVO(null);
 	}
 }

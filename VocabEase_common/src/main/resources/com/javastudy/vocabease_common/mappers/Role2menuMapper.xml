@@ -13,7 +13,6 @@
 		<result column="check_type" property="checkType"  />
 	</resultMap>
 
-
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
 		 r.role_id,r.menu_id,r.check_type

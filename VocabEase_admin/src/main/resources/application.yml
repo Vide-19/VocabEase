@@ -10,6 +10,8 @@ server:
     context-path: /api
 project:
   folder: D:/IdeaProject/VocabEase/
+admin:
+  phone: 13866668888
 log:
   root:
     level: debug

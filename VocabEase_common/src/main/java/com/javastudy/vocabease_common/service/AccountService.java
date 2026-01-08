@@ -97,4 +97,6 @@ public interface AccountService {
 	 */
 	SessionUserAdminDto login(String phone, String password);
 
+	void saveAccount(Account bean);
+
 }

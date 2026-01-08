@@ -1,8 +1,5 @@
 package com.javastudy.vocabease_common.entity.query;
 
-import java.util.Date;
-
-
 /**
  * 参数
  */
@@ -54,6 +51,8 @@ public class AccountQuery extends BaseParam {
 
 	private String rolesFuzzy;
 
+	private Boolean rolesQuery;
+
 	/**
 	 * 创建时间
 	 */
@@ -63,124 +62,131 @@ public class AccountQuery extends BaseParam {
 
 	private String createTimeEnd;
 
+	public Integer getUserId() {
+		return userId;
+	}
 
-	public void setUserId(Integer userId){
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
-	public Integer getUserId(){
-		return this.userId;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setUserName(String userName){
+	public void setUserName(String userName) {
 		this.userName = userName;
 	}
 
-	public String getUserName(){
-		return this.userName;
+	public String getUserNameFuzzy() {
+		return userNameFuzzy;
 	}
 
-	public void setUserNameFuzzy(String userNameFuzzy){
+	public void setUserNameFuzzy(String userNameFuzzy) {
 		this.userNameFuzzy = userNameFuzzy;
 	}
 
-	public String getUserNameFuzzy(){
-		return this.userNameFuzzy;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setPhone(String phone){
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
-	public String getPhone(){
-		return this.phone;
+	public String getPhoneFuzzy() {
+		return phoneFuzzy;
 	}
 
-	public void setPhoneFuzzy(String phoneFuzzy){
+	public void setPhoneFuzzy(String phoneFuzzy) {
 		this.phoneFuzzy = phoneFuzzy;
 	}
 
-	public String getPhoneFuzzy(){
-		return this.phoneFuzzy;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPassword(String password){
+	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	public String getPassword(){
-		return this.password;
+	public String getPasswordFuzzy() {
+		return passwordFuzzy;
 	}
 
-	public void setPasswordFuzzy(String passwordFuzzy){
+	public void setPasswordFuzzy(String passwordFuzzy) {
 		this.passwordFuzzy = passwordFuzzy;
 	}
 
-	public String getPasswordFuzzy(){
-		return this.passwordFuzzy;
+	public String getPosition() {
+		return position;
 	}
 
-	public void setPosition(String position){
+	public void setPosition(String position) {
 		this.position = position;
 	}
 
-	public String getPosition(){
-		return this.position;
+	public String getPositionFuzzy() {
+		return positionFuzzy;
 	}
 
-	public void setPositionFuzzy(String positionFuzzy){
+	public void setPositionFuzzy(String positionFuzzy) {
 		this.positionFuzzy = positionFuzzy;
 	}
 
-	public String getPositionFuzzy(){
-		return this.positionFuzzy;
+	public Integer getStatus() {
+		return status;
 	}
 
-	public void setStatus(Integer status){
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
-	public Integer getStatus(){
-		return this.status;
+	public String getRoles() {
+		return roles;
 	}
 
-	public void setRoles(String roles){
+	public void setRoles(String roles) {
 		this.roles = roles;
 	}
 
-	public String getRoles(){
-		return this.roles;
+	public String getRolesFuzzy() {
+		return rolesFuzzy;
 	}
 
-	public void setRolesFuzzy(String rolesFuzzy){
+	public void setRolesFuzzy(String rolesFuzzy) {
 		this.rolesFuzzy = rolesFuzzy;
 	}
 
-	public String getRolesFuzzy(){
-		return this.rolesFuzzy;
+	public Boolean getRolesQuery() {
+		return rolesQuery;
 	}
 
-	public void setCreateTime(String createTime){
+	public void setRolesQuery(Boolean rolesQuery) {
+		this.rolesQuery = rolesQuery;
+	}
+
+	public String getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
 
-	public String getCreateTime(){
-		return this.createTime;
+	public String getCreateTimeStart() {
+		return createTimeStart;
 	}
 
-	public void setCreateTimeStart(String createTimeStart){
+	public void setCreateTimeStart(String createTimeStart) {
 		this.createTimeStart = createTimeStart;
 	}
 
-	public String getCreateTimeStart(){
-		return this.createTimeStart;
+	public String getCreateTimeEnd() {
+		return createTimeEnd;
 	}
-	public void setCreateTimeEnd(String createTimeEnd){
+
+	public void setCreateTimeEnd(String createTimeEnd) {
 		this.createTimeEnd = createTimeEnd;
 	}
-
-	public String getCreateTimeEnd(){
-		return this.createTimeEnd;
-	}
-
 }

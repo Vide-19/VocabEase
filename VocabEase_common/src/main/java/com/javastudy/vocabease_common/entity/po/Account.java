@@ -25,19 +25,20 @@ public class Account implements Serializable {
 	/**
 	 * 用户名
 	 */
+	@VerifyParam(required = true, max = 20)
 	private String userName;
 
 	/**
 	 * 手机号
 	 */
-	@VerifyParam(regex = VerifyRegexEnum.PHONE)
+	@VerifyParam(required = true, regex = VerifyRegexEnum.PHONE)
 	private String phone;
 
 	/**
 	 * 密码
 	 */
 	@JsonIgnore
-	@VerifyParam(required = true)
+	@VerifyParam(regex = VerifyRegexEnum.PASSWORD)
 	private String password;
 
 	/**
@@ -53,6 +54,7 @@ public class Account implements Serializable {
 	/**
 	 * 角色
 	 */
+	@VerifyParam(required = true)
 	private String roles;
 
 	/**
@@ -62,73 +64,82 @@ public class Account implements Serializable {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 
-
-	public void setUserId(Integer userId){
-		this.userId = userId;
-	}
-
-	public Integer getUserId(){
-		return this.userId;
-	}
-
-	public void setUserName(String userName){
-		this.userName = userName;
-	}
-
-	public String getUserName(){
-		return this.userName;
-	}
-
-	public void setPhone(String phone){
-		this.phone = phone;
-	}
-
-	public String getPhone(){
-		return this.phone;
-	}
-
-	public void setPassword(String password){
-		this.password = password;
-	}
-
-	public String getPassword(){
-		return this.password;
-	}
-
-	public void setPosition(String position){
-		this.position = position;
-	}
-
-	public String getPosition(){
-		return this.position;
-	}
-
-	public void setStatus(Integer status){
-		this.status = status;
-	}
-
-	public Integer getStatus(){
-		return this.status;
-	}
-
-	public void setRoles(String roles){
-		this.roles = roles;
-	}
-
-	public String getRoles(){
-		return this.roles;
-	}
-
-	public void setCreateTime(Date createTime){
-		this.createTime = createTime;
-	}
-
-	public Date getCreateTime(){
-		return this.createTime;
-	}
+	private String roleNames;
 
 	@Override
 	public String toString (){
 		return "用户id:"+(userId == null ? "空" : userId)+"，用户名:"+(userName == null ? "空" : userName)+"，手机号:"+(phone == null ? "空" : phone)+"，密码:"+(password == null ? "空" : password)+"，职位:"+(position == null ? "空" : position)+"，状态0/1:"+(status == null ? "空" : status)+"，角色:"+(roles == null ? "空" : roles)+"，创建时间:"+(createTime == null ? "空" : DateUtil.format(createTime, DateTimePatternEnum.YYYY_MM_DD_HH_MM_SS.getPattern()));
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getPosition() {
+		return position;
+	}
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public String getRoles() {
+		return roles;
+	}
+
+	public void setRoles(String roles) {
+		this.roles = roles;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public String getRoleNames() {
+		return roleNames;
+	}
+
+	public void setRoleNames(String roleNames) {
+		this.roleNames = roleNames;
 	}
 }

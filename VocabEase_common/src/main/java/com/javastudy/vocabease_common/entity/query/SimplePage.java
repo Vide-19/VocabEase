@@ -1,6 +1,6 @@
 package com.javastudy.vocabease_common.entity.query;
-import com.javastudy.vocabease_common.entity.enums.PageSize;
 
+import com.javastudy.vocabease_common.entity.enums.PageSize;
 
 public class SimplePage {
 	private int pageNo;
@@ -49,16 +49,9 @@ public class SimplePage {
 		this.end = this.pageSize;
 	}
 
-	public int getStart() {
-		return start;
-	}
-
-	public int getEnd() {
-		return end;
-	}
-
-	public int getPageTotal() {
-		return pageTotal;
+	public void setCountTotal(int countTotal) {
+		this.countTotal = countTotal;
+		this.action();
 	}
 
 	public int getPageNo() {
@@ -69,10 +62,6 @@ public class SimplePage {
 		this.pageNo = pageNo;
 	}
 
-	public void setPageTotal(int pageTotal) {
-		this.pageTotal = pageTotal;
-	}
-
 	public int getCountTotal() {
 		return countTotal;
 	}
@@ -81,21 +70,31 @@ public class SimplePage {
 		return pageSize;
 	}
 
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public int getPageTotal() {
+		return pageTotal;
+	}
+
+	public void setPageTotal(int pageTotal) {
+		this.pageTotal = pageTotal;
+	}
+
+	public int getStart() {
+		return start;
+	}
+
 	public void setStart(int start) {
 		this.start = start;
+	}
+
+	public int getEnd() {
+		return end;
 	}
 
 	public void setEnd(int end) {
 		this.end = end;
 	}
-
-	public void setCountTotal(int countTotal) {
-		this.countTotal = countTotal;
-		this.action();
-	}
-
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
-	}
-
 }

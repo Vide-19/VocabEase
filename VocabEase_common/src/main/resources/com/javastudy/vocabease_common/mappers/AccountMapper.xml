@@ -87,7 +87,11 @@
 
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" /> FROM account a <include refid="query_condition" />
+		 SELECT <include refid="base_column_list" />
+		<if test="query.rolesQuery != null and query.rolesQuery">
+		,(SELECT GROUP_CONCAT(role_name SEPARATOR ',') FROM role WHERE FIND_IN_SET(role_id,a.roles)) roleNames
+		</if>
+		 FROM account a <include refid="query_condition" />
 		 <if test="query.orderBy!=null">
 			 order by ${query.orderBy}
 		 </if>

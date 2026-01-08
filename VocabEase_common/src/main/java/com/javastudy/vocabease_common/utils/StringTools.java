@@ -1,5 +1,7 @@
 package com.javastudy.vocabease_common.utils;
 import com.javastudy.vocabease_common.exception.BusinessException;
+import org.springframework.util.DigestUtils;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -49,5 +51,12 @@ public class StringTools {
             return true;
         }
         return false;
+    }
+
+    public static String encodeByMd5(String str) {
+        if (isEmpty(str))
+            return str;
+        else
+            return DigestUtils.md5DigestAsHex(str.getBytes());
     }
 }
