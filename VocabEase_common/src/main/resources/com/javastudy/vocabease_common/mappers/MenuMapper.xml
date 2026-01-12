@@ -357,4 +357,16 @@
 		select <include refid="base_column_list" /> from menu m where menu_id=#{menuId}
 	</select>
 
+	<!-- 根据roleIds获取对象-->
+	<select id="selectByRoleIds" resultMap="base_result_map" >
+		select distinct m.* from menu m
+		inner join role2menu r 
+		on m.menu_id = r.menu_id
+		where r.role_id in (
+		    <foreach collection="roleIds" separator="," item="item">
+				#{item}
+			</foreach>
+			)
+	</select>
+
 </mapper>

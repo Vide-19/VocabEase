@@ -74,4 +74,6 @@ public interface MenuService {
 
 	void saveMenu(Menu menu);
 
+	List<Menu> 	getMuneListByRoleIds(String roleIds);
+
 }

@@ -68,6 +68,14 @@ public class MenuServiceImpl implements MenuService {
 			this.menuMapper.updateByMenuId(menu, menu.getMenuId());
 	}
 
+	@Override
+	public List<Menu> getMuneListByRoleIds(String roleIds) {
+		if (StringTools.isEmpty(roleIds))
+			return new ArrayList<>();
+		String[] roleIdArray = roleIds.split(",");
+		return this.menuMapper.selectByRoleIds(roleIdArray);
+	}
+
 	/**
 	 * 根据条件查询列表
 	 */

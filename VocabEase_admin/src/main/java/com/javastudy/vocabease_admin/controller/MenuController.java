@@ -2,6 +2,7 @@ package com.javastudy.vocabease_admin.controller;
 
 import com.javastudy.vocabease_admin.annotation.GlobalInterceptor;
 import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
+import com.javastudy.vocabease_common.entity.enums.PermissionCodeEnum;
 import com.javastudy.vocabease_common.entity.po.Menu;
 import com.javastudy.vocabease_common.entity.query.MenuQuery;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
@@ -13,19 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 菜单表 Controller
+ * 菜单 Controller
  */
 @RestController("menuController")
 @RequestMapping("/settings")
 public class MenuController extends ABaseController{
-
 	@Resource
 	private MenuService menuService;
 	/**
 	 * 根据条件分页查询
 	 */
 	@RequestMapping("/menuList")
-	@GlobalInterceptor
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_MENU)
 	public ResponseVO loadDataList(){
 		MenuQuery query = new MenuQuery();
 		query.setFormatter2Tree(true);
@@ -37,7 +37,7 @@ public class MenuController extends ABaseController{
 	 * 保存更改的菜单
 	 */
 	@RequestMapping("/saveMenu")
-	@GlobalInterceptor
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_MENU_EDIT)
 	public ResponseVO saveMenu(@VerifyParam Menu menu){
 		this.menuService.saveMenu(menu);
 		return getSuccessResponseVO(null);
@@ -46,10 +46,9 @@ public class MenuController extends ABaseController{
 	 * 删除菜单
 	 */
 	@RequestMapping("/deleteMenu")
-	@GlobalInterceptor
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_MENU_DELETE)
 	public ResponseVO deleteMenu(@VerifyParam(required = true) Integer menuId){
 		this.menuService.deleteMenuByMenuId(menuId);
 		return getSuccessResponseVO(null);
 	}
-
 }

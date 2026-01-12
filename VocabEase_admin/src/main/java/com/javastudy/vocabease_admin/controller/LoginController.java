@@ -36,7 +36,7 @@ public class LoginController extends ABaseController {
     }
 
     @RequestMapping("/login")
-    @GlobalInterceptor
+    @GlobalInterceptor(checkLogin = false)
     public ResponseVO login(HttpSession session,
                             @VerifyParam(regex = VerifyRegexEnum.PHONE) String phone,
                             @VerifyParam(required = true) String password,

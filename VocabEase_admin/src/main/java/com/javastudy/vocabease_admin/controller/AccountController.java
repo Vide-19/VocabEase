@@ -1,8 +1,10 @@
 package com.javastudy.vocabease_admin.controller;
 
+import com.javastudy.vocabease_admin.annotation.GlobalInterceptor;
 import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 import com.javastudy.vocabease_common.entity.config.AppConfig;
 import com.javastudy.vocabease_common.entity.enums.AccountStatusEnum;
+import com.javastudy.vocabease_common.entity.enums.PermissionCodeEnum;
 import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
 import com.javastudy.vocabease_common.entity.enums.VerifyRegexEnum;
 import com.javastudy.vocabease_common.entity.po.Account;
@@ -19,12 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- *  Controller
+ *  用户Controller
  */
 @RestController("accountController")
 @RequestMapping("/settings")
 public class AccountController extends com.javastudy.vocabease_admin.controller.ABaseController {
-
 	@Resource
 	private AccountService accountService;
 	@Resource
@@ -33,6 +34,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 * 根据条件分页查询
 	 */
 	@RequestMapping("/loadAccountList")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_LIST)
 	public ResponseVO loadAccountList(AccountQuery query){
 		query.setOrderBy("create_time desc");
 		query.setRolesQuery(true);
@@ -42,6 +44,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 * 保存新增或更改的用户
 	 */
 	@RequestMapping("/saveAccount")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_EDIT)
 	public ResponseVO saveAccount(@VerifyParam Account account){
 		this.accountService.saveAccount(account);
 		return getSuccessResponseVO(null);
@@ -50,6 +53,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 * 删除用户
 	 */
 	@DeleteMapping("/deleteAccount")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_DELETE)
 	public ResponseVO deleteAccount(@VerifyParam(required = true) Integer userId){
 		Account account = this.accountService.getAccountByUserId(userId);
 		if (!StringTools.isEmpty(appConfig.getSuperAdminPhone()) &&
@@ -62,6 +66,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 * 修改密码
 	 */
 	@PostMapping("/updatePassword")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_UPDATE_PASSWORD)
 	public ResponseVO updatePassword(@VerifyParam Integer userId,
 									 @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password){
 		Account account = new Account();
@@ -73,6 +78,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 * 修改状态
 	 */
 	@PostMapping("/updateStatus")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_STATUS)
 	public ResponseVO updateStatus(@VerifyParam Integer userId,
 									 @VerifyParam(required = true) Integer status){
 		AccountStatusEnum accountStatusEnum = AccountStatusEnum.getByStatus(status);

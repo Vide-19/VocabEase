@@ -2,10 +2,14 @@ package com.javastudy.vocabease_admin.aspect;
 
 import com.javastudy.vocabease_admin.annotation.GlobalInterceptor;
 import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
+import com.javastudy.vocabease_common.entity.constants.Constants;
+import com.javastudy.vocabease_common.entity.dto.SessionUserAdminDto;
+import com.javastudy.vocabease_common.entity.enums.PermissionCodeEnum;
 import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
 import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.utils.StringTools;
 import com.javastudy.vocabease_common.utils.VerifyUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,10 +18,13 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.List;
 
 //AOP切面类
 @Aspect
@@ -43,31 +50,28 @@ public class OperationAspect {
         GlobalInterceptor interceptor = method.getAnnotation(GlobalInterceptor.class);
         if (interceptor == null)
             return;
-        if (interceptor.checkParams()) {
+        if (interceptor.checkParams())
             validateParams(method, args);
-        }
-
+        //校验登录
+        if (interceptor.checkLogin())
+            checkLogin();
+        //校验权限
+        if (interceptor.permissionCode() != null && interceptor.permissionCode() != PermissionCodeEnum.NO_PERMISSION)
+            checkPermission(interceptor.permissionCode());
     }
 
     private void checkValue(Object value, VerifyParam verifyParam) {
         Boolean isEmpty = value == null || StringTools.isEmpty(value.toString());
         Integer length = value == null ? 0 : value.toString().length();
-        /**
-         * 校验空 参数空但又必须传参
-         */
+        //校验空 参数空但又必须传参
         if (isEmpty && verifyParam.required())
             throw new BusinessException(ResponseCodeEnum.CODE_600);
-        /**
-         * 校验长度
-         */
+        //校验长度
         if (!isEmpty && (verifyParam.max() != -1 && verifyParam.max() < length || verifyParam.min() != -1 && verifyParam.min() > length))
             throw new BusinessException(ResponseCodeEnum.CODE_600);
-        /**
-         * 校验正则
-         */
+         //校验正则
         if (!isEmpty && !StringTools.isEmpty(verifyParam.regex().getRegex()) && !VerifyUtil.verify(verifyParam.regex(), value.toString()))
             throw new BusinessException(ResponseCodeEnum.CODE_600);
-
     }
     /**
      * 参数校验
@@ -105,7 +109,22 @@ public class OperationAspect {
             logger.error("校验参数错误", e);
             throw new BusinessException(ResponseCodeEnum.CODE_600);
         }
-
     }
+
+    private void checkLogin() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        SessionUserAdminDto sessionUserAdminDto = (SessionUserAdminDto) request.getSession().getAttribute(Constants.SESSION_KEY);
+        if (sessionUserAdminDto == null)
+            throw new BusinessException(ResponseCodeEnum.CODE_401);
+    }
+
+    private void checkPermission(PermissionCodeEnum permissionCodeEnum) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        SessionUserAdminDto sessionUserAdminDto = (SessionUserAdminDto) request.getSession().getAttribute(Constants.SESSION_KEY);
+        List<String> permissionCodeList = sessionUserAdminDto.getPermissionCodeList();
+        if (!permissionCodeList.contains(permissionCodeEnum.getCode()))
+            throw new BusinessException(ResponseCodeEnum.CODE_403);
+    }
+
 
 }

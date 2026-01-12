@@ -2,6 +2,8 @@ package com.javastudy.vocabease_common.mappers;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 菜单表 数据库操作接口
  */
@@ -23,6 +25,10 @@ public interface MenuMapper<T,P> extends BaseMapper<T,P> {
 	 * 根据MenuId获取对象
 	 */
 	 T selectByMenuId(@Param("menuId") Integer menuId);
+	/**
+	 * 根据RoleIds获取对象
+	 */
+	List<T> selectByRoleIds(@Param("roleIds") String[] roleIds);
 
 
 }
