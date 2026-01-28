@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.Article2categoryMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.Article2category">
+		<!--文章id-->
+		<result column="article_id" property="articleId"  />
+		<!--分类id-->
+		<result column="category_id" property="categoryId"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 a.article_id,a.category_id
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.articleId != null">
+				 and  a.article_id = #{query.articleId}
+			</if>
+			<if test="query.categoryId != null">
+				 and  a.category_id = #{query.categoryId}
+			</if>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM article2category a <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM article2category a <include refid="query_condition" />
+	</select>
+
+	<!-- 查询分类id-->
+	<select id="selectCategoryIdByArticleId" resultType="java.lang.Integer" >
+		SELECT category_id FROM article2category a <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.Article2category">
+		 INSERT INTO article2category
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.articleId != null">
+				 article_id,
+			</if>
+			<if test="bean.categoryId != null">
+				 category_id,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.articleId!=null">
+				 #{bean.articleId},
+			</if>
+			<if test="bean.categoryId!=null">
+				 #{bean.categoryId},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.Article2category">
+		 INSERT INTO article2category
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.articleId != null">
+				 article_id,
+			</if>
+			<if test="bean.categoryId != null">
+				 category_id,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.articleId!=null">
+				 #{bean.articleId},
+			</if>
+			<if test="bean.categoryId!=null">
+				 #{bean.categoryId},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.articleId!=null">
+				 article_id = VALUES(article_id),
+			</if>
+			<if test="bean.categoryId!=null">
+				 category_id = VALUES(category_id),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.Article2category">
+		 INSERT INTO article2category(
+			 article_id,
+			 category_id
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.articleId},
+				 #{item.categoryId}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.Article2category">
+		 INSERT INTO article2category(
+			 article_id,
+			 category_id
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.articleId},
+				 #{item.categoryId}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			article_id = VALUES(article_id),
+			category_id = VALUES(category_id)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.Article2categoryQuery">
+		 UPDATE article2category a
+ 		 <set> 
+			<if test="bean.articleId != null">
+				 article_id = #{bean.articleId},
+			</if>
+			<if test="bean.categoryId != null">
+				 category_id = #{bean.categoryId},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete a from article2category a
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据ArticleIdAndCategoryId修改-->
+	<update id="updateByArticleIdAndCategoryId" parameterType="com.javastudy.vocabease_common.entity.po.Article2category">
+		 UPDATE article2category
+ 		 <set> 
+ 		 </set>
+ 		 where article_id=#{articleId} and category_id=#{categoryId}
+	</update>
+
+	<!-- 根据ArticleIdAndCategoryId删除-->
+	<delete id="deleteByArticleIdAndCategoryId">
+		delete from article2category where article_id=#{articleId} and category_id=#{categoryId}
+	</delete>
+
+	<!-- 根据ArticleIds删除多个对象-->
+	<delete id="deleteByArticleIds">
+		delete from article2category where article_id in <foreach collection="articleIds" separator="," item="item">#{item}</foreach>
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByArticleIdAndCategoryId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from article2category a where article_id=#{articleId} and category_id=#{categoryId}
+	</select>
+
+</mapper>

@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.ArticleMapper">
+
+    <!--实体映射-->
+    <resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.Article">
+        <!--文章id-->
+        <id column="article_id" property="articleId"/>
+        <!--标题-->
+        <result column="title" property="title"/>
+        <!--难度-->
+        <result column="level" property="level"/>
+        <!--正文-->
+        <result column="body" property="body"/>
+        <!--翻译-->
+        <result column="translation" property="translation"/>
+        <!--创建时间-->
+        <result column="create_time" property="createTime"/>
+        <!--状态 0未发布 1已发布-->
+        <result column="status" property="status"/>
+        <!--作者id-->
+        <result column="creater_id" property="createrId"/>
+        <!--浏览量-->
+        <result column="read_count" property="readCount"/>
+        <!--收藏数-->
+        <result column="collect_count" property="collectCount"/>
+        <!--发布类型 0内部 1外部-->
+        <result column="post_type" property="postType"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列-->
+    <sql id="base_column_list">
+        a.article_id,a.title,a.level,
+		 a.create_time,a.status,a.creater_id,a.read_count,a.collect_count,
+		 a.post_type
+    </sql>
+
+    <sql id="base_condition_filed">
+        <if test="query.articleId != null">
+            and a.article_id = #{query.articleId}
+        </if>
+        <if test="query.title != null and query.title!=''">
+            and a.title = #{query.title}
+        </if>
+        <if test="query.level != null">
+            and a.level = #{query.level}
+        </if>
+        <if test="query.body != null and query.body!=''">
+            and a.body = #{query.body}
+        </if>
+        <if test="query.translation != null and query.translation!=''">
+            and a.translation = #{query.translation}
+        </if>
+        <if test="query.createTime != null and query.createTime!=''">
+            <![CDATA[ and  a.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.status != null">
+            and a.status = #{query.status}
+        </if>
+        <if test="query.createrId != null and query.createrId!=''">
+            and a.creater_id = #{query.createrId}
+        </if>
+        <if test="query.readCount != null">
+            and a.read_count = #{query.readCount}
+        </if>
+        <if test="query.collectCount != null">
+            and a.collect_count = #{query.collectCount}
+        </if>
+        <if test="query.postType != null">
+            and a.post_type = #{query.postType}
+        </if>
+    </sql>
+
+    <!-- 通用查询条件列-->
+    <sql id="query_condition">
+        <where>
+            <include refid="base_condition_filed"/>
+            <if test="query.titleFuzzy!= null  and query.titleFuzzy!=''">
+                and a.title like concat('%', #{query.titleFuzzy}, '%')
+            </if>
+            <if test="query.bodyFuzzy!= null  and query.bodyFuzzy!=''">
+                and a.body like concat('%', #{query.bodyFuzzy}, '%')
+            </if>
+            <if test="query.translationFuzzy!= null  and query.translationFuzzy!=''">
+                and a.translation like concat('%', #{query.translationFuzzy}, '%')
+            </if>
+            <if test="query.createTimeStart!= null and query.createTimeStart!=''">
+                <![CDATA[ and  a.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
+            </if>
+            <if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
+                <![CDATA[ and  a.create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+            </if>
+            <if test="query.createrIdFuzzy!= null  and query.createrIdFuzzy!=''">
+                and a.creater_id like concat('%', #{query.createrIdFuzzy}, '%')
+            </if>
+            <if test="query.articleIds！= null and query.articleIds.length>0">
+                and articleIds in(<foreach collection="query.articleIds" separator="," item="item">#{item}</foreach> )
+            </if>
+            <if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
+                <![CDATA[and articleId<#{query.currentId} order by desc]]>
+            </if>
+            <if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
+                <![CDATA[and articleId>#{query.currentId} order by asc]]>
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询集合-->
+    <select id="selectList" resultMap="base_result_map">
+        SELECT
+        <include refid="base_column_list"/>
+        <if test="query.queryBodyContent!=null and query.queryBodyContent">
+            ,body,translation
+        </if>
+        FROM article a
+        <include refid="query_condition"/>
+        <if test="query.orderBy!=null">
+            order by ${query.orderBy}
+        </if>
+        <if test="query.simplePage!=null">
+            limit #{query.simplePage.start},#{query.simplePage.end}
+        </if>
+    </select>
+
+    <!-- 查询数量-->
+    <select id="selectCount" resultType="java.lang.Integer">
+        SELECT count(1) FROM article a
+        <include refid="query_condition"/>
+    </select>
+
+    <!-- 插入 （匹配有值的字段）-->
+    <insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.Article">
+        <selectKey keyProperty="bean.articleId" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.title != null">
+                title,
+            </if>
+            <if test="bean.level != null">
+                level,
+            </if>
+            <if test="bean.body != null">
+                body,
+            </if>
+            <if test="bean.translation != null">
+                translation,
+            </if>
+            <if test="bean.createTime != null">
+                create_time,
+            </if>
+            <if test="bean.status != null">
+                status,
+            </if>
+            <if test="bean.createrId != null">
+                creater_id,
+            </if>
+            <if test="bean.readCount != null">
+                read_count,
+            </if>
+            <if test="bean.collectCount != null">
+                collect_count,
+            </if>
+            <if test="bean.postType != null">
+                post_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.title!=null">
+                #{bean.title},
+            </if>
+            <if test="bean.level!=null">
+                #{bean.level},
+            </if>
+            <if test="bean.body!=null">
+                #{bean.body},
+            </if>
+            <if test="bean.translation!=null">
+                #{bean.translation},
+            </if>
+            <if test="bean.createTime!=null">
+                #{bean.createTime},
+            </if>
+            <if test="bean.status!=null">
+                #{bean.status},
+            </if>
+            <if test="bean.createrId!=null">
+                #{bean.createrId},
+            </if>
+            <if test="bean.readCount!=null">
+                #{bean.readCount},
+            </if>
+            <if test="bean.collectCount!=null">
+                #{bean.collectCount},
+            </if>
+            <if test="bean.postType!=null">
+                #{bean.postType},
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 插入或者更新 （匹配有值的字段）-->
+    <insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.Article">
+        INSERT INTO article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.articleId != null">
+                article_id,
+            </if>
+            <if test="bean.title != null">
+                title,
+            </if>
+            <if test="bean.level != null">
+                level,
+            </if>
+            <if test="bean.body != null">
+                body,
+            </if>
+            <if test="bean.translation != null">
+                translation,
+            </if>
+            <if test="bean.createTime != null">
+                create_time,
+            </if>
+            <if test="bean.status != null">
+                status,
+            </if>
+            <if test="bean.createrId != null">
+                creater_id,
+            </if>
+            <if test="bean.readCount != null">
+                read_count,
+            </if>
+            <if test="bean.collectCount != null">
+                collect_count,
+            </if>
+            <if test="bean.postType != null">
+                post_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.articleId!=null">
+                #{bean.articleId},
+            </if>
+            <if test="bean.title!=null">
+                #{bean.title},
+            </if>
+            <if test="bean.level!=null">
+                #{bean.level},
+            </if>
+            <if test="bean.body!=null">
+                #{bean.body},
+            </if>
+            <if test="bean.translation!=null">
+                #{bean.translation},
+            </if>
+            <if test="bean.createTime!=null">
+                #{bean.createTime},
+            </if>
+            <if test="bean.status!=null">
+                #{bean.status},
+            </if>
+            <if test="bean.createrId!=null">
+                #{bean.createrId},
+            </if>
+            <if test="bean.readCount!=null">
+                #{bean.readCount},
+            </if>
+            <if test="bean.collectCount!=null">
+                #{bean.collectCount},
+            </if>
+            <if test="bean.postType!=null">
+                #{bean.postType},
+            </if>
+        </trim>
+        on DUPLICATE key update
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="bean.title!=null">
+                title = VALUES(title),
+            </if>
+            <if test="bean.level!=null">
+                level = VALUES(level),
+            </if>
+            <if test="bean.body!=null">
+                body = VALUES(body),
+            </if>
+            <if test="bean.translation!=null">
+                translation = VALUES(translation),
+            </if>
+            <if test="bean.createTime!=null">
+                create_time = VALUES(create_time),
+            </if>
+            <if test="bean.status!=null">
+                status = VALUES(status),
+            </if>
+            <if test="bean.createrId!=null">
+                creater_id = VALUES(creater_id),
+            </if>
+            <if test="bean.readCount!=null">
+                read_count = VALUES(read_count),
+            </if>
+            <if test="bean.collectCount!=null">
+                collect_count = VALUES(collect_count),
+            </if>
+            <if test="bean.postType!=null">
+                post_type = VALUES(post_type),
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 添加 （批量插入）-->
+    <insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.Article" useGeneratedKeys="true"
+            keyProperty="articleId">
+        INSERT INTO article(
+        title,
+        level,
+        body,
+        translation,
+        create_time,
+        status,
+        creater_id,
+        read_count,
+        collect_count,
+        post_type
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.title},
+            #{item.level},
+            #{item.body},
+            #{item.translation},
+            #{item.createTime},
+            #{item.status},
+            #{item.createrId},
+            #{item.readCount},
+            #{item.collectCount},
+            #{item.postType}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 批量新增修改 （批量插入）-->
+    <insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.Article">
+        INSERT INTO article(
+        title,
+        level,
+        body,
+        translation,
+        create_time,
+        status,
+        creater_id,
+        read_count,
+        collect_count,
+        post_type
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.title},
+            #{item.level},
+            #{item.body},
+            #{item.translation},
+            #{item.createTime},
+            #{item.status},
+            #{item.createrId},
+            #{item.readCount},
+            #{item.collectCount},
+            #{item.postType}
+            )
+        </foreach>
+        on DUPLICATE key update
+        title = VALUES(title),
+        level = VALUES(level),
+        body = VALUES(body),
+        translation = VALUES(translation),
+        create_time = VALUES(create_time),
+        status = VALUES(status),
+        creater_id = VALUES(creater_id),
+        read_count = VALUES(read_count),
+        collect_count = VALUES(collect_count),
+        post_type = VALUES(post_type)
+    </insert>
+
+    <!--多条件修改-->
+    <update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.ArticleQuery">
+        UPDATE article a
+        <set>
+            <if test="bean.title != null">
+                title = #{bean.title},
+            </if>
+            <if test="bean.level != null">
+                level = #{bean.level},
+            </if>
+            <if test="bean.body != null">
+                body = #{bean.body},
+            </if>
+            <if test="bean.translation != null">
+                translation = #{bean.translation},
+            </if>
+            <if test="bean.createTime != null">
+                create_time = #{bean.createTime},
+            </if>
+            <if test="bean.status != null">
+                status = #{bean.status},
+            </if>
+            <if test="bean.createrId != null">
+                creater_id = #{bean.createrId},
+            </if>
+            <if test="bean.readCount != null">
+                read_count = #{bean.readCount},
+            </if>
+            <if test="bean.collectCount != null">
+                collect_count = #{bean.collectCount},
+            </if>
+            <if test="bean.postType != null">
+                post_type = #{bean.postType},
+            </if>
+        </set>
+        <include refid="query_condition"/>
+    </update>
+
+    <!--多条件删除-->
+    <delete id="deleteByParam">
+        delete a from article a
+        <include refid="query_condition"/>
+    </delete>
+
+    <!-- 根据ArticleId修改-->
+    <update id="updateByArticleId" parameterType="com.javastudy.vocabease_common.entity.po.Article">
+        UPDATE article
+        <set>
+            <if test="bean.title != null">
+                title = #{bean.title},
+            </if>
+            <if test="bean.level != null">
+                level = #{bean.level},
+            </if>
+            <if test="bean.body != null">
+                body = #{bean.body},
+            </if>
+            <if test="bean.translation != null">
+                translation = #{bean.translation},
+            </if>
+            <if test="bean.createTime != null">
+                create_time = #{bean.createTime},
+            </if>
+            <if test="bean.status != null">
+                status = #{bean.status},
+            </if>
+            <if test="bean.createrId != null">
+                creater_id = #{bean.createrId},
+            </if>
+            <if test="bean.readCount != null">
+                read_count = #{bean.readCount},
+            </if>
+            <if test="bean.collectCount != null">
+                collect_count = #{bean.collectCount},
+            </if>
+            <if test="bean.postType != null">
+                post_type = #{bean.postType},
+            </if>
+        </set>
+        where article_id=#{articleId}
+    </update>
+
+    <!-- 根据ArticleId删除-->
+    <delete id="deleteByArticleId">
+        delete
+        from article
+        where article_id = #{articleId}
+    </delete>
+
+    <!-- 根据ArticleIds删除多个对象-->
+    <delete id="deleteByArticleIds">
+        delete from article where article_id in
+        <foreach collection="articleIds" separator="," item="item">#{item}</foreach>
+        and status=#{status}
+        <if test="userId!=null">and creater_id = #{userId}</if>
+    </delete>
+
+    <!-- 根据PrimaryKey获取对象-->
+    <select id="selectByArticleId" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from article a where article_id=#{articleId}
+    </select>
+
+    <select id="showArticleNext" resultMap="base_result_map">
+        select * from article
+        <include refid="query_condition"/>
+        limit 0,1
+    </select>
+
+    <update id="updateCount">
+        update article
+        <set>
+            <if test="readCount!=null">
+                read_count = read_count+#{readCount},
+            </if>
+            <if test="collectCount!=null">
+                collect_count = collect_count+#{collectCount},
+            </if>
+        </set>
+        <where>
+            article_id=#{articleId}
+        </where>
+    </update>
+
+</mapper>

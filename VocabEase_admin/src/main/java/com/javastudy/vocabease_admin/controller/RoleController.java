@@ -30,7 +30,7 @@ public class RoleController extends ABaseController {
 		return getSuccessResponseVO(roleService.findListByPage(query));
 	}
 	/**
-	 * 保存新增的角色
+	 * 新增、修改角色
 	 */
 	@RequestMapping("/saveRole")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ROLE_EDIT)

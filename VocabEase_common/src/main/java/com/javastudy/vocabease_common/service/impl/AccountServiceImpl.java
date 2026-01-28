@@ -179,7 +179,7 @@ public class AccountServiceImpl implements AccountService {
         SessionUserAdminDto sessionUserAdminDto = new SessionUserAdminDto();
         sessionUserAdminDto.setUserId(account.getUserId());
         sessionUserAdminDto.setUserName(account.getUserName());
-        List<Menu> menuList = new ArrayList<>();
+        List<Menu> menuList;
         if (!StringTools.isEmpty(appConfig.getSuperAdminPhone()) &&
                 ArrayUtils.contains(appConfig.getSuperAdminPhone().split(","), phone)) {
             sessionUserAdminDto.setSuperAdmin(true);

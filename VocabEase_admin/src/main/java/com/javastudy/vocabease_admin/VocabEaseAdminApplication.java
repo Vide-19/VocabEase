@@ -4,6 +4,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 @SpringBootApplication
 @MapperScan("com.javastudy.vocabease_common.mappers")
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
         "com.javastudy.vocabease_admin",
         "com.javastudy.vocabease_common"  // ← 显式包含 common 模块
 })
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 2400, redisNamespace = "vocabEase:session")
 public class VocabEaseAdminApplication {
     public static void main(String[] args) {
         SpringApplication.run(VocabEaseAdminApplication.class, args);

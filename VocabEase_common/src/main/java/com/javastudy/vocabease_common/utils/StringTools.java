@@ -1,5 +1,7 @@
 package com.javastudy.vocabease_common.utils;
+
 import com.javastudy.vocabease_common.exception.BusinessException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.util.DigestUtils;
 
 import java.lang.reflect.Field;
@@ -58,5 +60,30 @@ public class StringTools {
             return str;
         else
             return DigestUtils.md5DigestAsHex(str.getBytes());
+    }
+    /**
+     * 获取文件后缀
+     */
+    public static String getFileSuffix(String fileName) {
+        Integer index = fileName.lastIndexOf(".");
+        if (index == -1)
+            return "";
+        return fileName.substring(index);
+    }
+    /**
+     * 随机数
+     */
+    public static String getRandomString(int length) {
+        return RandomStringUtils.random(length, true, true);
+    }
+    /**
+     * 避免读到其它文件
+     */
+    public static boolean pathIsRight(String path) {
+        if (isEmpty(path))
+            return true;
+        if (path.contains("../") || path.contains("..\\"))
+            return false;
+        return true;
     }
 }

@@ -34,7 +34,7 @@ public class MenuController extends ABaseController{
 		return getSuccessResponseVO(menuList);
 	}
 	/**
-	 * 保存更改的菜单
+	 * 新增、修改菜单
 	 */
 	@RequestMapping("/saveMenu")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_MENU_EDIT)

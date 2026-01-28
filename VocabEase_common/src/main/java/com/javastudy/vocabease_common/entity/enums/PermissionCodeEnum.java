@@ -25,7 +25,7 @@ public enum PermissionCodeEnum {
     CONTENT("content", "内容管理"),
 
     CATEGORY_LIST("category_list", "分类列表"),
-    CATEGORY_EDIT("category_edit", "新增/修改/删除"),
+    CATEGORY_EDIT("category_edit", "新增/修改"),
     CATEGORY_DELETE("category_delete", "删除"),
 
     QUESTION_LIST("question_list", "问题列表"),
@@ -35,12 +35,12 @@ public enum PermissionCodeEnum {
     QUESTION_DELETE("question_delete", "取消"),
     QUESTION_DELETE_BATCH("question_delete_batch", "批量取消"),
 
-    EXAM_LIST("exam_list", "测试列表"),
-    EXAM_EDIT("exam_edit", "新增/修改"),
-    EXAM_IMPORT("exam_import", "导入"),
-    EXAM_POST("exam_post", "发布"),
-    EXAM_DELETE("exam_delete", "取消"),
-    EXAM_DELETE_BATCH("exam_delete_batch", "批量取消"),
+    ARTICLE_LIST("article_list", "文章列表"),
+    ARTICLE_EDIT("article_edit", "新增/修改"),
+    ARTICLE_IMPORT("article_import", "导入"),
+    ARTICLE_POST("article_post", "发布"),
+    ARTICLE_DELETE("article_delete", "取消"),
+    ARTICLE_DELETE_BATCH("article_delete_batch", "批量取消"),
 
     SHARE_LIST("share_list", "笔记列表"),
     SHARE_EDIT("share_edit", "新增/修改"),

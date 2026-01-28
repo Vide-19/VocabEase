@@ -1,7 +1,11 @@
 package com.javastudy.vocabease_admin.controller;
+
+import com.javastudy.vocabease_common.entity.constants.Constants;
+import com.javastudy.vocabease_common.entity.dto.SessionUserAdminDto;
 import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.exception.BusinessException;
+import jakarta.servlet.http.HttpSession;
 
 
 public class ABaseController {
@@ -10,7 +14,7 @@ public class ABaseController {
 
     protected static final String STATUC_ERROR = "error";
 
-    protected <T> ResponseVO getSuccessResponseVO(T t) {
+    protected <T> ResponseVO<T> getSuccessResponseVO(T t) {
         ResponseVO<T> responseVO = new ResponseVO<>();
         responseVO.setStatus(STATUC_SUCCESS);
         responseVO.setCode(ResponseCodeEnum.CODE_200.getCode());
@@ -19,7 +23,7 @@ public class ABaseController {
         return responseVO;
     }
 
-    protected <T> ResponseVO getBusinessErrorResponseVO(BusinessException e, T t) {
+    protected <T> ResponseVO<T> getBusinessErrorResponseVO(BusinessException e, T t) {
         ResponseVO<T> vo = new ResponseVO<>();
         vo.setStatus(STATUC_ERROR);
         if (e.getCode() == null) {
@@ -32,12 +36,16 @@ public class ABaseController {
         return vo;
     }
 
-    protected <T> ResponseVO getServerErrorResponseVO(T t) {
+    protected <T> ResponseVO<T> getServerErrorResponseVO(T t) {
         ResponseVO<T> vo = new ResponseVO<>();
         vo.setStatus(STATUC_ERROR);
         vo.setCode(ResponseCodeEnum.CODE_500.getCode());
         vo.setInfo(ResponseCodeEnum.CODE_500.getMsg());
         vo.setData(t);
         return vo;
+    }
+
+    protected SessionUserAdminDto getSessionUserAdminDto(HttpSession session) {
+        return (SessionUserAdminDto)session.getAttribute(Constants.SESSION_KEY);
     }
 }

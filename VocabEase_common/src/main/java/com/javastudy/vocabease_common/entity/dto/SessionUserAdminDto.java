@@ -2,9 +2,13 @@ package com.javastudy.vocabease_common.entity.dto;
 
 import com.javastudy.vocabease_common.entity.vo.MenuVO;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
-public class SessionUserAdminDto {
+public class SessionUserAdminDto implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 2733702841667793026L;
     private Integer userId;
     private String userName;
     private Boolean superAdmin;

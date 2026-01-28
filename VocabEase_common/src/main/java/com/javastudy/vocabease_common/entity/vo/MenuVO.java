@@ -1,9 +1,13 @@
 package com.javastudy.vocabease_common.entity.vo;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
-public class MenuVO {
+public class MenuVO implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 4213846188019786062L;
     /**
      * 菜单名
      */
