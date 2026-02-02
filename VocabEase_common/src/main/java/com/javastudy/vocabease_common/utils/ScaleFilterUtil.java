@@ -1,14 +1,16 @@
 package com.javastudy.vocabease_common.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class ScaleFilterUtil {
-    private static final Logger logger = Logger.getLogger(ScaleFilterUtil.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ScaleFilterUtil.class);
     /**
      * 生成指定尺寸的 JPEG 缩略图
      * @param file             源图片文件（必须是可读的本地图片）
@@ -55,7 +57,7 @@ public class ScaleFilterUtil {
             ImageIO.write(dst, "jpeg", targetFile);
             return true;
         } catch (IOException e) {
-            logger.warning("生成缩略图失败");
+            logger.error("生成缩略图失败");
         }
         return false;
     }

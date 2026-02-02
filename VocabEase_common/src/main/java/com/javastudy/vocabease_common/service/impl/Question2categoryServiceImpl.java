@@ -125,4 +125,14 @@ public class Question2categoryServiceImpl implements Question2categoryService {
 	public Integer deleteQuestion2categoryByQuestionIdAndCategoryId(Integer questionId, Integer categoryId) {
 		return this.question2categoryMapper.deleteByQuestionIdAndCategoryId(questionId, categoryId);
 	}
+
+	@Override
+	public Integer getCategoryIdByQuestionId(Integer questionId) {
+		return this.question2categoryMapper.selectCategoryIdByQuestionId(questionId);
+	}
+
+	@Override
+	public void deleteQuestion2categoryByQuestionIds(String[] questionIds) {
+		this.question2categoryMapper.deleteByQuestionIds(questionIds);
+	}
 }

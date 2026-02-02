@@ -36,6 +36,16 @@
         <!-- <prudent>false</prudent> -->
     </appender>
 
+    <logger name="io.lettuce.core.protocol" level="error" additivty="true">
+        <appender-ref ref="stdot"/>
+        <appender-ref ref="file"/>
+    </logger>
+
+    <logger name="org.springframework.data.redis" level="error" additivty="true">
+        <appender-ref ref="stdot"/>
+        <appender-ref ref="file"/>
+    </logger>
+
     <!-- 设置 root 日志级别 -->
     <root level="${log.root.level}">
         <appender-ref ref="stdot"/>

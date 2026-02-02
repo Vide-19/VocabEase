@@ -50,12 +50,10 @@ public class ArticleServiceImpl implements ArticleService {
 	public List<Article> findListByParam(ArticleQuery param) {
 		return this.articleMapper.selectList(param);
 	}
-
 	@Override
 	public Integer findCountByParam(ArticleQuery param) {
 		return this.articleMapper.selectCount(param);
 	}
-
 	/**
 	 * 分页查询方法
 	 */
@@ -70,7 +68,6 @@ public class ArticleServiceImpl implements ArticleService {
 		PaginationResultVO<Article> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
-
 	/**
 	 * 新增
 	 */
@@ -78,7 +75,6 @@ public class ArticleServiceImpl implements ArticleService {
 	public Integer add(Article bean) {
 		return this.articleMapper.insert(bean);
 	}
-
 	/**
 	 * 批量新增
 	 */
@@ -89,7 +85,6 @@ public class ArticleServiceImpl implements ArticleService {
 		}
 		return this.articleMapper.insertBatch(listBean);
 	}
-
 	/**
 	 * 批量新增或者修改
 	 */
@@ -100,7 +95,6 @@ public class ArticleServiceImpl implements ArticleService {
 		}
 		return this.articleMapper.insertOrUpdateBatch(listBean);
 	}
-
 	/**
 	 * 多条件更新
 	 */
@@ -109,7 +103,6 @@ public class ArticleServiceImpl implements ArticleService {
 		StringTools.checkParam(param);
 		return this.articleMapper.updateByParam(bean, param);
 	}
-
 	/**
 	 * 多条件删除
 	 */
@@ -118,7 +111,6 @@ public class ArticleServiceImpl implements ArticleService {
 		StringTools.checkParam(param);
 		return this.articleMapper.deleteByParam(param);
 	}
-
 	/**
 	 * 根据ArticleId获取对象
 	 */
@@ -126,7 +118,6 @@ public class ArticleServiceImpl implements ArticleService {
 	public Article getArticleByArticleId(Integer articleId) {
 		return this.articleMapper.selectByArticleId(articleId);
 	}
-
 	/**
 	 * 根据ArticleId修改
 	 */

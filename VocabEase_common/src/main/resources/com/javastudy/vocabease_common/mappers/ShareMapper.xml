@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.ShareMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.Share">
+		<!--笔记id-->
+		<id column="share_id" property="shareId"  />
+		<!--标题-->
+		<result column="title" property="title"  />
+		<!--内容-->
+		<result column="content" property="content"  />
+		<!--笔记类别 0无封面 1横幅 2小图标-->
+		<result column="cover_type" property="coverType"  />
+		<!--封面路径-->
+		<result column="cover_path" property="coverPath"  />
+		<!--创建时间-->
+		<result column="create_time" property="createTime"  />
+		<!--状态 0未发布 1已发布-->
+		<result column="status" property="status"  />
+		<!--作者id-->
+		<result column="creater_id" property="createrId"  />
+		<!--浏览量-->
+		<result column="read_count" property="readCount"  />
+		<!--收藏数-->
+		<result column="collect_count" property="collectCount"  />
+		<!--发布类型 0内部 1外部-->
+		<result column="post_type" property="postType"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 s.share_id,s.title,s.content,s.cover_type,s.cover_path,
+		 s.create_time,s.status,s.creater_id,s.read_count,s.collect_count,
+		 s.post_type
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.shareId != null">
+				 and  s.share_id = #{query.shareId}
+			</if>
+			<if test="query.title != null and query.title!=''">
+				 and  s.title = #{query.title}
+			</if>
+			<if test="query.content != null and query.content!=''">
+				 and  s.content = #{query.content}
+			</if>
+			<if test="query.coverType != null">
+				 and  s.cover_type = #{query.coverType}
+			</if>
+			<if test="query.coverPath != null and query.coverPath!=''">
+				 and  s.cover_path = #{query.coverPath}
+			</if>
+			<if test="query.createTime != null and query.createTime!=''">
+				 <![CDATA[ and  s.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.status != null">
+				 and  s.status = #{query.status}
+			</if>
+			<if test="query.createrId != null and query.createrId!=''">
+				 and  s.creater_id = #{query.createrId}
+			</if>
+			<if test="query.readCount != null">
+				 and  s.read_count = #{query.readCount}
+			</if>
+			<if test="query.collectCount != null">
+				 and  s.collect_count = #{query.collectCount}
+			</if>
+			<if test="query.postType != null">
+				 and  s.post_type = #{query.postType}
+			</if>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.titleFuzzy!= null  and query.titleFuzzy!=''">
+				 and  s.title like concat('%', #{query.titleFuzzy}, '%')
+			</if>
+			<if test="query.contentFuzzy!= null  and query.contentFuzzy!=''">
+				 and  s.content like concat('%', #{query.contentFuzzy}, '%')
+			</if>
+			<if test="query.coverPathFuzzy!= null  and query.coverPathFuzzy!=''">
+				 and  s.cover_path like concat('%', #{query.coverPathFuzzy}, '%')
+			</if>
+			<if test="query.createTimeStart!= null and query.createTimeStart!=''">
+				 <![CDATA[ and  s.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
+				 <![CDATA[ and  s.create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.createrIdFuzzy!= null  and query.createrIdFuzzy!=''">
+				 and  s.creater_id like concat('%', #{query.createrIdFuzzy}, '%')
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM share s <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM share s <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.Share">
+		<selectKey keyProperty="bean.shareId" resultType="Integer" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		 INSERT INTO share
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.title != null">
+				 title,
+			</if>
+			<if test="bean.content != null">
+				 content,
+			</if>
+			<if test="bean.coverType != null">
+				 cover_type,
+			</if>
+			<if test="bean.coverPath != null">
+				 cover_path,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+			<if test="bean.status != null">
+				 status,
+			</if>
+			<if test="bean.createrId != null">
+				 creater_id,
+			</if>
+			<if test="bean.readCount != null">
+				 read_count,
+			</if>
+			<if test="bean.collectCount != null">
+				 collect_count,
+			</if>
+			<if test="bean.postType != null">
+				 post_type,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.title!=null">
+				 #{bean.title},
+			</if>
+			<if test="bean.content!=null">
+				 #{bean.content},
+			</if>
+			<if test="bean.coverType!=null">
+				 #{bean.coverType},
+			</if>
+			<if test="bean.coverPath!=null">
+				 #{bean.coverPath},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+			<if test="bean.status!=null">
+				 #{bean.status},
+			</if>
+			<if test="bean.createrId!=null">
+				 #{bean.createrId},
+			</if>
+			<if test="bean.readCount!=null">
+				 #{bean.readCount},
+			</if>
+			<if test="bean.collectCount!=null">
+				 #{bean.collectCount},
+			</if>
+			<if test="bean.postType!=null">
+				 #{bean.postType},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.Share">
+		 INSERT INTO share
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.shareId != null">
+				 share_id,
+			</if>
+			<if test="bean.title != null">
+				 title,
+			</if>
+			<if test="bean.content != null">
+				 content,
+			</if>
+			<if test="bean.coverType != null">
+				 cover_type,
+			</if>
+			<if test="bean.coverPath != null">
+				 cover_path,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+			<if test="bean.status != null">
+				 status,
+			</if>
+			<if test="bean.createrId != null">
+				 creater_id,
+			</if>
+			<if test="bean.readCount != null">
+				 read_count,
+			</if>
+			<if test="bean.collectCount != null">
+				 collect_count,
+			</if>
+			<if test="bean.postType != null">
+				 post_type,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.shareId!=null">
+				 #{bean.shareId},
+			</if>
+			<if test="bean.title!=null">
+				 #{bean.title},
+			</if>
+			<if test="bean.content!=null">
+				 #{bean.content},
+			</if>
+			<if test="bean.coverType!=null">
+				 #{bean.coverType},
+			</if>
+			<if test="bean.coverPath!=null">
+				 #{bean.coverPath},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+			<if test="bean.status!=null">
+				 #{bean.status},
+			</if>
+			<if test="bean.createrId!=null">
+				 #{bean.createrId},
+			</if>
+			<if test="bean.readCount!=null">
+				 #{bean.readCount},
+			</if>
+			<if test="bean.collectCount!=null">
+				 #{bean.collectCount},
+			</if>
+			<if test="bean.postType!=null">
+				 #{bean.postType},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.title!=null">
+				 title = VALUES(title),
+			</if>
+			<if test="bean.content!=null">
+				 content = VALUES(content),
+			</if>
+			<if test="bean.coverType!=null">
+				 cover_type = VALUES(cover_type),
+			</if>
+			<if test="bean.coverPath!=null">
+				 cover_path = VALUES(cover_path),
+			</if>
+			<if test="bean.createTime!=null">
+				 create_time = VALUES(create_time),
+			</if>
+			<if test="bean.status!=null">
+				 status = VALUES(status),
+			</if>
+			<if test="bean.createrId!=null">
+				 creater_id = VALUES(creater_id),
+			</if>
+			<if test="bean.readCount!=null">
+				 read_count = VALUES(read_count),
+			</if>
+			<if test="bean.collectCount!=null">
+				 collect_count = VALUES(collect_count),
+			</if>
+			<if test="bean.postType!=null">
+				 post_type = VALUES(post_type),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.Share" useGeneratedKeys="true" keyProperty="shareId">
+		 INSERT INTO share(
+			 title,
+			 content,
+			 cover_type,
+			 cover_path,
+			 create_time,
+			 status,
+			 creater_id,
+			 read_count,
+			 collect_count,
+			 post_type
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.title},
+				 #{item.content},
+				 #{item.coverType},
+				 #{item.coverPath},
+				 #{item.createTime},
+				 #{item.status},
+				 #{item.createrId},
+				 #{item.readCount},
+				 #{item.collectCount},
+				 #{item.postType}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.Share">
+		 INSERT INTO share(
+			 title,
+			 content,
+			 cover_type,
+			 cover_path,
+			 create_time,
+			 status,
+			 creater_id,
+			 read_count,
+			 collect_count,
+			 post_type
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.title},
+				 #{item.content},
+				 #{item.coverType},
+				 #{item.coverPath},
+				 #{item.createTime},
+				 #{item.status},
+				 #{item.createrId},
+				 #{item.readCount},
+				 #{item.collectCount},
+				 #{item.postType}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			title = VALUES(title),
+			content = VALUES(content),
+			cover_type = VALUES(cover_type),
+			cover_path = VALUES(cover_path),
+			create_time = VALUES(create_time),
+			status = VALUES(status),
+			creater_id = VALUES(creater_id),
+			read_count = VALUES(read_count),
+			collect_count = VALUES(collect_count),
+			post_type = VALUES(post_type)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.ShareQuery">
+		 UPDATE share s
+ 		 <set> 
+			<if test="bean.title != null">
+				 title = #{bean.title},
+			</if>
+			<if test="bean.content != null">
+				 content = #{bean.content},
+			</if>
+			<if test="bean.coverType != null">
+				 cover_type = #{bean.coverType},
+			</if>
+			<if test="bean.coverPath != null">
+				 cover_path = #{bean.coverPath},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+			<if test="bean.status != null">
+				 status = #{bean.status},
+			</if>
+			<if test="bean.createrId != null">
+				 creater_id = #{bean.createrId},
+			</if>
+			<if test="bean.readCount != null">
+				 read_count = #{bean.readCount},
+			</if>
+			<if test="bean.collectCount != null">
+				 collect_count = #{bean.collectCount},
+			</if>
+			<if test="bean.postType != null">
+				 post_type = #{bean.postType},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete s from share s
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据ShareId修改-->
+	<update id="updateByShareId" parameterType="com.javastudy.vocabease_common.entity.po.Share">
+		 UPDATE share
+ 		 <set> 
+			<if test="bean.title != null">
+				 title = #{bean.title},
+			</if>
+			<if test="bean.content != null">
+				 content = #{bean.content},
+			</if>
+			<if test="bean.coverType != null">
+				 cover_type = #{bean.coverType},
+			</if>
+			<if test="bean.coverPath != null">
+				 cover_path = #{bean.coverPath},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+			<if test="bean.status != null">
+				 status = #{bean.status},
+			</if>
+			<if test="bean.createrId != null">
+				 creater_id = #{bean.createrId},
+			</if>
+			<if test="bean.readCount != null">
+				 read_count = #{bean.readCount},
+			</if>
+			<if test="bean.collectCount != null">
+				 collect_count = #{bean.collectCount},
+			</if>
+			<if test="bean.postType != null">
+				 post_type = #{bean.postType},
+			</if>
+ 		 </set>
+ 		 where share_id=#{shareId}
+	</update>
+
+	<!-- 根据ShareId删除-->
+	<delete id="deleteByShareId">
+		delete from share where share_id=#{shareId}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByShareId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from share s where share_id=#{shareId}
+	</select>
+
+</mapper>

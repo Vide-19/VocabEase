@@ -24,5 +24,9 @@ public interface Question2categoryMapper<T,P> extends BaseMapper<T,P> {
 	 */
 	 T selectByQuestionIdAndCategoryId(@Param("questionId") Integer questionId,@Param("categoryId") Integer categoryId);
 
-
+	 Integer selectCategoryIdByQuestionId(@Param("questionId") Integer questionId);
+	/**
+	 * 根据questionIds删除多个对象
+	 */
+	void deleteByQuestionIds(@Param("questionIds") String[] questionIds);
 }

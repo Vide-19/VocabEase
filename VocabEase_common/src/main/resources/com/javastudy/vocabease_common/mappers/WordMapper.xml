@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.WordMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.Word">
+		<!--单词ID-->
+		<id column="word_id" property="wordId"  />
+		<!--单词本身（英文）-->
+		<result column="word" property="word"  />
+		<!--音标（如 /ˈæpl/）-->
+		<result column="phonetic" property="phonetic"  />
+		<!--词性（n./v./adj.）-->
+		<result column="part_of_speech" property="partOfSpeech"  />
+		<!--中文释义（主释义，可存JSON或分表）-->
+		<result column="definition" property="definition"  />
+		<!--例句（英文 + 中文，可用分隔符或JSON）-->
+		<result column="example_sentence" property="exampleSentence"  />
+		<!--发音音频URL（可为空）-->
+		<result column="audio_url" property="audioUrl"  />
+		<!--配图URL（用于视觉记忆）-->
+		<result column="image_url" property="imageUrl"  />
+		<!--难度-->
+		<result column="level" property="level"  />
+		<!--状态：0-禁用，1-启用-->
+		<result column="status" property="status"  />
+		<!--创建者ID（管理员）-->
+		<result column="creator_id" property="creatorId"  />
+		<!--创建时间-->
+		<result column="create_time" property="createTime"  />
+		<!--更新时间-->
+		<result column="update_time" property="updateTime"  />
+		<!--发布类型 0内部 1外部-->
+		<result column="post_type" property="postType"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 w.word_id,w.word,w.phonetic,w.part_of_speech,w.definition,
+		 w.example_sentence,w.audio_url,w.image_url,w.level,w.status,
+		 w.creator_id,w.create_time,w.update_time,w.post_type
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.wordId != null">
+				 and  w.word_id = #{query.wordId}
+			</if>
+			<if test="query.word != null and query.word!=''">
+				 and  w.word = #{query.word}
+			</if>
+			<if test="query.phonetic != null and query.phonetic!=''">
+				 and  w.phonetic = #{query.phonetic}
+			</if>
+			<if test="query.partOfSpeech != null and query.partOfSpeech!=''">
+				 and  w.part_of_speech = #{query.partOfSpeech}
+			</if>
+			<if test="query.definition != null and query.definition!=''">
+				 and  w.definition = #{query.definition}
+			</if>
+			<if test="query.exampleSentence != null and query.exampleSentence!=''">
+				 and  w.example_sentence = #{query.exampleSentence}
+			</if>
+			<if test="query.audioUrl != null and query.audioUrl!=''">
+				 and  w.audio_url = #{query.audioUrl}
+			</if>
+			<if test="query.imageUrl != null and query.imageUrl!=''">
+				 and  w.image_url = #{query.imageUrl}
+			</if>
+			<if test="query.level != null">
+				 and  w.level = #{query.level}
+			</if>
+			<if test="query.status != null">
+				 and  w.status = #{query.status}
+			</if>
+			<if test="query.creatorId != null and query.creatorId!=''">
+				 and  w.creator_id = #{query.creatorId}
+			</if>
+			<if test="query.createTime != null and query.createTime!=''">
+				 <![CDATA[ and  w.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.updateTime != null and query.updateTime!=''">
+				 <![CDATA[ and  w.update_time=str_to_date(#{query.updateTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.postType != null">
+				 and  w.post_type = #{query.postType}
+			</if>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+		<where>
+			<include refid="base_condition_filed"/>
+			<if test="query.wordFuzzy!= null  and query.wordFuzzy!=''">
+				and w.word like concat('%', #{query.wordFuzzy}, '%')
+			</if>
+			<if test="query.phoneticFuzzy!= null  and query.phoneticFuzzy!=''">
+				and w.phonetic like concat('%', #{query.phoneticFuzzy}, '%')
+			</if>
+			<if test="query.partOfSpeechFuzzy!= null  and query.partOfSpeechFuzzy!=''">
+				and w.part_of_speech like concat('%', #{query.partOfSpeechFuzzy}, '%')
+			</if>
+			<if test="query.definitionFuzzy!= null  and query.definitionFuzzy!=''">
+				and w.definition like concat('%', #{query.definitionFuzzy}, '%')
+			</if>
+			<if test="query.exampleSentenceFuzzy!= null  and query.exampleSentenceFuzzy!=''">
+				and w.example_sentence like concat('%', #{query.exampleSentenceFuzzy}, '%')
+			</if>
+			<if test="query.audioUrlFuzzy!= null  and query.audioUrlFuzzy!=''">
+				and w.audio_url like concat('%', #{query.audioUrlFuzzy}, '%')
+			</if>
+			<if test="query.imageUrlFuzzy!= null  and query.imageUrlFuzzy!=''">
+				and w.image_url like concat('%', #{query.imageUrlFuzzy}, '%')
+			</if>
+			<if test="query.creatorIdFuzzy!= null  and query.creatorIdFuzzy!=''">
+				and w.creator_id like concat('%', #{query.creatorIdFuzzy}, '%')
+			</if>
+			<if test="query.createTimeStart!= null and query.createTimeStart!=''">
+				<![CDATA[ and  w.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
+				<![CDATA[ and  w.create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.updateTimeStart!= null and query.updateTimeStart!=''">
+				<![CDATA[ and  w.update_time>=str_to_date(#{query.updateTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.updateTimeEnd!= null and query.updateTimeEnd!=''">
+				<![CDATA[ and  w.update_time< date_sub(str_to_date(#{query.updateTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.wordIds！= null and query.wordIds.length>0">
+				and word_id in(<foreach collection="query.wordIds" separator="," item="item">#{item}</foreach> )
+			</if>
+			<if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
+				<![CDATA[ and word_id<#{query.currentId} order by word_id desc ]]>
+			</if>
+			<if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
+				<![CDATA[ and word_id>#{query.currentId} order by word_id asc ]]>
+			</if>
+		</where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM word w <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM word w <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.Word">
+		<selectKey keyProperty="bean.wordId" resultType="Integer" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		 INSERT INTO word
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.word != null">
+				 word,
+			</if>
+			<if test="bean.phonetic != null">
+				 phonetic,
+			</if>
+			<if test="bean.partOfSpeech != null">
+				 part_of_speech,
+			</if>
+			<if test="bean.definition != null">
+				 definition,
+			</if>
+			<if test="bean.exampleSentence != null">
+				 example_sentence,
+			</if>
+			<if test="bean.audioUrl != null">
+				 audio_url,
+			</if>
+			<if test="bean.imageUrl != null">
+				 image_url,
+			</if>
+			<if test="bean.level != null">
+				 level,
+			</if>
+			<if test="bean.status != null">
+				 status,
+			</if>
+			<if test="bean.creatorId != null">
+				 creator_id,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+			<if test="bean.updateTime != null">
+				 update_time,
+			</if>
+			<if test="bean.postType != null">
+				 post_type,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.word!=null">
+				 #{bean.word},
+			</if>
+			<if test="bean.phonetic!=null">
+				 #{bean.phonetic},
+			</if>
+			<if test="bean.partOfSpeech!=null">
+				 #{bean.partOfSpeech},
+			</if>
+			<if test="bean.definition!=null">
+				 #{bean.definition},
+			</if>
+			<if test="bean.exampleSentence!=null">
+				 #{bean.exampleSentence},
+			</if>
+			<if test="bean.audioUrl!=null">
+				 #{bean.audioUrl},
+			</if>
+			<if test="bean.imageUrl!=null">
+				 #{bean.imageUrl},
+			</if>
+			<if test="bean.level!=null">
+				 #{bean.level},
+			</if>
+			<if test="bean.status!=null">
+				 #{bean.status},
+			</if>
+			<if test="bean.creatorId!=null">
+				 #{bean.creatorId},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+			<if test="bean.updateTime!=null">
+				 #{bean.updateTime},
+			</if>
+			<if test="bean.postType!=null">
+				 #{bean.postType},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.Word">
+		 INSERT INTO word
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.wordId != null">
+				 word_id,
+			</if>
+			<if test="bean.word != null">
+				 word,
+			</if>
+			<if test="bean.phonetic != null">
+				 phonetic,
+			</if>
+			<if test="bean.partOfSpeech != null">
+				 part_of_speech,
+			</if>
+			<if test="bean.definition != null">
+				 definition,
+			</if>
+			<if test="bean.exampleSentence != null">
+				 example_sentence,
+			</if>
+			<if test="bean.audioUrl != null">
+				 audio_url,
+			</if>
+			<if test="bean.imageUrl != null">
+				 image_url,
+			</if>
+			<if test="bean.level != null">
+				 level,
+			</if>
+			<if test="bean.status != null">
+				 status,
+			</if>
+			<if test="bean.creatorId != null">
+				 creator_id,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+			<if test="bean.updateTime != null">
+				 update_time,
+			</if>
+			<if test="bean.postType != null">
+				 post_type,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.wordId!=null">
+				 #{bean.wordId},
+			</if>
+			<if test="bean.word!=null">
+				 #{bean.word},
+			</if>
+			<if test="bean.phonetic!=null">
+				 #{bean.phonetic},
+			</if>
+			<if test="bean.partOfSpeech!=null">
+				 #{bean.partOfSpeech},
+			</if>
+			<if test="bean.definition!=null">
+				 #{bean.definition},
+			</if>
+			<if test="bean.exampleSentence!=null">
+				 #{bean.exampleSentence},
+			</if>
+			<if test="bean.audioUrl!=null">
+				 #{bean.audioUrl},
+			</if>
+			<if test="bean.imageUrl!=null">
+				 #{bean.imageUrl},
+			</if>
+			<if test="bean.level!=null">
+				 #{bean.level},
+			</if>
+			<if test="bean.status!=null">
+				 #{bean.status},
+			</if>
+			<if test="bean.creatorId!=null">
+				 #{bean.creatorId},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+			<if test="bean.updateTime!=null">
+				 #{bean.updateTime},
+			</if>
+			<if test="bean.postType!=null">
+				 #{bean.postType},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.word!=null">
+				 word = VALUES(word),
+			</if>
+			<if test="bean.phonetic!=null">
+				 phonetic = VALUES(phonetic),
+			</if>
+			<if test="bean.partOfSpeech!=null">
+				 part_of_speech = VALUES(part_of_speech),
+			</if>
+			<if test="bean.definition!=null">
+				 definition = VALUES(definition),
+			</if>
+			<if test="bean.exampleSentence!=null">
+				 example_sentence = VALUES(example_sentence),
+			</if>
+			<if test="bean.audioUrl!=null">
+				 audio_url = VALUES(audio_url),
+			</if>
+			<if test="bean.imageUrl!=null">
+				 image_url = VALUES(image_url),
+			</if>
+			<if test="bean.level!=null">
+				 level = VALUES(level),
+			</if>
+			<if test="bean.status!=null">
+				 status = VALUES(status),
+			</if>
+			<if test="bean.creatorId!=null">
+				 creator_id = VALUES(creator_id),
+			</if>
+			<if test="bean.createTime!=null">
+				 create_time = VALUES(create_time),
+			</if>
+			<if test="bean.updateTime!=null">
+				 update_time = VALUES(update_time),
+			</if>
+			<if test="bean.postType!=null">
+				 post_type = VALUES(post_type),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.Word" useGeneratedKeys="true" keyProperty="wordId">
+		 INSERT INTO word(
+			 word,
+			 phonetic,
+			 part_of_speech,
+			 definition,
+			 example_sentence,
+			 audio_url,
+			 image_url,
+			 level,
+			 status,
+			 creator_id,
+			 create_time,
+			 update_time,
+			 post_type
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.word},
+				 #{item.phonetic},
+				 #{item.partOfSpeech},
+				 #{item.definition},
+				 #{item.exampleSentence},
+				 #{item.audioUrl},
+				 #{item.imageUrl},
+				 #{item.level},
+				 #{item.status},
+				 #{item.creatorId},
+				 #{item.createTime},
+				 #{item.updateTime},
+				 #{item.postType}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.Word">
+		 INSERT INTO word(
+			 word,
+			 phonetic,
+			 part_of_speech,
+			 definition,
+			 example_sentence,
+			 audio_url,
+			 image_url,
+			 level,
+			 status,
+			 creator_id,
+			 create_time,
+			 update_time,
+			 post_type
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.word},
+				 #{item.phonetic},
+				 #{item.partOfSpeech},
+				 #{item.definition},
+				 #{item.exampleSentence},
+				 #{item.audioUrl},
+				 #{item.imageUrl},
+				 #{item.level},
+				 #{item.status},
+				 #{item.creatorId},
+				 #{item.createTime},
+				 #{item.updateTime},
+				 #{item.postType}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			word = VALUES(word),
+			phonetic = VALUES(phonetic),
+			part_of_speech = VALUES(part_of_speech),
+			definition = VALUES(definition),
+			example_sentence = VALUES(example_sentence),
+			audio_url = VALUES(audio_url),
+			image_url = VALUES(image_url),
+			level = VALUES(level),
+			status = VALUES(status),
+			creator_id = VALUES(creator_id),
+			create_time = VALUES(create_time),
+			update_time = VALUES(update_time),
+			post_type = VALUES(post_type)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.WordQuery">
+		 UPDATE word w
+ 		 <set> 
+			<if test="bean.word != null">
+				 word = #{bean.word},
+			</if>
+			<if test="bean.phonetic != null">
+				 phonetic = #{bean.phonetic},
+			</if>
+			<if test="bean.partOfSpeech != null">
+				 part_of_speech = #{bean.partOfSpeech},
+			</if>
+			<if test="bean.definition != null">
+				 definition = #{bean.definition},
+			</if>
+			<if test="bean.exampleSentence != null">
+				 example_sentence = #{bean.exampleSentence},
+			</if>
+			<if test="bean.audioUrl != null">
+				 audio_url = #{bean.audioUrl},
+			</if>
+			<if test="bean.imageUrl != null">
+				 image_url = #{bean.imageUrl},
+			</if>
+			<if test="bean.level != null">
+				 level = #{bean.level},
+			</if>
+			<if test="bean.status != null">
+				 status = #{bean.status},
+			</if>
+			<if test="bean.creatorId != null">
+				 creator_id = #{bean.creatorId},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+			<if test="bean.updateTime != null">
+				 update_time = #{bean.updateTime},
+			</if>
+			<if test="bean.postType != null">
+				 post_type = #{bean.postType},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete w from word w
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据WordId修改-->
+	<update id="updateByWordId" parameterType="com.javastudy.vocabease_common.entity.po.Word">
+		 UPDATE word
+ 		 <set> 
+			<if test="bean.word != null">
+				 word = #{bean.word},
+			</if>
+			<if test="bean.phonetic != null">
+				 phonetic = #{bean.phonetic},
+			</if>
+			<if test="bean.partOfSpeech != null">
+				 part_of_speech = #{bean.partOfSpeech},
+			</if>
+			<if test="bean.definition != null">
+				 definition = #{bean.definition},
+			</if>
+			<if test="bean.exampleSentence != null">
+				 example_sentence = #{bean.exampleSentence},
+			</if>
+			<if test="bean.audioUrl != null">
+				 audio_url = #{bean.audioUrl},
+			</if>
+			<if test="bean.imageUrl != null">
+				 image_url = #{bean.imageUrl},
+			</if>
+			<if test="bean.level != null">
+				 level = #{bean.level},
+			</if>
+			<if test="bean.status != null">
+				 status = #{bean.status},
+			</if>
+			<if test="bean.creatorId != null">
+				 creator_id = #{bean.creatorId},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+			<if test="bean.updateTime != null">
+				 update_time = #{bean.updateTime},
+			</if>
+			<if test="bean.postType != null">
+				 post_type = #{bean.postType},
+			</if>
+ 		 </set>
+ 		 where word_id=#{wordId}
+	</update>
+
+	<!-- 根据WordId删除-->
+	<delete id="deleteByWordId">
+		delete from word where word_id=#{wordId}
+	</delete>
+
+	<!-- 根据WordIds删除多个对象-->
+	<delete id="deleteByWordIds">
+		delete from word where word_id in
+		<foreach collection="wordIds" separator="," item="item">#{item}</foreach>
+		and status=#{status}
+		<if test="userId!=null">and creater_id = #{userId}</if>
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByWordId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from word w where word_id=#{wordId}
+	</select>
+
+	<select id="showWordNext" resultMap="base_result_map">
+		select * from word
+		<include refid="query_condition"/>
+		limit 0,1
+	</select>
+
+</mapper>

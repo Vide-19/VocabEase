@@ -2,7 +2,8 @@ package com.javastudy.vocabease_common.entity.enums;
 
 public enum TemplateEnum {
     ARTICLE(0, "/template/template_article.xlsx", "文章上传模板.xlsx"),
-    QUESTION(1, "/template/template_question.xlsx", "试题上传模板.xlsx");
+    QUESTION(1, "/template/template_question.xlsx", "试题上传模板.xlsx"),
+    WORD(2, "/template/template_word.xlsx", "单词上传模板.xlsx"),;
 
     private Integer type;
     private String path;

@@ -1,5 +1,7 @@
 package com.javastudy.vocabease_common.mappers;
 
+import com.javastudy.vocabease_common.entity.po.Article;
+import com.javastudy.vocabease_common.entity.query.ArticleQuery;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -23,7 +25,7 @@ public interface ArticleMapper<T,P> extends BaseMapper<T,P> {
 	 */
 	void deleteByArticleIds(@Param("articleIds") String[] articleIds, @Param("status") Integer status, @Param("userId") Integer userId);
 
-	T showArticleNext(@Param("query") P p);
+	Article showArticleNext(@Param("query") ArticleQuery articleQuery);
 
 	Integer updateCount(@Param("readCount") Integer readCount, @Param("collectCount") Integer collectCount, @Param("articleId") Integer articleId);
 

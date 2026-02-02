@@ -96,13 +96,13 @@
                 and a.creater_id like concat('%', #{query.createrIdFuzzy}, '%')
             </if>
             <if test="query.articleIds！= null and query.articleIds.length>0">
-                and articleIds in(<foreach collection="query.articleIds" separator="," item="item">#{item}</foreach> )
+                and article_id in(<foreach collection="query.articleIds" separator="," item="item">#{item}</foreach> )
             </if>
             <if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
-                <![CDATA[and articleId<#{query.currentId} order by desc]]>
+                <![CDATA[ and article_id<#{query.currentId} order by article_id desc ]]>
             </if>
             <if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
-                <![CDATA[and articleId>#{query.currentId} order by asc]]>
+                <![CDATA[ and article_id>#{query.currentId} order by article_id asc ]]>
             </if>
         </where>
     </sql>

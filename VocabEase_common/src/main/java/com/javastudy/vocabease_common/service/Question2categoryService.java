@@ -1,10 +1,10 @@
 package com.javastudy.vocabease_common.service;
 
-import java.util.List;
-
-import com.javastudy.vocabease_common.entity.query.Question2categoryQuery;
 import com.javastudy.vocabease_common.entity.po.Question2category;
+import com.javastudy.vocabease_common.entity.query.Question2categoryQuery;
 import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
+
+import java.util.List;
 
 
 /**
@@ -68,5 +68,9 @@ public interface Question2categoryService {
 	 * 根据QuestionIdAndCategoryId删除
 	 */
 	Integer deleteQuestion2categoryByQuestionIdAndCategoryId(Integer questionId,Integer categoryId);
+
+	Integer getCategoryIdByQuestionId(Integer questionId);
+
+	void deleteQuestion2categoryByQuestionIds(String[] questionIds);
 
 }

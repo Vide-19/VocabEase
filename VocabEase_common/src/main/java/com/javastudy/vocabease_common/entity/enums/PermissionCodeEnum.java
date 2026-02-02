@@ -42,6 +42,13 @@ public enum PermissionCodeEnum {
     ARTICLE_DELETE("article_delete", "取消"),
     ARTICLE_DELETE_BATCH("article_delete_batch", "批量取消"),
 
+    WORD_LIST("word_list", "单词列表"),
+    WORD_EDIT("word_edit", "新增/修改"),
+    WORD_IMPORT("word_import", "导入"),
+    WORD_POST("word_post", "发布"),
+    WORD_DELETE("word_delete", "取消"),
+    WORD_DELETE_BATCH("word_delete_batch", "批量取消"),
+
     SHARE_LIST("share_list", "笔记列表"),
     SHARE_EDIT("share_edit", "新增/修改"),
     SHARE_POST("share_post", "发布"),

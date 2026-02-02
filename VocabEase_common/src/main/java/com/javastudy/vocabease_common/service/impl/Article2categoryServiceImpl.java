@@ -30,7 +30,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 	public List<Article2category> findListByParam(Article2categoryQuery param) {
 		return this.article2categoryMapper.selectList(param);
 	}
-
 	/**
 	 * 根据条件查询列表
 	 */
@@ -38,7 +37,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 	public Integer findCountByParam(Article2categoryQuery param) {
 		return this.article2categoryMapper.selectCount(param);
 	}
-
 	/**
 	 * 分页查询方法
 	 */
@@ -53,7 +51,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 		PaginationResultVO<Article2category> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
-
 	/**
 	 * 新增
 	 */
@@ -61,7 +58,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 	public Integer add(Article2category bean) {
 		return this.article2categoryMapper.insert(bean);
 	}
-
 	/**
 	 * 批量新增
 	 */
@@ -72,7 +68,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 		}
 		return this.article2categoryMapper.insertBatch(listBean);
 	}
-
 	/**
 	 * 批量新增或者修改
 	 */
@@ -83,7 +78,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 		}
 		return this.article2categoryMapper.insertOrUpdateBatch(listBean);
 	}
-
 	/**
 	 * 多条件更新
 	 */
@@ -92,7 +86,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 		StringTools.checkParam(param);
 		return this.article2categoryMapper.updateByParam(bean, param);
 	}
-
 	/**
 	 * 多条件删除
 	 */
@@ -101,7 +94,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 		StringTools.checkParam(param);
 		return this.article2categoryMapper.deleteByParam(param);
 	}
-
 	/**
 	 * 根据ArticleIdAndCategoryId获取对象
 	 */
@@ -109,7 +101,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 	public Article2category getArticle2categoryByArticleIdAndCategoryId(Integer articleId, Integer categoryId) {
 		return this.article2categoryMapper.selectByArticleIdAndCategoryId(articleId, categoryId);
 	}
-
 	/**
 	 * 根据ArticleIdAndCategoryId修改
 	 */
@@ -117,7 +108,6 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 	public Integer updateArticle2categoryByArticleIdAndCategoryId(Article2category bean, Integer articleId, Integer categoryId) {
 		return this.article2categoryMapper.updateByArticleIdAndCategoryId(bean, articleId, categoryId);
 	}
-
 	/**
 	 * 根据ArticleIdAndCategoryId删除
 	 */
@@ -125,7 +115,9 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 	public Integer deleteArticle2categoryByArticleIdAndCategoryId(Integer articleId, Integer categoryId) {
 		return this.article2categoryMapper.deleteByArticleIdAndCategoryId(articleId, categoryId);
 	}
-
+	/**
+	 * 通过文章id获取分类id
+	 */
 	@Override
 	public Integer getCategoryIdByArticleId(Integer articleId) {
 		return this.article2categoryMapper.selectCategoryIdByArticleId(articleId);

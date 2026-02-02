@@ -17,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +29,6 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.logging.Logger;
 
 /**
  * 文件上传controller
@@ -39,7 +40,7 @@ public class FileController extends ABaseController{
     @Resource
     private AppConfig appConfig;
 
-    private static final Logger logger = Logger.getLogger(FileController.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @RequestMapping("/uploadFile")
     @GlobalInterceptor
@@ -59,7 +60,7 @@ public class FileController extends ABaseController{
             if (fileType != null)
                 ScaleFilterUtil.createThumbnail(localFile, fileType.getMaxWidth(), fileType.getMaxWidth(), localFile);
         } catch (IOException e) {
-            logger.warning("文件上传失败");
+            logger.error("文件上传失败");
             throw new BusinessException("文件上传失败");
         }
         return getSuccessResponseVO(realFilePath);
@@ -100,20 +101,20 @@ public class FileController extends ABaseController{
                 os.write(byteData, 0, len);
             os.flush();
         } catch (IOException e) {
-            logger.warning("读取文件异常");
+            logger.error("读取文件异常");
         } finally {
             if (os != null) {
                 try {
                     os.close();
                 } catch (IOException e) {
-                    logger.warning("IO异常");
+                    logger.error("IO异常");
                 }
             }
             if (fis != null) {
                 try {
                     fis.close();
                 } catch (IOException e) {
-                    logger.warning("IO异常");
+                    logger.error("IO异常");
                 }
             }
         }
@@ -145,46 +146,22 @@ public class FileController extends ABaseController{
                 os.write(byteData, 0, len);
             os.flush();
         } catch (Exception e){
-            logger.warning("模板下载异常");
+            logger.error("模板下载异常");
         } finally {
             if (os != null) {
                 try {
                     os.close();
                 } catch (IOException e) {
-                    logger.warning("IO异常");
+                    logger.error("IO异常");
                 }
             }
             if (is != null) {
                  try {
                      is.close();
                  } catch (IOException e) {
-                     logger.warning("IO异常");
+                     logger.error("IO异常");
                  }
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

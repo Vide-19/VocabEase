@@ -11,19 +11,17 @@ public interface Article2categoryMapper<T,P> extends BaseMapper<T,P> {
 	 * 根据ArticleIdAndCategoryId更新
 	 */
 	 Integer updateByArticleIdAndCategoryId(@Param("bean") T t,@Param("articleId") Integer articleId,@Param("categoryId") Integer categoryId);
-
-
 	/**
 	 * 根据ArticleIdAndCategoryId删除
 	 */
 	 Integer deleteByArticleIdAndCategoryId(@Param("articleId") Integer articleId,@Param("categoryId") Integer categoryId);
-
-
 	/**
 	 * 根据ArticleIdAndCategoryId获取对象
 	 */
 	 T selectByArticleIdAndCategoryId(@Param("articleId") Integer articleId,@Param("categoryId") Integer categoryId);
-
+	/**
+	 * 通过文章id获取分类id
+	 */
 	 Integer selectCategoryIdByArticleId(@Param("articleId") Integer articleId);
 	/**
 	 * 根据ArticleIds删除多个对象
