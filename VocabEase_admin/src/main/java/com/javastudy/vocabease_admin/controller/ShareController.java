@@ -1,15 +1,20 @@
 package com.javastudy.vocabease_admin.controller;
 
+import com.javastudy.vocabease_admin.annotation.GlobalInterceptor;
+import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
+import com.javastudy.vocabease_common.entity.dto.SessionUserAdminDto;
+import com.javastudy.vocabease_common.entity.enums.PermissionCodeEnum;
+import com.javastudy.vocabease_common.entity.enums.PostStatusEnum;
 import com.javastudy.vocabease_common.entity.po.Share;
 import com.javastudy.vocabease_common.entity.query.ShareQuery;
+import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.service.ShareService;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.support.SessionStatus;
 
 /**
  * 笔记表 Controller
@@ -24,60 +29,72 @@ public class ShareController extends ABaseController{
 	 * 根据条件分页查询
 	 */
 	@RequestMapping("/loadDataList")
-	public ResponseVO loadDataList(ShareQuery query){
-		return getSuccessResponseVO(shareService.findListByPage(query));
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SHARE_LIST)
+	public ResponseVO<PaginationResultVO<Share>> loadDataList(ShareQuery query){
+		query.setOrderBy("share_id desc");
+		query.setQueryContent(true);
+		return getSuccessResponseVO(this.shareService.findListByPage(query));
 	}
-
 	/**
-	 * 新增
+	 * 新增/修改分享
 	 */
-	@RequestMapping("/add")
-	public ResponseVO add(Share bean) {
-		shareService.add(bean);
+	@RequestMapping("/saveShare")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SHARE_EDIT)
+	public ResponseVO<Void> saveShare(HttpSession session, @VerifyParam(required = true) Share share) {
+		SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
+		share.setCreaterId(sessionUserAdminDto.getUserId().toString());
+		this.shareService.saveShare(share, sessionUserAdminDto.getSuperAdmin());
 		return getSuccessResponseVO(null);
 	}
-
 	/**
-	 * 批量新增
+	 * 删除分享
 	 */
-	@RequestMapping("/addBatch")
-	public ResponseVO addBatch(@RequestBody List<Share> listBean) {
-		shareService.addBatch(listBean);
+	@RequestMapping("/deleteShare")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SHARE_DELETE)
+	public ResponseVO<Void> deleteShare(HttpSession session, @VerifyParam(required = true) String shareIds) {
+		SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
+		this.shareService.deleteShareByShareIds(shareIds, sessionUserAdminDto.getSuperAdmin() ? null : sessionUserAdminDto.getUserId());
 		return getSuccessResponseVO(null);
 	}
-
 	/**
-	 * 批量新增/修改
+	 * 批量删除分享
 	 */
-	@RequestMapping("/addOrUpdateBatch")
-	public ResponseVO addOrUpdateBatch(@RequestBody List<Share> listBean) {
-		shareService.addBatch(listBean);
+	@RequestMapping("/deleteShareBatch")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SHARE_DELETE_BATCH)
+	public ResponseVO<Void> deleteShareBatch(@VerifyParam(required = true) String shareIds) {
+		this.shareService.deleteShareByShareIds(shareIds, null);
 		return getSuccessResponseVO(null);
 	}
-
 	/**
-	 * 根据ShareId查询对象
+	 * 发布笔记
 	 */
-	@RequestMapping("/getShareByShareId")
-	public ResponseVO getShareByShareId(Integer shareId) {
-		return getSuccessResponseVO(shareService.getShareByShareId(shareId));
-	}
-
-	/**
-	 * 根据ShareId修改对象
-	 */
-	@RequestMapping("/updateShareByShareId")
-	public ResponseVO updateShareByShareId(Share bean,Integer shareId) {
-		shareService.updateShareByShareId(bean,shareId);
+	@RequestMapping("/postShare")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SHARE_POST)
+	public ResponseVO<Void> postShare(@VerifyParam(required = true) String shareIds,
+									  SessionStatus sessionStatus) {
+		this.shareService.updateShareStatus(shareIds, PostStatusEnum.IS_POST.getStatus());
 		return getSuccessResponseVO(null);
 	}
-
 	/**
-	 * 根据ShareId删除
+	 * 下架笔记
 	 */
-	@RequestMapping("/deleteShareByShareId")
-	public ResponseVO deleteShareByShareId(Integer shareId) {
-		shareService.deleteShareByShareId(shareId);
+	@RequestMapping("/cancelPostShare")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SHARE_POST)
+	public ResponseVO<Void> cancelPostShare(@VerifyParam(required = true) String shareIds,
+											SessionStatus sessionStatus) {
+		this.shareService.updateShareStatus(shareIds, PostStatusEnum.NO_POST.getStatus());
 		return getSuccessResponseVO(null);
 	}
+	/**
+	 * 下一篇
+	 */
+	@RequestMapping("/showNextShare")
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SHARE_LIST)
+	public ResponseVO<Share> showNextShare(ShareQuery shareQuery,
+											   @VerifyParam(required = true) Integer currentId, Integer nextType){
+		Share share = this.shareService.showShareNext(shareQuery, currentId, nextType, false);
+		return getSuccessResponseVO(share);
+	}
+	//👇
+
 }

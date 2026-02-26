@@ -45,7 +45,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 */
 	@RequestMapping("/saveAccount")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_EDIT)
-	public ResponseVO saveAccount(@VerifyParam Account account){
+	public ResponseVO<Void> saveAccount(@VerifyParam Account account){
 		this.accountService.saveAccount(account);
 		return getSuccessResponseVO(null);
 	}
@@ -54,7 +54,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 */
 	@DeleteMapping("/deleteAccount")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_DELETE)
-	public ResponseVO deleteAccount(@VerifyParam(required = true) Integer userId){
+	public ResponseVO<Void> deleteAccount(@VerifyParam(required = true) Integer userId){
 		Account account = this.accountService.getAccountByUserId(userId);
 		if (!StringTools.isEmpty(appConfig.getSuperAdminPhone()) &&
 				ArrayUtils.contains(appConfig.getSuperAdminPhone().split(","), account.getPhone()))
@@ -67,7 +67,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 */
 	@PostMapping("/updatePassword")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_UPDATE_PASSWORD)
-	public ResponseVO updatePassword(@VerifyParam Integer userId,
+	public ResponseVO<Void> updatePassword(@VerifyParam Integer userId,
 									 @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password){
 		Account account = new Account();
 		account.setPassword(StringTools.encodeByMd5(password));
@@ -79,11 +79,11 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 	 */
 	@PostMapping("/updateStatus")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_STATUS)
-	public ResponseVO updateStatus(@VerifyParam Integer userId,
+	public ResponseVO<Void> updateStatus(@VerifyParam(required = true) Integer userId,
 									 @VerifyParam(required = true) Integer status){
 		AccountStatusEnum accountStatusEnum = AccountStatusEnum.getByStatus(status);
 		if (accountStatusEnum == null)
-			throw new BusinessException(ResponseCodeEnum.CODE_600);
+			throw new BusinessException(ResponseCodeEnum.CODE_400);
 		Account account = new Account();
 		account.setStatus(status);
 		this.accountService.updateAccountByUserId(account, userId);

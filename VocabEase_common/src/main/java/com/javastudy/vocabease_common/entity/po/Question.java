@@ -82,6 +82,8 @@ public class Question implements Serializable {
 	 */
 	private Integer collectCount;
 
+	private Integer collectId;
+
 	/**
 	 * 发布类别 0内部 1外部
 	 */
@@ -201,6 +203,14 @@ public class Question implements Serializable {
 
 	public void setAnswer(String answer) {
 		this.answer = answer;
+	}
+
+	public Integer getCollectId() {
+		return collectId;
+	}
+
+	public void setCollectId(Integer collectId) {
+		this.collectId = collectId;
 	}
 
 	@Override

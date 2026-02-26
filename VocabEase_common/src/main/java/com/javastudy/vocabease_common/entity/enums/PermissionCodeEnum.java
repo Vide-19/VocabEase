@@ -62,6 +62,9 @@ public enum PermissionCodeEnum {
     APP_CAROUSEL_LIST("app_carousel_list", "轮播图列表"),
     APP_CAROUSEL_EDIT("app_carousel_edit", "轮播图新增/修改/删除"),
 
+    APP_FEEDBACK_LIST("app_feedback_list", "反馈列表"),
+    APP_FEEDBACK_REPLY("app_feedback_reply", "反馈回复"),
+
     APP_USER_LIST("app_user_list", "应用用户列表"),
     APP_USER_EDIT("app_user_edit", "应用用户新增/修改/删除"),
     APP_USER_DEVICE("app_user_device", "应用用户设备");

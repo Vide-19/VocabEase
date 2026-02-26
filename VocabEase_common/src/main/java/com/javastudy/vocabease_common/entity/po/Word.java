@@ -92,6 +92,10 @@ public class Word implements Serializable {
 	 */
 	private Integer postType;
 
+	private Boolean isCollect;
+
+	private Integer collectId;
+
 
 	public void setWordId(Integer wordId){
 		this.wordId = wordId;
@@ -203,6 +207,22 @@ public class Word implements Serializable {
 
 	public Integer getPostType(){
 		return this.postType;
+	}
+
+	public Boolean getCollect() {
+		return isCollect;
+	}
+
+	public void setCollect(Boolean collect) {
+		isCollect = collect;
+	}
+
+	public Integer getCollectId() {
+		return collectId;
+	}
+
+	public void setCollectId(Integer collectId) {
+		this.collectId = collectId;
 	}
 
 	@Override

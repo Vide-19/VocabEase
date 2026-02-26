@@ -27,6 +27,6 @@ public interface ArticleMapper<T,P> extends BaseMapper<T,P> {
 
 	Article showArticleNext(@Param("query") ArticleQuery articleQuery);
 
-	Integer updateCount(@Param("readCount") Integer readCount, @Param("collectCount") Integer collectCount, @Param("articleId") Integer articleId);
+	void updateCount(@Param("readCount") Integer readCount, @Param("collectCount") Integer collectCount, @Param("articleId") Integer articleId);
 
 }

@@ -1,11 +1,21 @@
 package com.javastudy.vocabease_common.utils;
 
 
+import com.javastudy.vocabease_common.entity.enums.DateTimePatternEnum;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class DateUtil {
 
@@ -44,4 +54,28 @@ public class DateUtil {
         }
         return new Date();
     }
+
+    public static Date getPreDate(Integer day) {
+        LocalDateTime localDateTime = LocalDateTime.now().minusDays(day);
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDateTime.atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+    public static List<String> getBetweenDate(Date dateStart, Date dateEnd) {
+        LocalDate localDateStart = fromLocalDate2String(dateStart);
+        LocalDate localDateEnd = fromLocalDate2String(dateEnd);
+        long numOfDays = ChronoUnit.DAYS.between(localDateStart, localDateEnd)+1;
+        List<LocalDate> list = Stream.iterate(localDateStart, date ->
+                date.plusDays(1)).limit(numOfDays).toList();
+        return list.stream().map(date ->
+                date.format(DateTimeFormatter.ofPattern(DateTimePatternEnum.YYYY_MM_DD.getPattern()))).toList();
+    }
+
+    public static LocalDate fromLocalDate2String(Date date) {
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        return instant.atZone(zone).toLocalDate();
+    }
+
 }

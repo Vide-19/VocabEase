@@ -6,7 +6,6 @@ package com.javastudy.vocabease_common.entity.query;
  */
 public class ArticleQuery extends BaseParam {
 
-
 	/**
 	 * 文章id
 	 */

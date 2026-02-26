@@ -1,5 +1,7 @@
 package com.javastudy.vocabease_common.mappers;
 
+import com.javastudy.vocabease_common.entity.po.Share;
+import com.javastudy.vocabease_common.entity.query.ShareQuery;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -24,5 +26,8 @@ public interface ShareMapper<T,P> extends BaseMapper<T,P> {
 	 */
 	 T selectByShareId(@Param("shareId") Integer shareId);
 
+	Share showShareNext(@Param("query") ShareQuery shareQuery);
+
+	void updateCount(@Param("readCount") Integer readCount, @Param("collectCount") Integer collectCount, @Param("shareId") Integer shareId);
 
 }

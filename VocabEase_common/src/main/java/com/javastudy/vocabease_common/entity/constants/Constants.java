@@ -3,7 +3,13 @@ package com.javastudy.vocabease_common.entity.constants;
 public class Constants {
     public static final String CHECK_CODE_KEY = "check_code_key";
     public static final String SESSION_KEY = "session_key";
+    public static final String REDIS_KEY_CHECK_CODE = "vocabease:check:";
+    public static final String JWT_KEY_LOGIN_TOKEN = "jwt_key_login_token";
+    public static final Integer JWT_TOKEN_EXPIRE = 60 * 60 * 24 * 7;
+    public static final String APP_UPDATE_FOLDER = "/app/";
+    public static final String READ_IMG_PATH = "/api/file/getImage/";
     public static final Integer LENGTH_8 = 8;
+    public static final Integer LENGTH_10 = 10;
     public static final Integer LENGTH_20 = 20;
     public static final Integer LENGTH_30 = 30;
     public static final Integer LENGTH_50 = 50;

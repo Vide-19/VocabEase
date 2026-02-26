@@ -1,6 +1,7 @@
 package com.javastudy.vocabease_common.entity.query;
 
 
+import java.util.List;
 
 /**
  * 问题选项表参数
@@ -18,6 +19,8 @@ public class Item4questionQuery extends BaseParam {
 	 */
 	private Integer questionId;
 
+	private List<String> questionIdList;
+
 	/**
 	 * 标题
 	 */
@@ -30,6 +33,13 @@ public class Item4questionQuery extends BaseParam {
 	 */
 	private Integer sort;
 
+	public List<String> getQuestionIdList() {
+		return questionIdList;
+	}
+
+	public void setQuestionIdList(List<String> questionIdList) {
+		this.questionIdList = questionIdList;
+	}
 
 	public void setItemId(Integer itemId){
 		this.itemId = itemId;

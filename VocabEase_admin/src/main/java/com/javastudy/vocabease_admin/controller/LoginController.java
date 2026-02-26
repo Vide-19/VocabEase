@@ -57,7 +57,7 @@ public class LoginController extends ABaseController {
      * 登出
      */
     @RequestMapping("/logout")
-    public ResponseVO logout(HttpSession session) {
+    public ResponseVO<Void> logout(HttpSession session) {
         session.invalidate();
         return getSuccessResponseVO(null);
     }
@@ -66,7 +66,7 @@ public class LoginController extends ABaseController {
      */
     @PostMapping("/updateMyPassword")
     @GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_UPDATE_PASSWORD)
-    public ResponseVO updateMyPassword(HttpSession session,
+    public ResponseVO<Void> updateMyPassword(HttpSession session,
                                      @VerifyParam(required = true, regex = VerifyRegexEnum.PASSWORD) String password){
         SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
         Account account = new Account();

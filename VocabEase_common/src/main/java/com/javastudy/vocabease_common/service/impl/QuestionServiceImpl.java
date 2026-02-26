@@ -158,7 +158,7 @@ public class QuestionServiceImpl implements QuestionService {
 		Category category = this.categoryService.getCategoryByCategoryId(
 				this.question2categoryService.getCategoryIdByQuestionId(questionId));
 		if (category == null)
-			throw new BusinessException(ResponseCodeEnum.CODE_600);
+			throw new BusinessException(ResponseCodeEnum.CODE_400);
 		// ========== 1. 处理题目主表（Question）==========
 		//新增
 		if (questionId == null){

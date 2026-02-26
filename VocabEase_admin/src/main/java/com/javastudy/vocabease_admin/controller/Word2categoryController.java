@@ -32,7 +32,7 @@ public class Word2categoryController extends ABaseController{
 	 * 新增
 	 */
 	@RequestMapping("/add")
-	public ResponseVO add(Word2category bean) {
+	public ResponseVO<Void> add(Word2category bean) {
 		word2categoryService.add(bean);
 		return getSuccessResponseVO(null);
 	}
@@ -41,7 +41,7 @@ public class Word2categoryController extends ABaseController{
 	 * 批量新增
 	 */
 	@RequestMapping("/addBatch")
-	public ResponseVO addBatch(@RequestBody List<Word2category> listBean) {
+	public ResponseVO<Void> addBatch(@RequestBody List<Word2category> listBean) {
 		word2categoryService.addBatch(listBean);
 		return getSuccessResponseVO(null);
 	}
@@ -50,7 +50,7 @@ public class Word2categoryController extends ABaseController{
 	 * 批量新增/修改
 	 */
 	@RequestMapping("/addOrUpdateBatch")
-	public ResponseVO addOrUpdateBatch(@RequestBody List<Word2category> listBean) {
+	public ResponseVO<Void> addOrUpdateBatch(@RequestBody List<Word2category> listBean) {
 		word2categoryService.addBatch(listBean);
 		return getSuccessResponseVO(null);
 	}
@@ -67,7 +67,7 @@ public class Word2categoryController extends ABaseController{
 	 * 根据WordIdAndCategoryId修改对象
 	 */
 	@RequestMapping("/updateWord2categoryByWordIdAndCategoryId")
-	public ResponseVO updateWord2categoryByWordIdAndCategoryId(Word2category bean,Integer wordId,Integer categoryId) {
+	public ResponseVO<Void> updateWord2categoryByWordIdAndCategoryId(Word2category bean,Integer wordId,Integer categoryId) {
 		word2categoryService.updateWord2categoryByWordIdAndCategoryId(bean,wordId,categoryId);
 		return getSuccessResponseVO(null);
 	}
@@ -76,7 +76,7 @@ public class Word2categoryController extends ABaseController{
 	 * 根据WordIdAndCategoryId删除
 	 */
 	@RequestMapping("/deleteWord2categoryByWordIdAndCategoryId")
-	public ResponseVO deleteWord2categoryByWordIdAndCategoryId(Integer wordId,Integer categoryId) {
+	public ResponseVO<Void> deleteWord2categoryByWordIdAndCategoryId(Integer wordId,Integer categoryId) {
 		word2categoryService.deleteWord2categoryByWordIdAndCategoryId(wordId,categoryId);
 		return getSuccessResponseVO(null);
 	}

@@ -64,7 +64,7 @@ public class QuestionController extends ABaseController{
 		if (!QuestionTypeEnum.TRUE_OR_FALSE.getType().equals(question.getQuestionType())
 			|| !QuestionTypeEnum.FILL_IN_THE_BLANK.getType().equals(question.getQuestionType())) {
 			if (StringTools.isEmpty(questionItemList))
-				throw new BusinessException(ResponseCodeEnum.CODE_600);
+				throw new BusinessException(ResponseCodeEnum.CODE_400);
 			item4question = JsonUtil.convertJsonArray2Object(questionItemList, Item4question.class);
 		}
 		this.questionService.saveQuestion(question, item4question, sessionUserAdminDto.getSuperAdmin());

@@ -27,7 +27,7 @@ public class ABaseController {
         ResponseVO<T> vo = new ResponseVO<>();
         vo.setStatus(STATUC_ERROR);
         if (e.getCode() == null) {
-            vo.setCode(ResponseCodeEnum.CODE_600.getCode());
+            vo.setCode(ResponseCodeEnum.CODE_400.getCode());
         } else {
             vo.setCode(e.getCode());
         }

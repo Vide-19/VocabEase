@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.AppCollectMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppCollect">
+		<!--收藏id-->
+		<id column="collect_id" property="collectId"  />
+		<!--用户id-->
+		<result column="user_id" property="userId"  />
+		<!--对象id-->
+		<result column="object_id" property="objectId"  />
+		<!--类型 0分享收藏 1单词收藏 2文章收藏 3问题收藏-->
+		<result column="collect_type" property="collectType"  />
+		<!--收藏时间-->
+		<result column="collect_time" property="collectTime"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 a.collect_id,a.user_id,a.object_id,a.collect_type,a.collect_time
+		 
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.collectId != null">
+				 and  a.collect_id = #{query.collectId}
+			</if>
+			<if test="query.userId != null and query.userId!=''">
+				 and  a.user_id = #{query.userId}
+			</if>
+			<if test="query.objectId != null and query.objectId!=''">
+				 and  a.object_id = #{query.objectId}
+			</if>
+			<if test="query.collectType != null">
+				 and  a.collect_type = #{query.collectType}
+			</if>
+			<if test="query.collectTime != null and query.collectTime!=''">
+				 <![CDATA[ and  a.collect_time=str_to_date(#{query.collectTime}, '%Y-%m-%d') ]]>
+			</if>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+        <where>
+            <include refid="base_condition_filed"/>
+            <if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
+                and a.user_id like concat('%', #{query.userIdFuzzy}, '%')
+            </if>
+            <if test="query.objectIdFuzzy!= null  and query.objectIdFuzzy!=''">
+                and a.object_id like concat('%', #{query.objectIdFuzzy}, '%')
+            </if>
+            <if test="query.collectTimeStart!= null and query.collectTimeStart!=''">
+                <![CDATA[ and  a.collect_time>=str_to_date(#{query.collectTimeStart}, '%Y-%m-%d') ]]>
+            </if>
+            <if test="query.collectTimeEnd!= null and query.collectTimeEnd!=''">
+                <![CDATA[ and  a.collect_time< date_sub(str_to_date(#{query.collectTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+            </if>
+            <if test="query.objectIdList!=null and query.objectIdList.size()>0">
+                and object_id in(<foreach collection="query.objectIdList" separator="," item="item">#{item}</foreach> )
+            </if>
+            <if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
+                <![CDATA[ and collect_id<#{query.currentId} order by collect_id desc ]]>
+            </if>
+            <if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
+                <![CDATA[ and collect_id>#{query.currentId} order by collect_id asc ]]>
+            </if>
+        </where>
+    </sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM app_collect a <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM app_collect a <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppCollect">
+		<selectKey keyProperty="bean.collectId" resultType="Integer" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		 INSERT INTO app_collect
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.userId != null">
+				 user_id,
+			</if>
+			<if test="bean.objectId != null">
+				 object_id,
+			</if>
+			<if test="bean.collectType != null">
+				 collect_type,
+			</if>
+			<if test="bean.collectTime != null">
+				 collect_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.userId!=null">
+				 #{bean.userId},
+			</if>
+			<if test="bean.objectId!=null">
+				 #{bean.objectId},
+			</if>
+			<if test="bean.collectType!=null">
+				 #{bean.collectType},
+			</if>
+			<if test="bean.collectTime!=null">
+				 #{bean.collectTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppCollect">
+		 INSERT INTO app_collect
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.collectId != null">
+				 collect_id,
+			</if>
+			<if test="bean.userId != null">
+				 user_id,
+			</if>
+			<if test="bean.objectId != null">
+				 object_id,
+			</if>
+			<if test="bean.collectType != null">
+				 collect_type,
+			</if>
+			<if test="bean.collectTime != null">
+				 collect_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.collectId!=null">
+				 #{bean.collectId},
+			</if>
+			<if test="bean.userId!=null">
+				 #{bean.userId},
+			</if>
+			<if test="bean.objectId!=null">
+				 #{bean.objectId},
+			</if>
+			<if test="bean.collectType!=null">
+				 #{bean.collectType},
+			</if>
+			<if test="bean.collectTime!=null">
+				 #{bean.collectTime},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.userId!=null">
+				 user_id = VALUES(user_id),
+			</if>
+			<if test="bean.objectId!=null">
+				 object_id = VALUES(object_id),
+			</if>
+			<if test="bean.collectType!=null">
+				 collect_type = VALUES(collect_type),
+			</if>
+			<if test="bean.collectTime!=null">
+				 collect_time = VALUES(collect_time),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppCollect" useGeneratedKeys="true" keyProperty="collectId">
+		 INSERT INTO app_collect(
+			 user_id,
+			 object_id,
+			 collect_type,
+			 collect_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.userId},
+				 #{item.objectId},
+				 #{item.collectType},
+				 #{item.collectTime}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppCollect">
+		 INSERT INTO app_collect(
+			 user_id,
+			 object_id,
+			 collect_type,
+			 collect_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.userId},
+				 #{item.objectId},
+				 #{item.collectType},
+				 #{item.collectTime}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			user_id = VALUES(user_id),
+			object_id = VALUES(object_id),
+			collect_type = VALUES(collect_type),
+			collect_time = VALUES(collect_time)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppCollectQuery">
+		 UPDATE app_collect a
+ 		 <set> 
+			<if test="bean.userId != null">
+				 user_id = #{bean.userId},
+			</if>
+			<if test="bean.objectId != null">
+				 object_id = #{bean.objectId},
+			</if>
+			<if test="bean.collectType != null">
+				 collect_type = #{bean.collectType},
+			</if>
+			<if test="bean.collectTime != null">
+				 collect_time = #{bean.collectTime},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete a from app_collect a
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据CollectId修改-->
+	<update id="updateByCollectId" parameterType="com.javastudy.vocabease_common.entity.po.AppCollect">
+		 UPDATE app_collect
+ 		 <set> 
+			<if test="bean.userId != null">
+				 user_id = #{bean.userId},
+			</if>
+			<if test="bean.objectId != null">
+				 object_id = #{bean.objectId},
+			</if>
+			<if test="bean.collectType != null">
+				 collect_type = #{bean.collectType},
+			</if>
+			<if test="bean.collectTime != null">
+				 collect_time = #{bean.collectTime},
+			</if>
+ 		 </set>
+ 		 where collect_id=#{collectId}
+	</update>
+
+	<!-- 根据CollectId删除-->
+	<delete id="deleteByCollectId">
+		delete from app_collect where collect_id=#{collectId}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByCollectId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_collect a where collect_id=#{collectId}
+	</select>
+
+	<!-- 获取对象-->
+	<select id="selectByParam" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_collect a <include refid="query_condition" />
+	</select>
+
+	<select id="showCollectNext" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_collect a <include refid="query_condition" />
+		limit 0,1
+	</select>
+
+</mapper>

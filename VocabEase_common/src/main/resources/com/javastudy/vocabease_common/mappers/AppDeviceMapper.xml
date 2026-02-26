@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.AppDeviceMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppDevice">
+		<!--设备id-->
+		<result column="device_id" property="deviceId"  />
+		<!--设备名称-->
+		<result column="device_brand" property="deviceBrand"  />
+		<!--创建时间-->
+		<result column="create_time" property="createTime"  />
+		<!--最近使用时间-->
+		<result column="last_use_time" property="lastUseTime"  />
+		<!--最近登录ip-->
+		<result column="last_login_ip" property="lastLoginIp"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 a.device_id,a.device_brand,a.create_time,a.last_use_time,a.last_login_ip
+		 
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.deviceId != null and query.deviceId!=''">
+				 and  a.device_id = #{query.deviceId}
+			</if>
+			<if test="query.deviceBrand != null and query.deviceBrand!=''">
+				 and  a.device_brand = #{query.deviceBrand}
+			</if>
+			<if test="query.createTime != null and query.createTime!=''">
+				 <![CDATA[ and  a.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.lastUseTime != null and query.lastUseTime!=''">
+				 <![CDATA[ and  a.last_use_time=str_to_date(#{query.lastUseTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.lastLoginIp != null and query.lastLoginIp!=''">
+				 and  a.last_login_ip = #{query.lastLoginIp}
+			</if>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.deviceIdFuzzy!= null  and query.deviceIdFuzzy!=''">
+				 and  a.device_id like concat('%', #{query.deviceIdFuzzy}, '%')
+			</if>
+			<if test="query.deviceBrandFuzzy!= null  and query.deviceBrandFuzzy!=''">
+				 and  a.device_brand like concat('%', #{query.deviceBrandFuzzy}, '%')
+			</if>
+			<if test="query.createTimeStart!= null and query.createTimeStart!=''">
+				 <![CDATA[ and  a.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
+				 <![CDATA[ and  a.create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.lastUseTimeStart!= null and query.lastUseTimeStart!=''">
+				 <![CDATA[ and  a.last_use_time>=str_to_date(#{query.lastUseTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.lastUseTimeEnd!= null and query.lastUseTimeEnd!=''">
+				 <![CDATA[ and  a.last_use_time< date_sub(str_to_date(#{query.lastUseTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.lastLoginIpFuzzy!= null  and query.lastLoginIpFuzzy!=''">
+				 and  a.last_login_ip like concat('%', #{query.lastLoginIpFuzzy}, '%')
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM app_device a <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM app_device a <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppDevice">
+		 INSERT INTO app_device
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.deviceId != null">
+				 device_id,
+			</if>
+			<if test="bean.deviceBrand != null">
+				 device_brand,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+			<if test="bean.lastUseTime != null">
+				 last_use_time,
+			</if>
+			<if test="bean.lastLoginIp != null">
+				 last_login_ip,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.deviceId!=null">
+				 #{bean.deviceId},
+			</if>
+			<if test="bean.deviceBrand!=null">
+				 #{bean.deviceBrand},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+			<if test="bean.lastUseTime!=null">
+				 #{bean.lastUseTime},
+			</if>
+			<if test="bean.lastLoginIp!=null">
+				 #{bean.lastLoginIp},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppDevice">
+		 INSERT INTO app_device
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.deviceId != null">
+				 device_id,
+			</if>
+			<if test="bean.deviceBrand != null">
+				 device_brand,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+			<if test="bean.lastUseTime != null">
+				 last_use_time,
+			</if>
+			<if test="bean.lastLoginIp != null">
+				 last_login_ip,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.deviceId!=null">
+				 #{bean.deviceId},
+			</if>
+			<if test="bean.deviceBrand!=null">
+				 #{bean.deviceBrand},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+			<if test="bean.lastUseTime!=null">
+				 #{bean.lastUseTime},
+			</if>
+			<if test="bean.lastLoginIp!=null">
+				 #{bean.lastLoginIp},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.deviceId!=null">
+				 device_id = VALUES(device_id),
+			</if>
+			<if test="bean.deviceBrand!=null">
+				 device_brand = VALUES(device_brand),
+			</if>
+			<if test="bean.createTime!=null">
+				 create_time = VALUES(create_time),
+			</if>
+			<if test="bean.lastUseTime!=null">
+				 last_use_time = VALUES(last_use_time),
+			</if>
+			<if test="bean.lastLoginIp!=null">
+				 last_login_ip = VALUES(last_login_ip),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppDevice">
+		 INSERT INTO app_device(
+			 device_id,
+			 device_brand,
+			 create_time,
+			 last_use_time,
+			 last_login_ip
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.deviceId},
+				 #{item.deviceBrand},
+				 #{item.createTime},
+				 #{item.lastUseTime},
+				 #{item.lastLoginIp}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppDevice">
+		 INSERT INTO app_device(
+			 device_id,
+			 device_brand,
+			 create_time,
+			 last_use_time,
+			 last_login_ip
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.deviceId},
+				 #{item.deviceBrand},
+				 #{item.createTime},
+				 #{item.lastUseTime},
+				 #{item.lastLoginIp}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			device_id = VALUES(device_id),
+			device_brand = VALUES(device_brand),
+			create_time = VALUES(create_time),
+			last_use_time = VALUES(last_use_time),
+			last_login_ip = VALUES(last_login_ip)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppDeviceQuery">
+		 UPDATE app_device a
+ 		 <set> 
+			<if test="bean.deviceId != null">
+				 device_id = #{bean.deviceId},
+			</if>
+			<if test="bean.deviceBrand != null">
+				 device_brand = #{bean.deviceBrand},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+			<if test="bean.lastUseTime != null">
+				 last_use_time = #{bean.lastUseTime},
+			</if>
+			<if test="bean.lastLoginIp != null">
+				 last_login_ip = #{bean.lastLoginIp},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete a from app_device a
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据DeviceId修改-->
+	<update id="updateByDeviceId" parameterType="com.javastudy.vocabease_common.entity.po.AppDevice">
+		 UPDATE app_device
+ 		 <set> 
+			<if test="bean.deviceBrand != null">
+				 device_brand = #{bean.deviceBrand},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+			<if test="bean.lastUseTime != null">
+				 last_use_time = #{bean.lastUseTime},
+			</if>
+			<if test="bean.lastLoginIp != null">
+				 last_login_ip = #{bean.lastLoginIp},
+			</if>
+ 		 </set>
+ 		 where device_id=#{deviceId}
+	</update>
+
+	<!-- 根据DeviceId删除-->
+	<delete id="deleteByDeviceId">
+		delete from app_device where device_id=#{deviceId}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByDeviceId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_device a where device_id=#{deviceId}
+	</select>
+
+</mapper>

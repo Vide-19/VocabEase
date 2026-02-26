@@ -69,4 +69,19 @@ public interface ShareService {
 	 */
 	Integer deleteShareByShareId(Integer shareId);
 
+	/**
+	 * 保存/新增分享
+	 */
+	void saveShare(Share share, Boolean isAdmin);
+	/**
+	 * 删除分享
+	 */
+	void deleteShareByShareIds(String shareIds, Integer userId);
+	/**
+	 * 修改发布状态
+	 */
+	void updateShareStatus(String shareIds, Integer status);
+
+	Share showShareNext(ShareQuery shareQuery, Integer currentId, Integer nextType, Boolean isUpdateReadCount);
+
 }

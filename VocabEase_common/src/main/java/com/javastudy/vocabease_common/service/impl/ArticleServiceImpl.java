@@ -162,7 +162,7 @@ public class ArticleServiceImpl implements ArticleService {
 			List<Article> curUserDataList = articleList.stream().filter(a ->
 					!a.getCreaterId().equals(String.valueOf(userId))).collect(Collectors.toList());
 			if (!curUserDataList.isEmpty())
-				throw new BusinessException(ResponseCodeEnum.CODE_600);
+				throw new BusinessException(ResponseCodeEnum.CODE_400);
 		}
 		this.articleMapper.deleteByArticleIds(articleIdArray, PostStatusEnum.NO_POST.getStatus(), userId);
 		this.article2categoryService.deleteArticle2categoryByArticleIds(articleIdArray);
@@ -280,7 +280,7 @@ public class ArticleServiceImpl implements ArticleService {
 			throw new BusinessException("已经在最后一页");
 		if (isUpdateReadCount && article != null) {
 			this.articleMapper.updateCount(1, null, currentId);
-			article.setReadCount(article.getReadCount() + 1);
+			article.setReadCount(article.getReadCount() == null ? 0 : article.getReadCount() + 1);
 		}
 		return article;
 	}

@@ -32,7 +32,7 @@
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
-		 s.share_id,s.title,s.content,s.cover_type,s.cover_path,
+		 s.share_id,s.title,s.cover_type,s.cover_path,
 		 s.create_time,s.status,s.creater_id,s.read_count,s.collect_count,
 		 s.post_type
 	</sql>
@@ -75,39 +75,54 @@
 
 	<!-- 通用查询条件列-->
 	<sql id="query_condition">
-	 <where>
-			<include refid="base_condition_filed" />
-			<if test="query.titleFuzzy!= null  and query.titleFuzzy!=''">
-				 and  s.title like concat('%', #{query.titleFuzzy}, '%')
-			</if>
-			<if test="query.contentFuzzy!= null  and query.contentFuzzy!=''">
-				 and  s.content like concat('%', #{query.contentFuzzy}, '%')
-			</if>
-			<if test="query.coverPathFuzzy!= null  and query.coverPathFuzzy!=''">
-				 and  s.cover_path like concat('%', #{query.coverPathFuzzy}, '%')
-			</if>
-			<if test="query.createTimeStart!= null and query.createTimeStart!=''">
-				 <![CDATA[ and  s.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
-			</if>
-			<if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
-				 <![CDATA[ and  s.create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
-			</if>
-			<if test="query.createrIdFuzzy!= null  and query.createrIdFuzzy!=''">
-				 and  s.creater_id like concat('%', #{query.createrIdFuzzy}, '%')
-			</if>
-	 </where>
-	</sql>
+        <where>
+            <include refid="base_condition_filed"/>
+            <if test="query.titleFuzzy!= null  and query.titleFuzzy!=''">
+                and s.title like concat('%', #{query.titleFuzzy}, '%')
+            </if>
+            <if test="query.contentFuzzy!= null  and query.contentFuzzy!=''">
+                and s.content like concat('%', #{query.contentFuzzy}, '%')
+            </if>
+            <if test="query.coverPathFuzzy!= null  and query.coverPathFuzzy!=''">
+                and s.cover_path like concat('%', #{query.coverPathFuzzy}, '%')
+            </if>
+            <if test="query.createTimeStart!= null and query.createTimeStart!=''">
+                <![CDATA[ and  s.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
+            </if>
+            <if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
+                <![CDATA[ and  s.create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+            </if>
+            <if test="query.createrIdFuzzy!= null  and query.createrIdFuzzy!=''">
+                and s.creater_id like concat('%', #{query.createrIdFuzzy}, '%')
+            </if>
+            <if test="query.shareIds!=null and query.shareIds.length>0">
+                and s.share_id in (<foreach collection="query.shareIds" separator="," item="item">#{item}</foreach> )
+            </if>
+            <if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
+                <![CDATA[ and share_id<#{query.currentId} order by share_id desc ]]>
+            </if>
+            <if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
+                <![CDATA[ and share_id>#{query.currentId} order by share_id asc ]]>
+            </if>
+        </where>
+    </sql>
 
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" /> FROM share s <include refid="query_condition" />
-		 <if test="query.orderBy!=null">
-			 order by ${query.orderBy}
-		 </if>
-		 <if test="query.simplePage!=null">
-			 limit #{query.simplePage.start},#{query.simplePage.end}
-		 </if>
-	</select>
+        SELECT
+        <include refid="base_column_list"/>
+        <if test="query.isQueryContent">
+            ,content
+        </if>
+        FROM share s
+        <include refid="query_condition"/>
+        <if test="query.orderBy!=null">
+            order by ${query.orderBy}
+        </if>
+        <if test="query.simplePage!=null">
+            limit #{query.simplePage.start},#{query.simplePage.end}
+        </if>
+    </select>
 
 	<!-- 查询数量-->
 	<select id="selectCount" resultType="java.lang.Integer" >
@@ -456,5 +471,26 @@
 	<select id="selectByShareId" resultMap="base_result_map" >
 		select <include refid="base_column_list" /> from share s where share_id=#{shareId}
 	</select>
+
+	<select id="showShareNext" resultMap="base_result_map">
+		select * from share
+		<include refid="query_condition"/>
+		limit 0,1
+	</select>
+
+	<update id="updateCount">
+		update share
+		<set>
+			<if test="readCount!=null">
+				read_count = read_count+#{readCount},
+			</if>
+			<if test="collectCount!=null">
+				collect_count = collect_count+#{collectCount},
+			</if>
+		</set>
+		<where>
+			share_id=#{shareId}
+		</where>
+	</update>
 
 </mapper>

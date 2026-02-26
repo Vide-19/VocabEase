@@ -34,7 +34,7 @@ public class RoleController extends ABaseController {
 	 */
 	@RequestMapping("/saveRole")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ROLE_EDIT)
-	public ResponseVO saveRole(@VerifyParam Role role,
+	public ResponseVO<Void> saveRole(@VerifyParam Role role,
 							   String menuIds,
 							   String halfMenuIds) {
 		roleService.savaRole(role, menuIds, halfMenuIds);
@@ -45,7 +45,7 @@ public class RoleController extends ABaseController {
 	 */
 	@RequestMapping("/saveRole2Menu")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ROLE_EDIT)
-	public ResponseVO saveRole2Menu(@VerifyParam(required = true) Integer roleId,
+	public ResponseVO<Void> saveRole2Menu(@VerifyParam(required = true) Integer roleId,
 									@VerifyParam(required = true) String menuIds,
 							   String halfMenuIds) {
 		roleService.saveRole2Menu(roleId, menuIds, halfMenuIds);
@@ -65,7 +65,7 @@ public class RoleController extends ABaseController {
 	 */
 	@RequestMapping("/deleteRole")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ROLE_DELETE)
-	public ResponseVO deleteRole(@VerifyParam(required = true) Integer roleId) {
+	public ResponseVO<Void> deleteRole(@VerifyParam(required = true) Integer roleId) {
 		roleService.deleteRoleByRoleId(roleId);
 		return getSuccessResponseVO(null);
 	}

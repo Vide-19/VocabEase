@@ -70,6 +70,10 @@ public class Article implements Serializable {
 	 */
 	private Integer collectCount;
 
+	private Boolean isCollect;
+
+	private Integer collectId;
+
 	/**
 	 * 发布类型 0内部 1外部
 	 */
@@ -160,6 +164,22 @@ public class Article implements Serializable {
 
 	public Integer getPostType(){
 		return this.postType;
+	}
+
+	public Boolean getCollect() {
+		return isCollect;
+	}
+
+	public void setCollect(Boolean collect) {
+		isCollect = collect;
+	}
+
+	public Integer getCollectId() {
+		return collectId;
+	}
+
+	public void setCollectId(Integer collectId) {
+		this.collectId = collectId;
 	}
 
 	@Override

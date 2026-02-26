@@ -22,7 +22,7 @@ public class JsonUtil {
             return JSONObject.parseObject(json, clazz);
         } catch (Exception e) {
             logger.error("json转object异常, json: {}", json);
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
         }
     }
 
@@ -31,7 +31,7 @@ public class JsonUtil {
             return JSONArray.parseArray(jsonArray, clazz);
         } catch (Exception e) {
             logger.error("jsonArray转object异常, json: {}", jsonArray);
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
         }
     }
 

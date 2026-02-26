@@ -5,12 +5,14 @@ import com.javastudy.vocabease_common.entity.po.Share;
 import com.javastudy.vocabease_common.entity.query.ShareQuery;
 import com.javastudy.vocabease_common.entity.query.SimplePage;
 import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
+import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.mappers.ShareMapper;
 import com.javastudy.vocabease_common.service.ShareService;
 import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -125,4 +127,78 @@ public class ShareServiceImpl implements ShareService {
 	public Integer deleteShareByShareId(Integer shareId) {
 		return this.shareMapper.deleteByShareId(shareId);
 	}
+	/**
+	 * 保存/新增分享
+	 */
+	@Override
+	public void saveShare(Share share, Boolean isAdmin) {
+		//新增
+		if (share.getShareId() == null) {
+			share.setCreateTime(new Date());
+			this.shareMapper.insert(share);
+		}
+		//修改
+		else {
+			Share shareDB = this.shareMapper.selectByShareId(share.getShareId());
+			if (!shareDB.getShareId().equals(share.getShareId()) && !isAdmin)
+				throw new BusinessException("非管理员或作者无法修改当前笔记");
+			share.setCreaterId(null);
+			share.setCreateTime(null);
+			this.shareMapper.updateByShareId(share, share.getShareId());
+		}
+	}
+	/**
+	 * 删除分享
+	 */
+	@Override
+	public void deleteShareByShareIds(String shareIds, Integer userId) {
+		String[] shareIdArray = shareIds.split(",");
+		if (userId != null) {
+			ShareQuery query = new ShareQuery();
+			query.setShareIds(shareIdArray);
+			List<Share> shareList = this.findListByParam(query);
+			List<Share> currentUserList = shareList.stream().filter(item ->
+					!item.getCreaterId().equals(String.valueOf(userId))).toList();
+			if (!currentUserList.isEmpty())
+				throw new BusinessException("非管理员或作者无法删除当前笔记");
+		}
+		ShareQuery query = new ShareQuery();
+		query.setShareIds(shareIdArray);
+		this.shareMapper.deleteByParam(query);
+	}
+	/**
+	 * 修改发布状态
+	 */
+	public void updateShareStatus(String shareIds, Integer status) {
+		ShareQuery shareQuery = new ShareQuery();
+		shareQuery.setShareIds(shareIds.split(","));
+		Share share = new Share();
+		share.setStatus(status);
+		this.updateByParam(share, shareQuery);
+	}
+
+	@Override
+	public Share showShareNext(ShareQuery shareQuery, Integer currentId,
+							   Integer nextType, Boolean isUpdateReadCount) {
+		if (nextType == null)
+			shareQuery.setShareId(currentId);
+		else {
+			shareQuery.setShareId(nextType);
+			shareQuery.setCurrentId(currentId);
+		}
+		Share share = this.shareMapper.showShareNext(shareQuery);
+		if (share == null && nextType == null)
+			throw new BusinessException("抱歉，没有更多了");
+		else if (share == null && nextType == -1)
+			throw new BusinessException("已经在第一页");
+		else if (share == null && nextType == 1)
+			throw new BusinessException("已经在最后一页");
+		if (isUpdateReadCount && share != null) {
+			this.shareMapper.updateCount(1, null, currentId);
+			share.setReadCount(share.getReadCount() + 1);
+		}
+		return share;
+	}
+
+
 }

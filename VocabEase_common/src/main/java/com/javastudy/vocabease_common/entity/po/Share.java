@@ -5,6 +5,7 @@ import com.javastudy.vocabease_common.entity.enums.DateTimePatternEnum;
 import com.javastudy.vocabease_common.utils.DateUtil;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,6 +16,8 @@ import java.util.Date;
 public class Share implements Serializable {
 
 
+	@Serial
+	private static final long serialVersionUID = 1419545595435022457L;
 	/**
 	 * 笔记id
 	 */
@@ -66,6 +69,10 @@ public class Share implements Serializable {
 	 * 收藏数
 	 */
 	private Integer collectCount;
+
+	private Boolean isCollect;
+
+	private Integer collectId;
 
 	/**
 	 * 发布类型 0内部 1外部
@@ -159,6 +166,22 @@ public class Share implements Serializable {
 
 	public Integer getPostType(){
 		return this.postType;
+	}
+
+	public Boolean getCollect() {
+		return isCollect;
+	}
+
+	public void setCollect(Boolean collect) {
+		isCollect = collect;
+	}
+
+	public Integer getCollectId() {
+		return collectId;
+	}
+
+	public void setCollectId(Integer collectId) {
+		this.collectId = collectId;
 	}
 
 	@Override

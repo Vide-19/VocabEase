@@ -65,13 +65,13 @@ public class OperationAspect {
         Integer length = value == null ? 0 : value.toString().length();
         //校验空 参数空但又必须传参
         if (isEmpty && verifyParam.required())
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
         //校验长度
         if (!isEmpty && (verifyParam.max() != -1 && verifyParam.max() < length || verifyParam.min() != -1 && verifyParam.min() > length))
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
          //校验正则
         if (!isEmpty && !StringTools.isEmpty(verifyParam.regex().getRegex()) && !VerifyUtil.verify(verifyParam.regex(), value.toString()))
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
     }
     /**
      * 参数校验
@@ -107,7 +107,7 @@ public class OperationAspect {
             }
         } catch (Exception e) {
             logger.error("校验参数错误", e);
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
         }
     }
 

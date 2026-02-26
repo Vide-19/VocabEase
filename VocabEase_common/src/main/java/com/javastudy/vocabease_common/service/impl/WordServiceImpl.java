@@ -165,7 +165,7 @@ public class WordServiceImpl implements WordService {
 			List<Word> curUserDataList = wordList.stream().filter(a ->
 					!a.getCreatorId().equals(String.valueOf(userId))).collect(Collectors.toList());
 			if (!curUserDataList.isEmpty())
-				throw new BusinessException(ResponseCodeEnum.CODE_600);
+				throw new BusinessException(ResponseCodeEnum.CODE_400);
 		}
 		this.wordMapper.deleteByWordIds(wordIdArray, PostStatusEnum.NO_POST.getStatus(), userId);
 		this.word2categoryService.deleteWord2categoryByWordIds(wordIdArray);

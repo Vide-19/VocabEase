@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.AppFeedbackMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppFeedback">
+		<!--反馈Id-->
+		<id column="feedback_id" property="feedbackId"  />
+		<!--用户Id-->
+		<result column="user_id" property="userId"  />
+		<!--用户昵称-->
+		<result column="nick_name" property="nickName"  />
+		<!--反馈内容-->
+		<result column="content" property="content"  />
+		<!--创建时间-->
+		<result column="create_time" property="createTime"  />
+		<!--父反馈id-->
+		<result column="p_feedback_id" property="pFeedbackId"  />
+		<!--状态 0未回复 1已回复-->
+		<result column="status" property="status"  />
+		<!--类型 0用户 1管理-->
+		<result column="send_type" property="sendType"  />
+		<!--最后发送时间-->
+		<result column="last_send_time" property="lastSendTime"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 a.feedback_id,a.user_id,a.nick_name,a.content,a.create_time,
+		 a.p_feedback_id,a.status,a.send_type,a.last_send_time
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.feedbackId != null">
+				 and  a.feedback_id = #{query.feedbackId}
+			</if>
+			<if test="query.userId != null and query.userId!=''">
+				 and  a.user_id = #{query.userId}
+			</if>
+			<if test="query.nickName != null and query.nickName!=''">
+				 and  a.nick_name = #{query.nickName}
+			</if>
+			<if test="query.content != null and query.content!=''">
+				 and  a.content = #{query.content}
+			</if>
+			<if test="query.createTime != null and query.createTime!=''">
+				 <![CDATA[ and  a.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.pFeedbackId != null">
+				 and  a.p_feedback_id = #{query.pFeedbackId}
+			</if>
+			<if test="query.status != null">
+				 and  a.status = #{query.status}
+			</if>
+			<if test="query.sendType != null">
+				 and  a.send_type = #{query.sendType}
+			</if>
+			<if test="query.lastSendTime != null and query.lastSendTime!=''">
+				 <![CDATA[ and  a.last_send_time=str_to_date(#{query.lastSendTime}, '%Y-%m-%d') ]]>
+			</if>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
+				 and  a.user_id like concat('%', #{query.userIdFuzzy}, '%')
+			</if>
+			<if test="query.nickNameFuzzy!= null  and query.nickNameFuzzy!=''">
+				 and  a.nick_name like concat('%', #{query.nickNameFuzzy}, '%')
+			</if>
+			<if test="query.contentFuzzy!= null  and query.contentFuzzy!=''">
+				 and  a.content like concat('%', #{query.contentFuzzy}, '%')
+			</if>
+			<if test="query.createTimeStart!= null and query.createTimeStart!=''">
+				 <![CDATA[ and  a.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
+				 <![CDATA[ and  a.create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.lastSendTimeStart!= null and query.lastSendTimeStart!=''">
+				 <![CDATA[ and  a.last_send_time>=str_to_date(#{query.lastSendTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.lastSendTimeEnd!= null and query.lastSendTimeEnd!=''">
+				 <![CDATA[ and  a.last_send_time< date_sub(str_to_date(#{query.lastSendTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM app_feedback a <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM app_feedback a <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppFeedback">
+		<selectKey keyProperty="bean.feedbackId" resultType="Integer" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		 INSERT INTO app_feedback
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.userId != null">
+				 user_id,
+			</if>
+			<if test="bean.nickName != null">
+				 nick_name,
+			</if>
+			<if test="bean.content != null">
+				 content,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+			<if test="bean.pFeedbackId != null">
+				 p_feedback_id,
+			</if>
+			<if test="bean.status != null">
+				 status,
+			</if>
+			<if test="bean.sendType != null">
+				 send_type,
+			</if>
+			<if test="bean.lastSendTime != null">
+				 last_send_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.userId!=null">
+				 #{bean.userId},
+			</if>
+			<if test="bean.nickName!=null">
+				 #{bean.nickName},
+			</if>
+			<if test="bean.content!=null">
+				 #{bean.content},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+			<if test="bean.pFeedbackId!=null">
+				 #{bean.pFeedbackId},
+			</if>
+			<if test="bean.status!=null">
+				 #{bean.status},
+			</if>
+			<if test="bean.sendType!=null">
+				 #{bean.sendType},
+			</if>
+			<if test="bean.lastSendTime!=null">
+				 #{bean.lastSendTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppFeedback">
+		 INSERT INTO app_feedback
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.feedbackId != null">
+				 feedback_id,
+			</if>
+			<if test="bean.userId != null">
+				 user_id,
+			</if>
+			<if test="bean.nickName != null">
+				 nick_name,
+			</if>
+			<if test="bean.content != null">
+				 content,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+			<if test="bean.pFeedbackId != null">
+				 p_feedback_id,
+			</if>
+			<if test="bean.status != null">
+				 status,
+			</if>
+			<if test="bean.sendType != null">
+				 send_type,
+			</if>
+			<if test="bean.lastSendTime != null">
+				 last_send_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.feedbackId!=null">
+				 #{bean.feedbackId},
+			</if>
+			<if test="bean.userId!=null">
+				 #{bean.userId},
+			</if>
+			<if test="bean.nickName!=null">
+				 #{bean.nickName},
+			</if>
+			<if test="bean.content!=null">
+				 #{bean.content},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+			<if test="bean.pFeedbackId!=null">
+				 #{bean.pFeedbackId},
+			</if>
+			<if test="bean.status!=null">
+				 #{bean.status},
+			</if>
+			<if test="bean.sendType!=null">
+				 #{bean.sendType},
+			</if>
+			<if test="bean.lastSendTime!=null">
+				 #{bean.lastSendTime},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.userId!=null">
+				 user_id = VALUES(user_id),
+			</if>
+			<if test="bean.nickName!=null">
+				 nick_name = VALUES(nick_name),
+			</if>
+			<if test="bean.content!=null">
+				 content = VALUES(content),
+			</if>
+			<if test="bean.createTime!=null">
+				 create_time = VALUES(create_time),
+			</if>
+			<if test="bean.pFeedbackId!=null">
+				 p_feedback_id = VALUES(p_feedback_id),
+			</if>
+			<if test="bean.status!=null">
+				 status = VALUES(status),
+			</if>
+			<if test="bean.sendType!=null">
+				 send_type = VALUES(send_type),
+			</if>
+			<if test="bean.lastSendTime!=null">
+				 last_send_time = VALUES(last_send_time),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppFeedback" useGeneratedKeys="true" keyProperty="feedbackId">
+		 INSERT INTO app_feedback(
+			 user_id,
+			 nick_name,
+			 content,
+			 create_time,
+			 p_feedback_id,
+			 status,
+			 send_type,
+			 last_send_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.userId},
+				 #{item.nickName},
+				 #{item.content},
+				 #{item.createTime},
+				 #{item.pFeedbackId},
+				 #{item.status},
+				 #{item.sendType},
+				 #{item.lastSendTime}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppFeedback">
+		 INSERT INTO app_feedback(
+			 user_id,
+			 nick_name,
+			 content,
+			 create_time,
+			 p_feedback_id,
+			 status,
+			 send_type,
+			 last_send_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.userId},
+				 #{item.nickName},
+				 #{item.content},
+				 #{item.createTime},
+				 #{item.pFeedbackId},
+				 #{item.status},
+				 #{item.sendType},
+				 #{item.lastSendTime}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			user_id = VALUES(user_id),
+			nick_name = VALUES(nick_name),
+			content = VALUES(content),
+			create_time = VALUES(create_time),
+			p_feedback_id = VALUES(p_feedback_id),
+			status = VALUES(status),
+			send_type = VALUES(send_type),
+			last_send_time = VALUES(last_send_time)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppFeedbackQuery">
+		 UPDATE app_feedback a
+ 		 <set> 
+			<if test="bean.userId != null">
+				 user_id = #{bean.userId},
+			</if>
+			<if test="bean.nickName != null">
+				 nick_name = #{bean.nickName},
+			</if>
+			<if test="bean.content != null">
+				 content = #{bean.content},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+			<if test="bean.pFeedbackId != null">
+				 p_feedback_id = #{bean.pFeedbackId},
+			</if>
+			<if test="bean.status != null">
+				 status = #{bean.status},
+			</if>
+			<if test="bean.sendType != null">
+				 send_type = #{bean.sendType},
+			</if>
+			<if test="bean.lastSendTime != null">
+				 last_send_time = #{bean.lastSendTime},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete a from app_feedback a
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据FeedbackId修改-->
+	<update id="updateByFeedbackId" parameterType="com.javastudy.vocabease_common.entity.po.AppFeedback">
+		 UPDATE app_feedback
+ 		 <set> 
+			<if test="bean.userId != null">
+				 user_id = #{bean.userId},
+			</if>
+			<if test="bean.nickName != null">
+				 nick_name = #{bean.nickName},
+			</if>
+			<if test="bean.content != null">
+				 content = #{bean.content},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+			<if test="bean.pFeedbackId != null">
+				 p_feedback_id = #{bean.pFeedbackId},
+			</if>
+			<if test="bean.status != null">
+				 status = #{bean.status},
+			</if>
+			<if test="bean.sendType != null">
+				 send_type = #{bean.sendType},
+			</if>
+			<if test="bean.lastSendTime != null">
+				 last_send_time = #{bean.lastSendTime},
+			</if>
+ 		 </set>
+ 		 where feedback_id=#{feedbackId}
+	</update>
+
+	<!-- 根据FeedbackId删除-->
+	<delete id="deleteByFeedbackId">
+		delete from app_feedback where feedback_id=#{feedbackId}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByFeedbackId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_feedback a where feedback_id=#{feedbackId}
+	</select>
+
+</mapper>

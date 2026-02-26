@@ -188,7 +188,7 @@ public class RoleServiceImpl implements RoleService {
 
 	public void saveRole2Menu(Integer roleId, String menuIds, String halfMenuIds) {
 		if (roleId == null || menuIds == null)
-			throw new BusinessException(ResponseCodeEnum.CODE_600);
+			throw new BusinessException(ResponseCodeEnum.CODE_400);
 		Role2menuQuery role2menuQuery = new Role2menuQuery();
 		role2menuQuery.setRoleId(roleId);
 		this.role2menuMapper.deleteByParam(role2menuQuery);

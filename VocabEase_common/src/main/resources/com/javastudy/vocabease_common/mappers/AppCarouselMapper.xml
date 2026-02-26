@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.AppCarouselMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppCarousel">
+		<!--轮播图id-->
+		<id column="carousel_id" property="carouselId"  />
+		<!--图片地址-->
+		<result column="imag_path" property="imagPath"  />
+		<!--对象类型 0单词 1文章 2问题 3笔记 4外部-->
+		<result column="object_type" property="objectType"  />
+		<!--对象id-->
+		<result column="object_id" property="objectId"  />
+		<!--外部链接-->
+		<result column="outer_link" property="outerLink"  />
+		<!--排序-->
+		<result column="sort" property="sort"  />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		 a.carousel_id,a.imag_path,a.object_type,a.object_id,a.outer_link,
+		 a.sort
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.carouselId != null">
+				 and  a.carousel_id = #{query.carouselId}
+			</if>
+			<if test="query.imagPath != null and query.imagPath!=''">
+				 and  a.imag_path = #{query.imagPath}
+			</if>
+			<if test="query.objectType != null">
+				 and  a.object_type = #{query.objectType}
+			</if>
+			<if test="query.objectId != null and query.objectId!=''">
+				 and  a.object_id = #{query.objectId}
+			</if>
+			<if test="query.outerLink != null and query.outerLink!=''">
+				 and  a.outer_link = #{query.outerLink}
+			</if>
+			<if test="query.sort != null">
+				 and  a.sort = #{query.sort}
+			</if>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.imagPathFuzzy!= null  and query.imagPathFuzzy!=''">
+				 and  a.imag_path like concat('%', #{query.imagPathFuzzy}, '%')
+			</if>
+			<if test="query.objectIdFuzzy!= null  and query.objectIdFuzzy!=''">
+				 and  a.object_id like concat('%', #{query.objectIdFuzzy}, '%')
+			</if>
+			<if test="query.outerLinkFuzzy!= null  and query.outerLinkFuzzy!=''">
+				 and  a.outer_link like concat('%', #{query.outerLinkFuzzy}, '%')
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM app_carousel a <include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM app_carousel a <include refid="query_condition" />
+	</select>
+
+	<select id="selectMaxSortByType" resultType="java.lang.Integer">
+		SELECT MAX(sort) FROM app_carousel
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppCarousel">
+		<selectKey keyProperty="bean.carouselId" resultType="Integer" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		 INSERT INTO app_carousel
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.imagPath != null">
+				 imag_path,
+			</if>
+			<if test="bean.objectType != null">
+				 object_type,
+			</if>
+			<if test="bean.objectId != null">
+				 object_id,
+			</if>
+			<if test="bean.outerLink != null">
+				 outer_link,
+			</if>
+			<if test="bean.sort != null">
+				 sort,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.imagPath!=null">
+				 #{bean.imagPath},
+			</if>
+			<if test="bean.objectType!=null">
+				 #{bean.objectType},
+			</if>
+			<if test="bean.objectId!=null">
+				 #{bean.objectId},
+			</if>
+			<if test="bean.outerLink!=null">
+				 #{bean.outerLink},
+			</if>
+			<if test="bean.sort!=null">
+				 #{bean.sort},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppCarousel">
+		 INSERT INTO app_carousel
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.carouselId != null">
+				 carousel_id,
+			</if>
+			<if test="bean.imagPath != null">
+				 imag_path,
+			</if>
+			<if test="bean.objectType != null">
+				 object_type,
+			</if>
+			<if test="bean.objectId != null">
+				 object_id,
+			</if>
+			<if test="bean.outerLink != null">
+				 outer_link,
+			</if>
+			<if test="bean.sort != null">
+				 sort,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.carouselId!=null">
+				 #{bean.carouselId},
+			</if>
+			<if test="bean.imagPath!=null">
+				 #{bean.imagPath},
+			</if>
+			<if test="bean.objectType!=null">
+				 #{bean.objectType},
+			</if>
+			<if test="bean.objectId!=null">
+				 #{bean.objectId},
+			</if>
+			<if test="bean.outerLink!=null">
+				 #{bean.outerLink},
+			</if>
+			<if test="bean.sort!=null">
+				 #{bean.sort},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.imagPath!=null">
+				 imag_path = VALUES(imag_path),
+			</if>
+			<if test="bean.objectType!=null">
+				 object_type = VALUES(object_type),
+			</if>
+			<if test="bean.objectId!=null">
+				 object_id = VALUES(object_id),
+			</if>
+			<if test="bean.outerLink!=null">
+				 outer_link = VALUES(outer_link),
+			</if>
+			<if test="bean.sort!=null">
+				 sort = VALUES(sort),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppCarousel" useGeneratedKeys="true" keyProperty="carouselId">
+		 INSERT INTO app_carousel(
+			 imag_path,
+			 object_type,
+			 object_id,
+			 outer_link,
+			 sort
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.imagPath},
+				 #{item.objectType},
+				 #{item.objectId},
+				 #{item.outerLink},
+				 #{item.sort}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppCarousel">
+		 INSERT INTO app_carousel(
+			 imag_path,
+			 object_type,
+			 object_id,
+			 outer_link,
+			 sort
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.imagPath},
+				 #{item.objectType},
+				 #{item.objectId},
+				 #{item.outerLink},
+				 #{item.sort}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			imag_path = VALUES(imag_path),
+			object_type = VALUES(object_type),
+			object_id = VALUES(object_id),
+			outer_link = VALUES(outer_link),
+			sort = VALUES(sort)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppCarouselQuery">
+		 UPDATE app_carousel a
+ 		 <set> 
+			<if test="bean.imagPath != null">
+				 imag_path = #{bean.imagPath},
+			</if>
+			<if test="bean.objectType != null">
+				 object_type = #{bean.objectType},
+			</if>
+			<if test="bean.objectId != null">
+				 object_id = #{bean.objectId},
+			</if>
+			<if test="bean.outerLink != null">
+				 outer_link = #{bean.outerLink},
+			</if>
+			<if test="bean.sort != null">
+				 sort = #{bean.sort},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete a from app_carousel a
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据CarouselId修改-->
+	<update id="updateByCarouselId" parameterType="com.javastudy.vocabease_common.entity.po.AppCarousel">
+		 UPDATE app_carousel
+ 		 <set> 
+			<if test="bean.imagPath != null">
+				 imag_path = #{bean.imagPath},
+			</if>
+			<if test="bean.objectType != null">
+				 object_type = #{bean.objectType},
+			</if>
+			<if test="bean.objectId != null">
+				 object_id = #{bean.objectId},
+			</if>
+			<if test="bean.outerLink != null">
+				 outer_link = #{bean.outerLink},
+			</if>
+			<if test="bean.sort != null">
+				 sort = #{bean.sort},
+			</if>
+ 		 </set>
+ 		 where carousel_id=#{carouselId}
+	</update>
+
+	<!-- 根据CarouselId删除-->
+	<delete id="deleteByCarouselId">
+		delete from app_carousel where carousel_id=#{carouselId}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByCarouselId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_carousel a where carousel_id=#{carouselId}
+	</select>
+
+
+
+</mapper>

@@ -1,9 +1,9 @@
 package com.javastudy.vocabease_admin.controller;
+
 import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.exception.BusinessException;
-
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class AGlobalExceptionHandlerController extends ABaseController {
@@ -32,18 +30,18 @@ public class AGlobalExceptionHandlerController extends ABaseController {
         } else if (e instanceof BusinessException) {
             //业务错误
             BusinessException biz = (BusinessException) e;
-            ajaxResponse.setCode(biz.getCode() == null ? ResponseCodeEnum.CODE_600.getCode() : biz.getCode());
+            ajaxResponse.setCode(biz.getCode() == null ? ResponseCodeEnum.CODE_400.getCode() : biz.getCode());
             ajaxResponse.setInfo(biz.getMessage());
             ajaxResponse.setStatus(STATUC_ERROR);
         } else if (e instanceof BindException|| e instanceof MethodArgumentTypeMismatchException) {
             //参数类型错误
-            ajaxResponse.setCode(ResponseCodeEnum.CODE_600.getCode());
-            ajaxResponse.setInfo(ResponseCodeEnum.CODE_600.getMsg());
+            ajaxResponse.setCode(ResponseCodeEnum.CODE_400.getCode());
+            ajaxResponse.setInfo(ResponseCodeEnum.CODE_400.getMsg());
             ajaxResponse.setStatus(STATUC_ERROR);
         } else if (e instanceof DuplicateKeyException) {
             //主键冲突
-            ajaxResponse.setCode(ResponseCodeEnum.CODE_601.getCode());
-            ajaxResponse.setInfo(ResponseCodeEnum.CODE_601.getMsg());
+            ajaxResponse.setCode(ResponseCodeEnum.CODE_409.getCode());
+            ajaxResponse.setInfo(ResponseCodeEnum.CODE_409.getMsg());
             ajaxResponse.setStatus(STATUC_ERROR);
         } else {
             ajaxResponse.setCode(ResponseCodeEnum.CODE_500.getCode());

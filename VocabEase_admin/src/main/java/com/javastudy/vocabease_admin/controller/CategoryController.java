@@ -36,7 +36,7 @@ public class CategoryController extends ABaseController{
 	 */
 	@RequestMapping("/saveCategory")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.CATEGORY_EDIT)
-	public ResponseVO saveCategory(Category category){
+	public ResponseVO<Void> saveCategory(Category category){
 		this.categoryService.saveCategory(category);
 		return getSuccessResponseVO(null);
 	}
@@ -45,7 +45,7 @@ public class CategoryController extends ABaseController{
 	 */
 	@RequestMapping("/deleteCategory")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.CATEGORY_DELETE)
-	public ResponseVO deleteCategory(@VerifyParam(required = true) Integer categoryId){
+	public ResponseVO<Void> deleteCategory(@VerifyParam(required = true) Integer categoryId){
 		this.categoryService.deleteCategoryByCategoryId(categoryId);
 		return getSuccessResponseVO(null);
 	}
@@ -54,7 +54,7 @@ public class CategoryController extends ABaseController{
 	 */
 	@RequestMapping("/updateSort")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.CATEGORY_EDIT)
-	public ResponseVO updateSort(@VerifyParam(required = true) String  categoryIds){
+	public ResponseVO<Void> updateSort(@VerifyParam(required = true) String  categoryIds){
 		this.categoryService.updateSort(categoryIds);
 		return getSuccessResponseVO(null);
 	}

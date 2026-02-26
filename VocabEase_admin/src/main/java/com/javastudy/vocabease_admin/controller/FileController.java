@@ -126,7 +126,7 @@ public class FileController extends ABaseController{
     public void downloadTemplate(HttpServletResponse response, HttpServletRequest request, Integer type) {
         TemplateEnum templateEnum = TemplateEnum.getEnumByType(type);
         if (templateEnum == null)
-            throw new BusinessException(ResponseCodeEnum.CODE_600);
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
         OutputStream os = null;
         InputStream is = null;
         try {

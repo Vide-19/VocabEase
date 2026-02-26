@@ -38,7 +38,7 @@ public class MenuController extends ABaseController{
 	 */
 	@RequestMapping("/saveMenu")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_MENU_EDIT)
-	public ResponseVO saveMenu(@VerifyParam Menu menu){
+	public ResponseVO<Void> saveMenu(@VerifyParam Menu menu){
 		this.menuService.saveMenu(menu);
 		return getSuccessResponseVO(null);
 	}
@@ -47,7 +47,7 @@ public class MenuController extends ABaseController{
 	 */
 	@RequestMapping("/deleteMenu")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_MENU_DELETE)
-	public ResponseVO deleteMenu(@VerifyParam(required = true) Integer menuId){
+	public ResponseVO<Void> deleteMenu(@VerifyParam(required = true) Integer menuId){
 		this.menuService.deleteMenuByMenuId(menuId);
 		return getSuccessResponseVO(null);
 	}

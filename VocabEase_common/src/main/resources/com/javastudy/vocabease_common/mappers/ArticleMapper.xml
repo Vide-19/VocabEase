@@ -95,7 +95,7 @@
             <if test="query.createrIdFuzzy!= null  and query.createrIdFuzzy!=''">
                 and a.creater_id like concat('%', #{query.createrIdFuzzy}, '%')
             </if>
-            <if test="query.articleIds！= null and query.articleIds.length>0">
+            <if test="query.articleIds!= null and query.articleIds.length>0">
                 and article_id in(<foreach collection="query.articleIds" separator="," item="item">#{item}</foreach> )
             </if>
             <if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">

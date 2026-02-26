@@ -9,12 +9,16 @@ public class AppConfig {
     private String projectFolder;
     @Value("${admin.phone}")
     private String superAdminPhone;
+    @Value("${spring.security.jwt.key}")
+    private String jwtCommonSecret;
+    @Value("${spring.application.name}")
+    private String applicationName;
+    @Value("${spring.application.domain}")
+    private String appDomain;
 
     public String getProjectFolder() {return projectFolder;}
-
-    public void setProjectFolder(String projectFolder) {this.projectFolder = projectFolder;}
-
     public String getSuperAdminPhone() {return superAdminPhone;}
-
-    public void setSuperAdminPhone(String superAdminPhone) {this.superAdminPhone = superAdminPhone;}
+    public String getJwtCommonSecret() {return jwtCommonSecret;}
+    public String getApplicationName() {return applicationName;}
+    public String getAppDomain() {return appDomain;}
 }

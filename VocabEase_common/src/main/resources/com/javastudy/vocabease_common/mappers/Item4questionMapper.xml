@@ -38,12 +38,15 @@
 
 	<!-- 通用查询条件列-->
 	<sql id="query_condition">
-	 <where>
-			<include refid="base_condition_filed" />
+		<where>
+			<include refid="base_condition_filed"/>
 			<if test="query.titleFuzzy!= null  and query.titleFuzzy!=''">
-				 and  i.title like concat('%', #{query.titleFuzzy}, '%')
+				and i.title like concat('%', #{query.titleFuzzy}, '%')
 			</if>
-	 </where>
+			<if test="query.questionIdList!=null and query.questionIdList.size()>0">
+				and i.question_id in(<foreach collection="query.questionIdList" separator="," item="item">#{item}</foreach> )
+			</if>
+		</where>
 	</sql>
 
 	<!-- 查询集合-->

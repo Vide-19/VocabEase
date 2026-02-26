@@ -1,5 +1,7 @@
 package com.javastudy.vocabease_common.entity.query;
 
+import java.util.List;
+
 /**
  * 问题表参数
  */
@@ -15,6 +17,12 @@ public class QuestionQuery extends BaseParam {
 	private Integer currentId;
 
 	private Integer nextType;
+
+	private Boolean isQuestionItem;
+
+	private String[] categoryIds;
+
+	private List<Integer> questionIdList;
 
 	/**
 	 * 标题
@@ -34,6 +42,8 @@ public class QuestionQuery extends BaseParam {
 	 * 答案
 	 */
 	private String answer;
+
+	private String answerFuzzy;
 
 	/**
 	 * 答案解释
@@ -256,5 +266,45 @@ public class QuestionQuery extends BaseParam {
 
 	public void setNextType(Integer nextType) {
 		this.nextType = nextType;
+	}
+
+	public String getAnswer() {
+		return answer;
+	}
+
+	public void setAnswer(String answer) {
+		this.answer = answer;
+	}
+
+	public String getAnswerFuzzy() {
+		return answerFuzzy;
+	}
+
+	public void setAnswerFuzzy(String answerFuzzy) {
+		this.answerFuzzy = answerFuzzy;
+	}
+
+	public Boolean getQuestionItem() {
+		return isQuestionItem;
+	}
+
+	public void setQuestionItem(Boolean questionItem) {
+		isQuestionItem = questionItem;
+	}
+
+	public String[] getCategoryIds() {
+		return categoryIds;
+	}
+
+	public void setCategoryIds(String[] categoryIds) {
+		this.categoryIds = categoryIds;
+	}
+
+	public List<Integer> getQuestionIdList() {
+		return questionIdList;
+	}
+
+	public void setQuestionIdList(List<Integer> questionIdList) {
+		this.questionIdList = questionIdList;
 	}
 }

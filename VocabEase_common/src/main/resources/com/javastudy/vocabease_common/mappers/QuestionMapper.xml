@@ -80,6 +80,12 @@
         <if test="query.questionType != null">
             and q.question_type = #{query.questionType}
         </if>
+        <if test="query.categoryIds != null and query.categoryIds.length>0">
+             and category_id in (<foreach collection="query.categoryIds" separator="," item="item">#{item}</foreach> )
+        </if>
+        <if test="query.questionIdList != null and query.questionIdList.size()>0">
+            and question_id not in (<foreach collection="query.questionIdList" separator="," item="item">#{item}</foreach> )
+        </if>
     </sql>
 
 	<!-- 通用查询条件列-->

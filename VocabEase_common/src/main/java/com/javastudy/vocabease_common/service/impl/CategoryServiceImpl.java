@@ -157,22 +157,19 @@ public class CategoryServiceImpl implements CategoryService {
 		query.setCategoryName(category.getCategoryName());
 		query.setType(category.getType());
 		// 如果是更新，排除当前记录自身
-		if (category.getCategoryId() != null) {
+		if (category.getCategoryId() != null)
 			query.setExcludeCategoryId(category.getCategoryId()); // 需 Query 支持此字段
-		}
-		if (this.findCountByParam(query) > 0) {
+		if (this.findCountByParam(query) > 0)
 			throw new BusinessException("该分类名称已存在");
-		}
 		// 2. 处理新增：设置 sort
 		if (category.getCategoryId() == null) {
 			// 查询当前 type 下的最大 sort 值
 			Integer maxSort = this.categoryMapper.selectMaxSortByType(category.getType());
 			category.setSort(maxSort == null ? 1 : maxSort + 1);
 			this.categoryMapper.insert(category);
-		} else {
+		} else
 			// 更新：直接覆盖（假设 updateByCategoryId 更新所有字段）
 			this.categoryMapper.updateByCategoryId(category, category.getCategoryId());
-		}
 	}
 	/**
 	 * 修改分类排序
@@ -195,12 +192,10 @@ public class CategoryServiceImpl implements CategoryService {
 	public List<Category> getCategoryListByType(Integer type) {
 		CategoryTypeEnum categoryTypeFromEnum = CategoryTypeEnum.getEnumByType(type);
 		if (categoryTypeFromEnum == null)
-			throw new BusinessException(ResponseCodeEnum.CODE_600);
+			throw new BusinessException(ResponseCodeEnum.CODE_400);
 		CategoryQuery query = new CategoryQuery();
 		query.setTypes(new Integer[] {categoryTypeFromEnum.getType(), CategoryTypeEnum.ARTICLE_QUESTION.getType()});
 		query.setOrderBy("sort asc");
-
-
 		return List.of();
 	}
 

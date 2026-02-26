@@ -11,6 +11,12 @@ public class ShareQuery extends BaseParam {
 	 */
 	private Integer shareId;
 
+	private String[] shareIds;
+
+	private Integer currentId;
+
+	private Integer nextType;
+
 	/**
 	 * 标题
 	 */
@@ -24,6 +30,8 @@ public class ShareQuery extends BaseParam {
 	private String content;
 
 	private String contentFuzzy;
+
+	private Boolean isQueryContent;
 
 	/**
 	 * 笔记类别 0无封面 1横幅 2小图标
@@ -209,4 +217,35 @@ public class ShareQuery extends BaseParam {
 		return this.postType;
 	}
 
+	public Boolean getQueryContent() {
+		return isQueryContent;
+	}
+
+	public void setQueryContent(Boolean queryContent) {
+		isQueryContent = queryContent;
+	}
+
+	public String[] getShareIds() {
+		return shareIds;
+	}
+
+	public void setShareIds(String[] shareIds) {
+		this.shareIds = shareIds;
+	}
+
+	public Integer getCurrentId() {
+		return currentId;
+	}
+
+	public void setCurrentId(Integer currentId) {
+		this.currentId = currentId;
+	}
+
+	public Integer getNextType() {
+		return nextType;
+	}
+
+	public void setNextType(Integer nextType) {
+		this.nextType = nextType;
+	}
 }
