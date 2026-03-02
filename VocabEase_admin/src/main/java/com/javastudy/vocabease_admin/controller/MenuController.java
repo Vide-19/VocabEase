@@ -38,7 +38,7 @@ public class MenuController extends ABaseController{
 	 */
 	@RequestMapping("/saveMenu")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_MENU_EDIT)
-	public ResponseVO<Void> saveMenu(@VerifyParam Menu menu){
+	public ResponseVO<Void> saveMenu(@VerifyParam(required = true) Menu menu){
 		this.menuService.saveMenu(menu);
 		return getSuccessResponseVO(null);
 	}

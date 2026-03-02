@@ -1,5 +1,6 @@
 package com.javastudy.vocabease_common.entity.po;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -9,6 +10,8 @@ import java.io.Serializable;
 public class Role2menu implements Serializable {
 
 
+	@Serial
+	private static final long serialVersionUID = -1483779908600458170L;
 	/**
 	 * 角色id
 	 */

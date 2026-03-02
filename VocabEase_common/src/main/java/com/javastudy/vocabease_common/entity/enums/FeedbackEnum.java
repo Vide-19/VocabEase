@@ -3,6 +3,7 @@ package com.javastudy.vocabease_common.entity.enums;
 public enum FeedbackEnum {
     CLIENT(0, "访客"),
     ADMIN(1, "管理员"),
+    REGULAR(10, "普通用户"),
     NO_REPLY(2, "未回复"),
     IS_REPLY(3, "已回复");
 

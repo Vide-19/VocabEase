@@ -38,8 +38,8 @@ public class IndexController extends ABaseController {
      * 统计内容数据
      */
     @RequestMapping("/getWeekContentData")
-    //@GlobalInterceptor(permissionCode = PermissionCodeEnum.HOME)
-    public ResponseVO<List<StatisticDataDto>> getWeekContentData() {
-        return getSuccessResponseVO(this.statisticDataService.getAllData());
+    @GlobalInterceptor(permissionCode = PermissionCodeEnum.HOME)
+    public ResponseVO<StatisticWeekDataDto> getWeekContentData() {
+        return getSuccessResponseVO(this.statisticDataService.getWeekContentData());
     }
 }

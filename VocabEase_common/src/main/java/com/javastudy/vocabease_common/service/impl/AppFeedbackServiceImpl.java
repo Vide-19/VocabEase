@@ -77,5 +77,23 @@ public class AppFeedbackServiceImpl implements AppFeedbackService {
 		this.appFeedbackMapper.updateByFeedbackId(pFeedback, pFeedback.getFeedbackId());
 	}
 
-
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void saveNewFeedback(AppFeedback appFeedback) {
+		Date currentDate = new Date();
+		if (appFeedback.getpFeedbackId() != null && appFeedback.getpFeedbackId() != 0) {
+			AppFeedback pFeedbackDB = this.appFeedbackMapper.selectByFeedbackId(appFeedback.getFeedbackId());
+			if (pFeedbackDB == null)
+				throw new BusinessException(ResponseCodeEnum.CODE_400);
+			AppFeedback pFeedbackUpdate = new AppFeedback();
+			pFeedbackUpdate.setLastSendTime(currentDate);
+			pFeedbackUpdate.setStatus(FeedbackEnum.NO_REPLY.getCode());
+			this.appFeedbackMapper.updateByFeedbackId(pFeedbackUpdate, pFeedbackDB.getFeedbackId());
+		}
+		appFeedback.setStatus(FeedbackEnum.NO_REPLY.getCode());
+		appFeedback.setCreateTime(currentDate);
+		appFeedback.setSendType(FeedbackEnum.CLIENT.getCode());
+		appFeedback.setLastSendTime(currentDate);
+		this.appFeedbackMapper.insert(appFeedback);
+	}
 }

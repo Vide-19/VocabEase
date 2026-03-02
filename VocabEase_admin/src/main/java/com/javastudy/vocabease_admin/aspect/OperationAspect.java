@@ -31,8 +31,12 @@ import java.util.List;
 @Component("operationAspect")
 public class OperationAspect {
     private Logger logger = LoggerFactory.getLogger(OperationAspect.class);
-    public static final String[] BASE_TYPE = new String[]{"java.lang.String",
-            "java.lang.Integer", "java.lang.Long"};
+    public static final String[] BASE_TYPE = new String[]{
+            "java.lang.String",
+            "java.lang.Integer", "java.lang.Long", "java.lang.Boolean",
+            "java.lang.Double", "java.lang.Float",
+            "int", "long", "boolean", "double", "float"
+    };
     //注解配置
     /*
     //定义切点
@@ -125,6 +129,4 @@ public class OperationAspect {
         if (!permissionCodeList.contains(permissionCodeEnum.getCode()))
             throw new BusinessException(ResponseCodeEnum.CODE_403);
     }
-
-
 }

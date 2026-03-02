@@ -3,6 +3,7 @@ package com.javastudy.vocabease_admin.controller;
 import com.javastudy.vocabease_admin.annotation.GlobalInterceptor;
 import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 import com.javastudy.vocabease_common.entity.config.AppConfig;
+import com.javastudy.vocabease_common.entity.dto.SessionUserAdminDto;
 import com.javastudy.vocabease_common.entity.enums.AccountStatusEnum;
 import com.javastudy.vocabease_common.entity.enums.PermissionCodeEnum;
 import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
@@ -14,6 +15,7 @@ import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.service.AccountService;
 import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -89,4 +91,14 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
 		this.accountService.updateAccountByUserId(account, userId);
 		return getSuccessResponseVO(null);
 	}
+	/**
+	 * 获取当前用户信息
+	 */
+	@RequestMapping("/getMyInfo")
+	@GlobalInterceptor // ← 需要登录
+	public ResponseVO<SessionUserAdminDto> getMyInfo(HttpSession session) {
+		SessionUserAdminDto user = getSessionUserAdminDto(session);
+		return getSuccessResponseVO(user);
+	}
+	//修改个人信息👇
 }

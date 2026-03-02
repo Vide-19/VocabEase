@@ -58,7 +58,6 @@ public class MenuServiceImpl implements MenuService {
 
 	/**
 	 * 保存修改的菜单
-	 * @param menu
 	 */
 	@Override
 	public void saveMenu(Menu menu) {

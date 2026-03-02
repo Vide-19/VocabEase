@@ -72,8 +72,8 @@ public interface RoleService {
 	/**
 	 * 保存新增的角色
 	 */
-	void savaRole(Role role, String menuIds, String halfMenuIds);
+	void savaRole(Role role, String menuIds);
 
-	void saveRole2Menu(Integer roleId, String menuIds, String halfMenuIds);
+	void saveRole2Menu(Integer roleId, String menuIds);
 
 }

@@ -8,6 +8,7 @@ public class Constants {
     public static final Integer JWT_TOKEN_EXPIRE = 60 * 60 * 24 * 7;
     public static final String APP_UPDATE_FOLDER = "/app/";
     public static final String READ_IMG_PATH = "/api/file/getImage/";
+    public static final String AVATAR_FOLDER = "avatar/";
     public static final Integer LENGTH_8 = 8;
     public static final Integer LENGTH_10 = 10;
     public static final Integer LENGTH_20 = 20;
@@ -25,5 +26,6 @@ public class Constants {
     public static final String[] EXCEL_TITLE_ARTICLE = new String[] {"标题", "正文", "翻译", "难度", "分类"};
     public static final String[] EXCEL_TITLE_WORD = new String[] {"单词", "音标", "词性", "释义", "例句", "难度", "分类"};
     public static final String[] EXCEL_TITLE_QUESTION = new String[] {"标题", "问题描述", "问题选项", "答案解析", "问题类型", "难度", "分类"};
+    public static final int ORDER_CORS = -102;
 
 }

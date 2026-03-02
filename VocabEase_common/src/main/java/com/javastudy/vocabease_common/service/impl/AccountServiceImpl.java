@@ -3,6 +3,7 @@ package com.javastudy.vocabease_common.service.impl;
 import com.javastudy.vocabease_common.entity.config.AppConfig;
 import com.javastudy.vocabease_common.entity.dto.SessionUserAdminDto;
 import com.javastudy.vocabease_common.entity.enums.AccountStatusEnum;
+import com.javastudy.vocabease_common.entity.enums.FeedbackEnum;
 import com.javastudy.vocabease_common.entity.enums.MenuTypeEnum;
 import com.javastudy.vocabease_common.entity.enums.PageSize;
 import com.javastudy.vocabease_common.entity.po.Account;
@@ -179,6 +180,7 @@ public class AccountServiceImpl implements AccountService {
         SessionUserAdminDto sessionUserAdminDto = new SessionUserAdminDto();
         sessionUserAdminDto.setUserId(account.getUserId());
         sessionUserAdminDto.setUserName(account.getUserName());
+        sessionUserAdminDto.setPhone(account.getPhone());
         List<Menu> menuList;
         if (!StringTools.isEmpty(appConfig.getSuperAdminPhone()) &&
                 ArrayUtils.contains(appConfig.getSuperAdminPhone().split(","), phone)) {
@@ -222,6 +224,8 @@ public class AccountServiceImpl implements AccountService {
             account.setPassword(StringTools.encodeByMd5(account.getPassword()));
             account.setStatus(AccountStatusEnum.ENABLED.getStatus());
             account.setCreateTime(new Date());
+            if (account.getRoles() == null)
+                account.setRoles(FeedbackEnum.REGULAR.getCode().toString());
             this.accountMapper.insert(account);
         }
         //修改

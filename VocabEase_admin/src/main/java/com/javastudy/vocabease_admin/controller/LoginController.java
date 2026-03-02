@@ -5,6 +5,7 @@ import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 import com.javastudy.vocabease_common.entity.constants.Constants;
 import com.javastudy.vocabease_common.entity.dto.CreateImagCode;
 import com.javastudy.vocabease_common.entity.dto.SessionUserAdminDto;
+import com.javastudy.vocabease_common.entity.enums.AccountStatusEnum;
 import com.javastudy.vocabease_common.entity.enums.PermissionCodeEnum;
 import com.javastudy.vocabease_common.entity.enums.VerifyRegexEnum;
 import com.javastudy.vocabease_common.entity.po.Account;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
+@RequestMapping("/api")
 public class LoginController extends ABaseController {
     @Resource
     private AccountService accountService;
@@ -72,6 +74,35 @@ public class LoginController extends ABaseController {
         Account account = new Account();
         account.setPassword(StringTools.encodeByMd5(password));
         this.accountService.updateAccountByUserId(account, sessionUserAdminDto.getUserId());
+        return getSuccessResponseVO(null);
+    }
+    /**
+     * 注册
+     */
+    @PostMapping("/register")
+    @GlobalInterceptor(checkLogin = false) // ← 关键：跳过登录检查
+    public ResponseVO<Void> register(
+            HttpSession session,
+            @VerifyParam(required = true) String username,
+            @VerifyParam(required = true, regex = VerifyRegexEnum.PHONE) String phone,
+            @VerifyParam(required = true) String password,
+            @VerifyParam(required = true) String checkCode) {
+
+        // 1. 验证验证码
+        if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
+            throw new BusinessException("验证码错误");
+        }
+
+        // 2. 构造 Account 对象（注意：注册时状态应为启用，角色可默认）
+        Account account = new Account();
+        account.setUserName(username);
+        account.setPhone(phone);
+        account.setPassword(password);
+        account.setStatus(AccountStatusEnum.DISABLED.getStatus()); // 默认启用
+
+        // 3. 调用 service 保存（复用 saveAccount 逻辑）
+        this.accountService.saveAccount(account);
+
         return getSuccessResponseVO(null);
     }
 }

@@ -12,25 +12,21 @@ import java.lang.annotation.Target;
 public @interface VerifyParam {
     /**
      * 最大长度默认-1
-     * @return
      */
     int max() default -1;
 
     /**
      * 最小长度默认-1
-     * @return
      */
     int min() default -1;
 
     /**
      * 请求 默认非必填
-     * @return
      */
     boolean required() default false;
 
     /**
      * 校验正则表达式
-     * @return
      */
     VerifyRegexEnum regex() default VerifyRegexEnum.NO;
 }

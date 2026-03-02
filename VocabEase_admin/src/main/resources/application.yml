@@ -8,10 +8,14 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  security:
+    jwt:
+      key: test123456
+  application:
+    name: VocabEase
+    domain: "需配置域名"
 server:
   port: 9091
-  servlet:
-    context-path: /api
 project:
   folder: D:/IdeaProject/VocabEase/
 admin:
@@ -19,8 +23,7 @@ admin:
 log:
   root:
     level: debug
-isDev:
-  false
+isDev: false
 mybatis:
   mapper-locations: classpath*:com/javastudy/vocabease_common/mappers/*.xml
   type-aliases-package: com.javastudy.vocabease_common.entity

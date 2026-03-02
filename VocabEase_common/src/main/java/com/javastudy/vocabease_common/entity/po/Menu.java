@@ -2,6 +2,7 @@ package com.javastudy.vocabease_common.entity.po;
 
 import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import java.util.List;
 public class Menu implements Serializable {
 
 
+	@Serial
+	private static final long serialVersionUID = -2623348274830520322L;
 	/**
 	 * 菜单id，自增主键
 	 */

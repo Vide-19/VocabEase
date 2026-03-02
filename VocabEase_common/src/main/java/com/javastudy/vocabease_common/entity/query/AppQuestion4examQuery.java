@@ -1,6 +1,7 @@
 package com.javastudy.vocabease_common.entity.query;
 
 
+import java.util.List;
 
 /**
  * 测试问题表参数
@@ -28,6 +29,8 @@ public class AppQuestion4examQuery extends BaseParam {
 	 * 问题id
 	 */
 	private Integer questionId;
+
+	private List<String> questionIds;
 
 	/**
 	 * 作答内容
@@ -114,5 +117,13 @@ public class AppQuestion4examQuery extends BaseParam {
 
 	public void setShowAnswer(Boolean showAnswer) {
 		isShowAnswer = showAnswer;
+	}
+
+	public List<String> getQuestionIds() {
+		return questionIds;
+	}
+
+	public void setQuestionIds(List<String> questionIds) {
+		this.questionIds = questionIds;
 	}
 }

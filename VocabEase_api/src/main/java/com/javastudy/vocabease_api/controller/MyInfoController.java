@@ -3,23 +3,29 @@ package com.javastudy.vocabease_api.controller;
 import com.javastudy.vocabease_api.annotation.GlobalInterceptor;
 import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 import com.javastudy.vocabease_common.entity.config.AppConfig;
+import com.javastudy.vocabease_common.entity.constants.Constants;
 import com.javastudy.vocabease_common.entity.dto.AppAccountDto;
-import com.javastudy.vocabease_common.entity.enums.CollectTypeEnum;
-import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
+import com.javastudy.vocabease_common.entity.enums.*;
 import com.javastudy.vocabease_common.entity.po.*;
 import com.javastudy.vocabease_common.entity.query.*;
 import com.javastudy.vocabease_common.entity.vo.AppUserInfoVO;
+import com.javastudy.vocabease_common.entity.vo.ExamQuestionVO;
 import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.service.*;
 import com.javastudy.vocabease_common.utils.CopyUtil;
+import com.javastudy.vocabease_common.utils.ScaleFilterUtil;
+import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -172,13 +178,157 @@ public class MyInfoController extends ABaseController {
      * 我的测试记录
      */
     @RequestMapping("/getMyExam")
-    public ResponseVO<AppUserInfoVO> getMyExam(@RequestHeader(value = "token", required = false) String token) {
+    @GlobalInterceptor(checkLogin = true)
+    public ResponseVO<PaginationResultVO<AppExam>> getMyExam(@RequestHeader(value = "token", required = false) String token,
+                                                             Integer PageNum) {
         AppAccountDto dto = getTokenUserAdminDto(token);
         if (dto == null)
             return getSuccessResponseVO(null);
-        //👇
+        AppExamQuery query = new AppExamQuery();
+        query.setPageNo(PageNum);
+        query.setUserId(dto.getUserId());
+        query.setOrderBy("exam_id desc");
+        PaginationResultVO<AppExam> vo = this.appExamService.findListByPage(query);
+        return getSuccessResponseVO(vo);
+    }
 
+    /**
+     * 上传我的头像
+     */
+    @RequestMapping("/uploadMyAvatar")
+    @GlobalInterceptor(checkLogin = true)
+    public ResponseVO<Void> uploadMyAvatar(@RequestHeader(value = "token", required = false) String token,
+                                           MultipartFile file) throws IOException {
+        AppAccountDto dto = getTokenUserAdminDto(token);
+        if (dto == null)
+            return getSuccessResponseVO(null);
+        String folderName = appConfig.getProjectFolder() + Constants.AVATAR_FOLDER;
+        File folder = new File(folderName);
+        if (!folder.exists())
+            folder.exists();
+        String avatarName = dto.getUserId() + StringTools.getFileSuffix(file.getOriginalFilename());
+        File avatarFile = new File(folder.getPath() + "/" + avatarName);
+        file.transferTo(avatarFile);
 
+        ScaleFilterUtil.createThumbnail(avatarFile, Constants.LENGTH_50, Constants.LENGTH_50, avatarFile);
+        AppAccount account = new AppAccount();
+        account.setAvatar(Constants.AVATAR_FOLDER + avatarName);
+        this.appAccountService.updateAppAccountByUserId(account, dto.getUserId());
+        return getSuccessResponseVO(null);
+    }
+
+    /**
+     * 更新我的信息
+     */
+    @RequestMapping("/updateMyInfo")
+    @GlobalInterceptor(checkLogin = true)
+    public ResponseVO<Void> updateMyInfo(@RequestHeader(value = "token", required = false) String token,
+                                         @VerifyParam(required = true) Integer gender,
+                                         @VerifyParam(regex = VerifyRegexEnum.PASSWORD) String password) throws IOException {
+        AppAccountDto dto = getTokenUserAdminDto(token);
+        if (dto == null)
+            return getSuccessResponseVO(null);
+        AppAccount updateInfo = new AppAccount();
+        updateInfo.setGender(gender);
+        if (!StringTools.isEmpty(password))
+            updateInfo.setPassword(StringTools.encodeByMd5(password));
+        this.appAccountService.updateAppAccountByUserId(updateInfo, dto.getUserId());
+        return getSuccessResponseVO(null);
+    }
+
+    /**
+     * 我的错题
+     */
+    @RequestMapping("/getMyWrong")
+    @GlobalInterceptor(checkLogin = true)
+    public ResponseVO<PaginationResultVO<AppQuestion4exam>> getMyWrong(
+            @RequestHeader(value = "token", required = false) String token,
+            Integer PageNum) {
+        AppAccountDto dto = getTokenUserAdminDto(token);
+        if (dto == null)
+            return getSuccessResponseVO(null);
+        AppQuestion4examQuery query = new AppQuestion4examQuery();
+        query.setPageNo(PageNum);
+        query.setUserId(dto.getUserId());
+        query.setOrderBy("exam_id desc");
+        query.setResult(ExamStatusEnum.FALSE.getStatus());
+        PaginationResultVO vo = this.appQuestion4examService.findListByPage(query);
+
+        List<AppQuestion4exam> wrongQuestionList = vo.getList();
+        List<String> wrongQuestionIdList = wrongQuestionList.stream().
+                map(item -> item.getQuestionId().toString()).toList();
+        if (wrongQuestionIdList.isEmpty())
+            return getSuccessResponseVO(vo);
+
+        query = new AppQuestion4examQuery();
+        query.setShowAnswer(true);
+        query.setQuestionIds(wrongQuestionIdList);
+        query.setResult(ExamStatusEnum.FALSE.getStatus());
+        List<ExamQuestionVO> wrongQuestionDetailList = this.appExamService.getAppExamQuestion(query);
+
+        for (ExamQuestionVO item : wrongQuestionDetailList) {
+            item.setQuestion(resetContentImg(item.getQuestion()));
+            item.setAnswerAnalysis(resetContentImg(item.getAnswerAnalysis()));
+        }
+        vo.setList(wrongQuestionDetailList);
+        return getSuccessResponseVO(vo);
+    }
+
+    /**
+     * 我的反馈
+     */
+    @RequestMapping("/getMyFeedback")
+    @GlobalInterceptor(checkLogin = true)
+    public ResponseVO<PaginationResultVO<AppFeedback>> getMyFeedback(
+            @RequestHeader(value = "token", required = false) String token, Integer pageNum) {
+        AppAccountDto dto = getTokenUserAdminDto(token);
+        if (dto == null)
+            return getSuccessResponseVO(null);
+        AppFeedbackQuery query = new AppFeedbackQuery();
+        query.setOrderBy("feedback_id desc");
+        query.setPageNo(pageNum);
+        query.setpFeedbackId(0);
+        query.setUserId(dto.getUserId());
+        PaginationResultVO<AppFeedback> vo = this.appFeedbackService.findListByPage(query);
+        return getSuccessResponseVO(vo);
+    }
+
+    /**
+     * 我的反馈
+     */
+    @RequestMapping("/getMyFeedbackReply")
+    public ResponseVO<PaginationResultVO<AppFeedback>> getMyFeedbackReply(
+            @RequestHeader(value = "token", required = false) String token,
+            @VerifyParam(required = true) Integer pFeedbackId) {
+        AppAccountDto dto = getTokenUserAdminDto(token);
+        if (dto == null)
+            return getSuccessResponseVO(null);
+        AppFeedbackQuery query = new AppFeedbackQuery();
+        query.setOrderBy("feedback_id desc");
+        query.setpFeedbackId(pFeedbackId);
+        query.setUserId(dto.getUserId());
+        PaginationResultVO<AppFeedback> vo = this.appFeedbackService.findListByPage(query);
+        return getSuccessResponseVO(vo);
+    }
+
+    /**
+     * 新增我的反馈
+     */
+    @RequestMapping("/addMyNewFeedback")
+    @GlobalInterceptor(checkLogin = true, frequencyType = RequestFrequencyEnum.DAY, requestFrequencyThreshold = 5)
+    public ResponseVO<Void> addMyNewFeedback(
+            @RequestHeader(value = "token", required = false) String token,
+            @VerifyParam(required = true) Integer pFeedbackId,
+            @VerifyParam(required = true, max = 300) String content) {
+        AppAccountDto dto = getTokenUserAdminDto(token);
+        if (dto == null)
+            return getSuccessResponseVO(null);
+        AppFeedback newFeedback = new AppFeedback();
+        newFeedback.setUserId(dto.getUserId());
+        newFeedback.setNickName(dto.getNickName());
+        newFeedback.setContent(content);
+        newFeedback.setpFeedbackId(pFeedbackId);
+        this.appFeedbackService.saveNewFeedback(newFeedback);
         return getSuccessResponseVO(null);
     }
 }

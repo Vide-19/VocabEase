@@ -6,6 +6,7 @@ import com.javastudy.vocabease_common.entity.enums.DateTimePatternEnum;
 import com.javastudy.vocabease_common.utils.DateUtil;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -17,9 +18,12 @@ import java.util.List;
 public class Role implements Serializable {
 
 
+	@Serial
+	private static final long serialVersionUID = -1413350622730176927L;
 	/**
 	 * 角色id
 	 */
+	@VerifyParam(min = 1) // ← 添加这一行
 	private Integer roleId;
 
 	/**
@@ -50,6 +54,24 @@ public class Role implements Serializable {
 
 	private List<Integer> menuIds;
 
+	private String menuIdx;
+	//private String halfMenuIds;
+
+	public String getMenuIdx() {
+		return menuIdx;
+	}
+
+	public void setMenuIdx(String menuIdx) {
+		this.menuIdx = menuIdx;
+	}
+
+//	public String getHalfMenuIds() {
+//		return halfMenuIds;
+//	}
+//
+//	public void setHalfMenuIds(String halfMenuIds) {
+//		this.halfMenuIds = halfMenuIds;
+//	}
 
 	public void setRoleId(Integer roleId){
 		this.roleId = roleId;

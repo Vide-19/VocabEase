@@ -11,9 +11,18 @@ public class SessionUserAdminDto implements Serializable {
     private static final long serialVersionUID = 2733702841667793026L;
     private Integer userId;
     private String userName;
+    private String phone;
     private Boolean superAdmin;
     private List<MenuVO> menuList;
     private List<String> permissionCodeList;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public List<MenuVO> getMenuList() {
         return menuList;

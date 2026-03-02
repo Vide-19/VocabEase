@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/VocabEase_admin/VocabEase_admin.iml" filepath="$PROJECT_DIR$/VocabEase_admin/VocabEase_admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vocabease_frontend.iml" filepath="$PROJECT_DIR$/vocabease_frontend.iml" />
     </modules>
   </component>
 </project>

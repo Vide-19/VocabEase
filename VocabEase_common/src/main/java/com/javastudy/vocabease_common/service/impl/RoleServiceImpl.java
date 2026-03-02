@@ -125,9 +125,14 @@ public class RoleServiceImpl implements RoleService {
 	 */
 	@Override
 	public Role getRoleByRoleId(Integer roleId) {
-		Role role = this.roleMapper.selectByRoleId(roleId);
-		List<Integer> selectMenuIds = this.role2menuMapper.selectMenuIdsByRoleIds(new String[]{String.valueOf(roleId)});
-		role.setMenuIds(selectMenuIds);
+		Role role = roleMapper.selectByRoleId(roleId);
+		if (role != null) {
+			// 只查叶子节点（实际 role2menu 存的就是叶子）
+			List<Integer> menuIds = role2menuMapper.selectMenuIdsByRoleIds(
+					new String[]{String.valueOf(roleId)}
+			);
+			role.setMenuIds(menuIds); // 前端用这个初始化 el-tree
+		}
 		return role;
 	}
 
@@ -159,60 +164,75 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void savaRole(Role role, String menuIds, String halfMenuIds) {
+	public void savaRole(Role role, String menuIds) {
 		Integer roleId = role.getRoleId();
-		Boolean addMenu = false;
-		//新增
-		if (roleId == null) {
-			Date date = new Date();
-			role.setCreateTime(date);
-			role.setLastUpdateTime(date);
-			this.roleMapper.insert(role);
-			addMenu = true;
+		boolean isNew = (roleId == null);
+
+		// 先校验角色名唯一性（修复逻辑）
+		RoleQuery query = new RoleQuery();
+		query.setRoleName(role.getRoleName());
+		Integer count = findCountByParam(query);
+
+		// 新增：count > 0 则重复；编辑：count > 1 则重复（排除自己）
+		if ((isNew && count > 0) || (!isNew && count > 1)) {
+			throw new BusinessException("该角色名称已存在");
+		}
+
+		if (isNew) {
+			Date now = new Date();
+			role.setCreateTime(now);
+			role.setLastUpdateTime(now);
+			roleMapper.insert(role);
 			roleId = role.getRoleId();
+		} else {
+			role.setLastUpdateTime(new Date());
+			roleMapper.updateByRoleId(role, roleId);
 		}
-		//修改
-		else {
-			role.setCreateTime(null);
-			this.roleMapper.updateByRoleId(role, roleId);
-		}
-		RoleQuery roleQuery = new RoleQuery();
-		roleQuery.setRoleName(role.getRoleName());
-		Integer count = this.findCountByParam(roleQuery);
-		if (count > 1)
-			throw new BusinessException("该角色已存在，请重新设置");
-		if (addMenu) {
-			this.saveRole2Menu(roleId, menuIds, halfMenuIds);
+
+		// 只有传入了menuIds才更新菜单权限
+		if (!StringTools.isEmpty(menuIds)) {
+			saveRole2Menu(roleId, menuIds);
 		}
 	}
 
-	public void saveRole2Menu(Integer roleId, String menuIds, String halfMenuIds) {
-		if (roleId == null || menuIds == null)
+	public void saveRole2Menu(Integer roleId, String menuIds) {
+		if (roleId == null || StringTools.isEmpty(menuIds)) {
 			throw new BusinessException(ResponseCodeEnum.CODE_400);
-		Role2menuQuery role2menuQuery = new Role2menuQuery();
-		role2menuQuery.setRoleId(roleId);
-		this.role2menuMapper.deleteByParam(role2menuQuery);
-		String[] menuIdsArray = menuIds.split(",");
-		String[] halfMenuIdsArray = halfMenuIds.split(",");
-		List<Role2menu> role2menuList = getRole2MenuList(roleId, menuIdsArray, halfMenuIdsArray);
-		if (!role2menuList.isEmpty())
-			this.role2menuMapper.insertBatch(role2menuList);
+		}
+
+		// 删除旧关联
+		Role2menuQuery delQuery = new Role2menuQuery();
+		delQuery.setRoleId(roleId);
+		role2menuMapper.deleteByParam(delQuery);
+
+		// 批量插入新关联（全部视为叶子节点）
+		String[] ids = menuIds.split(",");
+		List<Role2menu> list = new ArrayList<>();
+		for (String id : ids) {
+			String trimId = id.trim();
+			if (!trimId.isEmpty()) {
+				try {
+					Role2menu r2m = new Role2menu();
+					r2m.setRoleId(roleId);
+					r2m.setMenuId(Integer.parseInt(trimId));
+					list.add(r2m);
+				} catch (NumberFormatException e) {
+					throw new BusinessException("菜单ID格式错误");
+				}
+			}
+		}
+		if (!list.isEmpty()) {
+			role2menuMapper.insertBatch(list);
+		}
 	}
 
-	private static List<Role2menu> getRole2MenuList(Integer roleId, String[] menuIdsArray, String[] halfMenuIdsArray) {
+	private static List<Role2menu> getRole2MenuList(Integer roleId, String[] menuIdsArray) {
 		List<Role2menu> role2MenuList = new ArrayList<>();
 		for (String menuId : menuIdsArray) {
 			Role2menu role2menu = new Role2menu();
 			role2menu.setMenuId(Integer.parseInt(menuId));
 			role2menu.setRoleId(roleId);
 			role2menu.setCheckType(MenuCheckTypeEnum.ALL.getCheckTypeCode());
-			role2MenuList.add(role2menu);
-		}
-		for (String menuId : halfMenuIdsArray) {
-			Role2menu role2menu = new Role2menu();
-			role2menu.setMenuId(Integer.parseInt(menuId));
-			role2menu.setRoleId(roleId);
-			role2menu.setCheckType(MenuCheckTypeEnum.HALF.getCheckTypeCode());
 			role2MenuList.add(role2menu);
 		}
 		return role2MenuList;

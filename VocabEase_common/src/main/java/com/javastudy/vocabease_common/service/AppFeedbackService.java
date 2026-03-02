@@ -28,4 +28,6 @@ public interface AppFeedbackService {
 	 * 回复问题
 	 */
 	void replyFeedback(AppFeedback appFeedback);
+
+	void saveNewFeedback(AppFeedback appFeedback);
 }
