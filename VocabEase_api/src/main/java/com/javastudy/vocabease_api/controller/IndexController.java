@@ -82,19 +82,4 @@ public class IndexController extends ABaseController {
         this.appDeviceService.reportData(appDevice);
         return getSuccessResponseVO(null);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

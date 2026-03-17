@@ -2,6 +2,7 @@ package com.javastudy.vocabease_admin.controller;
 
 import com.javastudy.vocabease_common.entity.po.Word2category;
 import com.javastudy.vocabease_common.entity.query.Word2categoryQuery;
+import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.service.Word2categoryService;
 import jakarta.annotation.Resource;
@@ -24,8 +25,8 @@ public class Word2categoryController extends ABaseController{
 	 * 根据条件分页查询
 	 */
 	@RequestMapping("/loadDataList")
-	public ResponseVO loadDataList(Word2categoryQuery query){
-		return getSuccessResponseVO(word2categoryService.findListByPage(query));
+	public ResponseVO<PaginationResultVO<Word2category>> loadDataList(Word2categoryQuery query){
+		return getSuccessResponseVO(this.word2categoryService.findListByPage(query));
 	}
 
 	/**
@@ -59,18 +60,18 @@ public class Word2categoryController extends ABaseController{
 	 * 根据WordIdAndCategoryId查询对象
 	 */
 	@RequestMapping("/getWord2categoryByWordIdAndCategoryId")
-	public ResponseVO getWord2categoryByWordIdAndCategoryId(Integer wordId,Integer categoryId) {
-		return getSuccessResponseVO(word2categoryService.getWord2categoryByWordIdAndCategoryId(wordId,categoryId));
+	public ResponseVO<Word2category> getWord2categoryByWordIdAndCategoryId(Integer wordId,Integer categoryId) {
+		return getSuccessResponseVO(this.word2categoryService.getWord2categoryByWordIdAndCategoryId(wordId,categoryId));
 	}
 
 	/**
-	 * 根据WordIdAndCategoryId修改对象
+	 * 根据WordId修改对象
 	 */
-	@RequestMapping("/updateWord2categoryByWordIdAndCategoryId")
-	public ResponseVO<Void> updateWord2categoryByWordIdAndCategoryId(Word2category bean,Integer wordId,Integer categoryId) {
-		word2categoryService.updateWord2categoryByWordIdAndCategoryId(bean,wordId,categoryId);
+/*	@RequestMapping("/updateWord2categoryByWordId")
+	public ResponseVO<Void> updateWord2categoryByWordId(Integer wordId, Integer categoryId) {
+		this.word2categoryService.updateWord2categoryByWordId(wordId, categoryId);
 		return getSuccessResponseVO(null);
-	}
+	}*/
 
 	/**
 	 * 根据WordIdAndCategoryId删除
@@ -79,5 +80,13 @@ public class Word2categoryController extends ABaseController{
 	public ResponseVO<Void> deleteWord2categoryByWordIdAndCategoryId(Integer wordId,Integer categoryId) {
 		word2categoryService.deleteWord2categoryByWordIdAndCategoryId(wordId,categoryId);
 		return getSuccessResponseVO(null);
+	}
+
+	/**
+	 * 根据WordId查询对象
+	 */
+	@RequestMapping("/getCategoryIdByWordId")
+	public ResponseVO<Integer> getCategoryIdByWordId(Integer wordId) {
+		return getSuccessResponseVO(this.word2categoryService.getCategoryIdByWordId(wordId));
 	}
 }

@@ -38,9 +38,9 @@ public class WordController extends ABaseController {
      * 加载单词
      */
     @RequestMapping("/loadWord")
-    @GlobalInterceptor
+    //@GlobalInterceptor
     public ResponseVO<PaginationResultVO<Word>> loadWord(@VerifyParam(required = true) Integer pageNum,
-                                                               @VerifyParam(required = true) Integer categoryId) {
+                                                         @VerifyParam(required = true) Integer categoryId) {
         Word2categoryQuery a2cQuery = new Word2categoryQuery();
         a2cQuery.setCategoryId(categoryId);
         List<Word2category> a2cList = this.a2cService.findListByParam(a2cQuery);
@@ -59,13 +59,14 @@ public class WordController extends ABaseController {
         query.setStatus(PostStatusEnum.IS_POST.getStatus());
         return getSuccessResponseVO(this.wordService.findListByPage(query));
     }
+
     /**
      * 下一单词
      */
     @RequestMapping("/getWordNext")
     @GlobalInterceptor
     public ResponseVO<Word> getWordNext(@RequestHeader(value = "token", required = false) String token,
-                                                @VerifyParam(required = true) Integer currentId, Integer nextType) {
+                                        @VerifyParam(required = true) Integer currentId, Integer nextType) {
         WordQuery query = new WordQuery();
         query.setStatus(PostStatusEnum.IS_POST.getStatus());
         Word word = this.wordService.showWordNext(query, currentId, nextType);

@@ -1,16 +1,18 @@
 package com.javastudy.vocabease_common.mappers;
 
+import com.javastudy.vocabease_common.entity.po.Category;
+import com.javastudy.vocabease_common.entity.query.CategoryQuery;
 import org.apache.ibatis.annotations.Param;
 
 /**
  * 分类表 数据库操作接口
  */
-public interface CategoryMapper<T,P> extends BaseMapper<T,P> {
+public interface CategoryMapper extends BaseMapper<Category, CategoryQuery> {
 
 	/**
 	 * 根据CategoryId更新
 	 */
-	 Integer updateByCategoryId(@Param("bean") T t,@Param("categoryId") Integer categoryId);
+	 Integer updateByCategoryId(@Param("bean") Category t,@Param("categoryId") Integer categoryId);
 
 	/**
 	 * 根据CategoryId删除
@@ -20,7 +22,12 @@ public interface CategoryMapper<T,P> extends BaseMapper<T,P> {
 	/**
 	 * 根据CategoryId获取对象
 	 */
-	 T selectByCategoryId(@Param("categoryId") Integer categoryId);
+	Category selectByCategoryId(@Param("categoryId") Integer categoryId);
+
+	/**
+	 * 根据CategoryName获取对象
+	 */
+	Integer selectCategoryIdByCategoryName(@Param("categoryName") String categoryName);
 
 	 void updateCategoryName(@Param("categoryId") Integer categoryId,@Param("categoryName") String categoryName);
 

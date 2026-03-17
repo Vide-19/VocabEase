@@ -3,11 +3,10 @@ package com.javastudy.vocabease_common.entity.enums;
 import java.util.Objects;
 
 public enum CategoryTypeEnum {
-    ARTICLE(0, "文章"),
+    ARTICLE(3, "文章"),
     QUESTION(1, "问题"),
-    ARTICLE_QUESTION(2, "文章/问题"),
-    OTHERS(3, "其它"),
-    WORD(4, "单词");
+    OTHERS(4, "其它"),
+    WORD(2, "单词");
 
     private Integer type;
     private String description;

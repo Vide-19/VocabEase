@@ -48,6 +48,10 @@ public interface CategoryService {
 	 */
 	Category getCategoryByCategoryId(Integer categoryId);
 	/**
+	 * 根据CategoryName查询对象
+	 */
+	Integer getCategoryIdByCategoryName(String categoryName);
+	/**
 	 * 根据CategoryId修改
 	 */
 	Integer updateCategoryByCategoryId(Category bean,Integer categoryId);

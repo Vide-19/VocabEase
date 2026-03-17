@@ -73,5 +73,9 @@ public interface AppAccountService {
 
 	String login(String email, String password, String ip, String deviceId, String deviceBrand);
 	String autoLogin(String token, String ip, String deviceId, String deviceBrand);
+	AppAccount getAccountByOpenId(String openId);
+	void registerByWechat(AppAccount account);
+	String generateToken(AppAccount account, String ip, String deviceId, String deviceBrand);
 
+	void updateAccountDevice(AppAccount account);
 }

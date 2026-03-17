@@ -2,6 +2,7 @@ package com.javastudy.vocabease_common.entity.po;
 
 import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -11,6 +12,8 @@ import java.io.Serializable;
 public class Category implements Serializable {
 
 
+	@Serial
+	private static final long serialVersionUID = 985255263032867481L;
 	/**
 	 * 分类id
 	 */
@@ -38,7 +41,7 @@ public class Category implements Serializable {
 	private String bgColor;
 
 	/**
-	 * 0文章 1考题
+	 * 1考题 2单词 3文章
 	 */
 	@VerifyParam(required = true)
 	private Integer type;

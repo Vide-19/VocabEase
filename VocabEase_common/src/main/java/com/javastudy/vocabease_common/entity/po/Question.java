@@ -97,6 +97,36 @@ public class Question implements Serializable {
 
 	List<Item4question> itemList;
 
+	private String questionItemList;
+
+	private String categoryName;
+
+	private Integer categoryId;
+
+	public String getQuestionItemList() {
+		return questionItemList;
+	}
+
+	public void setQuestionItemList(String questionItemList) {
+		this.questionItemList = questionItemList;
+	}
+
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
+
 	public List<Item4question> getItemList() {return itemList;}
 
 	public void setItemList(List<Item4question> itemList) {this.itemList = itemList;}

@@ -6,48 +6,50 @@ const router = createRouter({
         {
             path: '/',
             name: 'welcome',
-            component: () => import('@/views/Welcome.vue'),
+            component: () => import('@/views/login/Welcome.vue'),
             children: [
+                {path: '/', redirect: '/login' },
                 {
                     path: '/login',
                     name: '登录',
-                    component: () => import('@/views/Login.vue')
+                    component: () => import('@/views/login/Login.vue')
                 }, {
                     path: '/register',
                     name: '注册',
-                    component: () => import('@/views/Register.vue')
+                    component: () => import('@/views/login/Register.vue')
                 }, {
                     //先不管👇功能待修改
                     path: '/reset',
                     name: '忘记密码',
-                    component: () => import('@/views/Reset.vue')
+                    component: () => import('@/views/login/Reset.vue')
                 }
             ]
         }, {
             path: '/index',
             component: () => import('@/views/Index.vue'), // 注意：path 也是 '/'
             meta: {requiresAuth: true},
+            redirect: '/index/dashboard', // 👈 关键：访问 /index 时自动重定向到 /index/dashboard
             children: [
                 {
-                    path: '/dashboard',
+                    path: 'dashboard',
                     name: '仪表盘',
                     component: () => import('@/views/Dashboard.vue')
                 }, {
-                    path: '/content',
+                    path: 'content',
                     name: '内容管理',
-                    component: () => import('@/views/Content.vue')
+                    component: () => import('@/views/content/Content.vue')
                 }, {
-                    path: '/user',
+                    path: 'user',
                     name: '用户管理',
                     component: () => import('@/views/User.vue')
                 }, {
-                    path: '/profile',
+                    path: 'profile',
                     name: '个人中心',
                     component: () => import('@/views/Profile.vue')
                 }, {
-                    path: '/settings',
-                    name: '设置',
-                    component: () => import('@/views/Settings.vue')
+                    path: 'settings',
+                    name: '系统管理',
+                    component: () => import('@/views/settings/Settings.vue')
                 }
             ]
         }

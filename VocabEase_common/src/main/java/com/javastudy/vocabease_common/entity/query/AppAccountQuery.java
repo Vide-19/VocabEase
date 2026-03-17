@@ -1,8 +1,5 @@
 package com.javastudy.vocabease_common.entity.query;
 
-import java.util.Date;
-
-
 /**
  * 小程序用户表参数
  */
@@ -15,6 +12,10 @@ public class AppAccountQuery extends BaseParam {
 	private String userId;
 
 	private String userIdFuzzy;
+
+	private String openId;
+
+	private String openIdFuzzy;
 
 	/**
 	 * 用户邮箱
@@ -93,6 +94,21 @@ public class AppAccountQuery extends BaseParam {
 	 */
 	private Integer status;
 
+	public String getOpenId() {
+		return openId;
+	}
+
+	public void setOpenId(String openId) {
+		this.openId = openId;
+	}
+
+	public String getOpenIdFuzzy() {
+		return openIdFuzzy;
+	}
+
+	public void setOpenIdFuzzy(String openIdFuzzy) {
+		this.openIdFuzzy = openIdFuzzy;
+	}
 
 	public void setUserId(String userId){
 		this.userId = userId;

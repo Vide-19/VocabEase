@@ -38,7 +38,7 @@ public class AppCollectController extends ABaseController {
                                        @VerifyParam(required = true) String objectId,
                                        @VerifyParam(required = true) Integer collectType) {
         AppAccountDto dto = getTokenUserAdminDto(token);
-        this.appCollectService.addCollect(dto.getUserId(), objectId, collectType);
+        this.appCollectService.cancelCollect(dto.getUserId(), objectId, collectType);
         return getSuccessResponseVO(null);
     }
 }

@@ -13,12 +13,13 @@
 		<result column="title" property="title"  />
 		<!--排序-->
 		<result column="sort" property="sort"  />
+		<result column="is_correct" property="isCorrect"  />
 	</resultMap>
 
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
-		 i.item_id,i.question_id,i.title,i.sort
+		 i.item_id,i.question_id,i.title,i.sort,i.is_correct
 	</sql>
 
 	<sql id="base_condition_filed">
@@ -142,18 +143,20 @@
 
 	<!-- 添加 （批量插入）-->
 	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.Item4question" useGeneratedKeys="true" keyProperty="itemId">
-		 INSERT INTO item4question(
-			 question_id,
-			 title,
-			 sort
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.questionId},
-				 #{item.title},
-				 #{item.sort}
-			 )
-		 </foreach>
+		INSERT INTO item4question(
+		question_id,
+		title,
+		sort,
+		is_correct
+		)values
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.questionId},
+			#{item.title},
+			#{item.sort},
+			#{item.isCorrect}
+			)
+		</foreach>
 	</insert>
 
 	<!-- 批量新增修改 （批量插入）-->
@@ -201,19 +204,22 @@
 
 	<!-- 根据ItemId修改-->
 	<update id="updateByItemId" parameterType="com.javastudy.vocabease_common.entity.po.Item4question">
-		 UPDATE item4question
- 		 <set> 
+		UPDATE item4question
+		<set>
 			<if test="bean.questionId != null">
-				 question_id = #{bean.questionId},
+				question_id = #{bean.questionId},
 			</if>
 			<if test="bean.title != null">
-				 title = #{bean.title},
+				title = #{bean.title},
 			</if>
 			<if test="bean.sort != null">
-				 sort = #{bean.sort},
+				sort = #{bean.sort},
 			</if>
- 		 </set>
- 		 where item_id=#{itemId}
+			<if test="bean.isCorrect != null">
+				is_correct = #{bean.isCorrect},
+			</if>
+		</set>
+		where item_id=#{itemId}
 	</update>
 
 	<!-- 根据ItemId删除-->

@@ -51,7 +51,10 @@
 
 	<!-- 查询分类id-->
 	<select id="selectCategoryIdByQuestionId" resultType="java.lang.Integer" >
-		SELECT category_id FROM question2category q <include refid="query_condition" />
+		SELECT category_id
+		FROM question2category
+		WHERE question_id = #{questionId}
+		LIMIT 1
 	</select>
 
 	<!-- 插入 （匹配有值的字段）-->
@@ -172,7 +175,7 @@
 	<!-- 根据QuestionIds删除多个对象-->
 	<delete id="deleteByQuestionIds">
 		delete from question2category where question_id in
-		<foreach collection="questionIds" separator="," item="item">#{item}</foreach>
+		<foreach collection="questionIds" open="(" separator="," close=")" item="item">#{item}</foreach>
 	</delete>
 
 	<!-- 根据PrimaryKey获取对象-->

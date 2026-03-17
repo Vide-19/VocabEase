@@ -17,10 +17,10 @@ public enum QuestionTypeEnum {
     public Integer getType() {return type;}
     public String getDescription() {return description;}
 
-    public static QuestionTypeEnum getTypeByDescription(String description) {
-        for (QuestionTypeEnum type : QuestionTypeEnum.values())
-            if (description.equals(type.getDescription()))
-                return type;
+    public static QuestionTypeEnum getEnumByType(String type) {
+        for (QuestionTypeEnum e : QuestionTypeEnum.values())
+            if (e.type.toString().equals(type))
+                return e;
         return null;
     }
 }

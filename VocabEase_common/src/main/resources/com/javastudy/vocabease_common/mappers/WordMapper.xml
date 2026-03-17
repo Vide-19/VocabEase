@@ -33,6 +33,7 @@
 		<result column="update_time" property="updateTime"  />
 		<!--发布类型 0内部 1外部-->
 		<result column="post_type" property="postType"  />
+		<result column="category_name" property="categoryName" />
 	</resultMap>
 
 
@@ -40,53 +41,57 @@
 	<sql id="base_column_list">
 		 w.word_id,w.word,w.phonetic,w.part_of_speech,w.definition,
 		 w.example_sentence,w.audio_url,w.image_url,w.level,w.status,
-		 w.creator_id,w.create_time,w.update_time,w.post_type
+		 w.creator_id,w.create_time,w.update_time,w.post_type,
+		 c.category_name as category_name
 	</sql>
 
 	<sql id="base_condition_filed">
-			<if test="query.wordId != null">
-				 and  w.word_id = #{query.wordId}
-			</if>
-			<if test="query.word != null and query.word!=''">
-				 and  w.word = #{query.word}
-			</if>
-			<if test="query.phonetic != null and query.phonetic!=''">
-				 and  w.phonetic = #{query.phonetic}
-			</if>
-			<if test="query.partOfSpeech != null and query.partOfSpeech!=''">
-				 and  w.part_of_speech = #{query.partOfSpeech}
-			</if>
-			<if test="query.definition != null and query.definition!=''">
-				 and  w.definition = #{query.definition}
-			</if>
-			<if test="query.exampleSentence != null and query.exampleSentence!=''">
-				 and  w.example_sentence = #{query.exampleSentence}
-			</if>
-			<if test="query.audioUrl != null and query.audioUrl!=''">
-				 and  w.audio_url = #{query.audioUrl}
-			</if>
-			<if test="query.imageUrl != null and query.imageUrl!=''">
-				 and  w.image_url = #{query.imageUrl}
-			</if>
-			<if test="query.level != null">
-				 and  w.level = #{query.level}
-			</if>
-			<if test="query.status != null">
-				 and  w.status = #{query.status}
-			</if>
-			<if test="query.creatorId != null and query.creatorId!=''">
-				 and  w.creator_id = #{query.creatorId}
-			</if>
-			<if test="query.createTime != null and query.createTime!=''">
-				 <![CDATA[ and  w.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
-			</if>
-			<if test="query.updateTime != null and query.updateTime!=''">
-				 <![CDATA[ and  w.update_time=str_to_date(#{query.updateTime}, '%Y-%m-%d') ]]>
-			</if>
-			<if test="query.postType != null">
-				 and  w.post_type = #{query.postType}
-			</if>
-	</sql>
+        <if test="query.wordId != null">
+            and w.word_id = #{query.wordId}
+        </if>
+        <if test="query.word != null and query.word!=''">
+            and w.word = #{query.word}
+        </if>
+        <if test="query.phonetic != null and query.phonetic!=''">
+            and w.phonetic = #{query.phonetic}
+        </if>
+        <if test="query.partOfSpeech != null and query.partOfSpeech!=''">
+            and w.part_of_speech = #{query.partOfSpeech}
+        </if>
+        <if test="query.definition != null and query.definition!=''">
+            and w.definition = #{query.definition}
+        </if>
+        <if test="query.exampleSentence != null and query.exampleSentence!=''">
+            and w.example_sentence = #{query.exampleSentence}
+        </if>
+        <if test="query.audioUrl != null and query.audioUrl!=''">
+            and w.audio_url = #{query.audioUrl}
+        </if>
+        <if test="query.imageUrl != null and query.imageUrl!=''">
+            and w.image_url = #{query.imageUrl}
+        </if>
+        <if test="query.level != null">
+            and w.level = #{query.level}
+        </if>
+        <if test="query.status != null">
+            and w.status = #{query.status}
+        </if>
+        <if test="query.creatorId != null and query.creatorId!=''">
+            and w.creator_id = #{query.creatorId}
+        </if>
+        <if test="query.createTime != null and query.createTime!=''">
+            <![CDATA[ and  w.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.updateTime != null and query.updateTime!=''">
+            <![CDATA[ and  w.update_time=str_to_date(#{query.updateTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.postType != null">
+            and w.post_type = #{query.postType}
+        </if>
+        <if test="query.categoryId != null">
+            and c.category_id = #{query.categoryId}
+        </if>
+    </sql>
 
 	<!-- 通用查询条件列-->
 	<sql id="query_condition">
@@ -129,32 +134,40 @@
 				<![CDATA[ and  w.update_time< date_sub(str_to_date(#{query.updateTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
 			</if>
 			<if test="query.wordIds!= null and query.wordIds.length>0">
-				and word_id in(<foreach collection="query.wordIds" separator="," item="item">#{item}</foreach> )
+				and w.word_id in(<foreach collection="query.wordIds" separator="," item="item">#{item}</foreach> )
 			</if>
 			<if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
-				<![CDATA[ and word_id<#{query.currentId} order by word_id desc ]]>
+				<![CDATA[ and w.word_id<#{query.currentId} order by w.word_id desc ]]>
 			</if>
 			<if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
-				<![CDATA[ and word_id>#{query.currentId} order by word_id asc ]]>
+				<![CDATA[ and w.word_id>#{query.currentId} order by w.word_id asc ]]>
 			</if>
 		</where>
 	</sql>
 
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" /> FROM word w <include refid="query_condition" />
-		 <if test="query.orderBy!=null">
-			 order by ${query.orderBy}
-		 </if>
-		 <if test="query.simplePage!=null">
-			 limit #{query.simplePage.start},#{query.simplePage.end}
-		 </if>
+		SELECT
+		<include refid="base_column_list"/>
+		FROM word w
+		LEFT JOIN word2category w2c ON w.word_id = w2c.word_id
+		LEFT JOIN category c ON w2c.category_id = c.category_id
+		<include refid="query_condition"/>
+		<if test="query.orderBy!=null">
+			order by ${query.orderBy}
+		</if>
+		<if test="query.simplePage!=null">
+			limit #{query.simplePage.start},#{query.simplePage.end}
+		</if>
 	</select>
 
 	<!-- 查询数量-->
 	<select id="selectCount" resultType="java.lang.Integer" >
-		 SELECT count(1) FROM word w <include refid="query_condition" />
-	</select>
+        SELECT count(1) FROM word w
+        LEFT JOIN word2category w2c ON w.word_id = w2c.word_id
+        LEFT JOIN category c ON w2c.category_id = c.category_id
+        <include refid="query_condition"/>
+    </select>
 
 	<!-- 插入 （匹配有值的字段）-->
 	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.Word">
@@ -575,15 +588,20 @@
 	<!-- 根据WordIds删除多个对象-->
 	<delete id="deleteByWordIds">
 		delete from word where word_id in
-		<foreach collection="wordIds" separator="," item="item">#{item}</foreach>
+		<foreach collection="wordIds" open="(" separator="," close=")" item="item">#{item}</foreach>
 		and status=#{status}
 		<if test="userId!=null">and creater_id = #{userId}</if>
 	</delete>
 
 	<!-- 根据PrimaryKey获取对象-->
 	<select id="selectByWordId" resultMap="base_result_map" >
-		select <include refid="base_column_list" /> from word w where word_id=#{wordId}
-	</select>
+        select
+        <include refid="base_column_list"/>
+        from word w
+        LEFT JOIN word2category w2c ON w.word_id = w2c.word_id
+        LEFT JOIN category c ON w2c.category_id = c.category_id
+        where w.word_id=#{wordId}
+    </select>
 
 	<select id="showWordNext" resultMap="base_result_map">
 		select * from word

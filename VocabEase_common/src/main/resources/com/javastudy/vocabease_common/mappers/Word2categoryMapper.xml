@@ -51,7 +51,10 @@
 
 	<!-- 查询分类id-->
 	<select id="selectCategoryIdByWordId" resultType="java.lang.Integer" >
-		SELECT category_id FROM word2category a <include refid="query_condition" />
+		SELECT category_id
+		FROM word2category
+		WHERE word_id = #{wordId}
+		LIMIT 1
 	</select>
 
 	<!-- 插入 （匹配有值的字段）-->
@@ -157,11 +160,14 @@
 	</delete>
 
 	<!-- 根据WordIdAndCategoryId修改-->
-	<update id="updateByWordIdAndCategoryId" parameterType="com.javastudy.vocabease_common.entity.po.Word2category">
+	<update id="updateByWordId">
 		 UPDATE word2category
- 		 <set> 
+ 		 <set>
+			 <if test="bean.categoryId != null">
+				 category_id = #{categoryId},
+			 </if>
  		 </set>
- 		 where word_id=#{wordId} and category_id=#{categoryId}
+ 		 where word_id=#{wordId}
 	</update>
 
 	<!-- 根据WordIdAndCategoryId删除-->
@@ -172,7 +178,7 @@
 	<!-- 根据WordIds删除多个对象-->
 	<delete id="deleteByWordIds">
 		delete from word2category where word_id in
-		<foreach collection="wordIds" separator="," item="item">#{item}</foreach>
+		<foreach collection="wordIds" open="(" separator="," close=")" item="item">#{item}</foreach>
 	</delete>
 
 	<!-- 根据PrimaryKey获取对象-->

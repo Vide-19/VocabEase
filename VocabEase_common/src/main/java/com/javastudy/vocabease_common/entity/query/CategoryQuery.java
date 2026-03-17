@@ -40,7 +40,7 @@ public class CategoryQuery extends BaseParam {
 	private String bgColorFuzzy;
 
 	/**
-	 * 0问题 1考题 2问题考题
+	 * 1考题 2单词 3文章
 	 */
 	private Integer type;
 

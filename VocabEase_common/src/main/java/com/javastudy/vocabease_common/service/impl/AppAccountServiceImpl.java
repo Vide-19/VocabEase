@@ -187,7 +187,7 @@ public class AppAccountServiceImpl implements AppAccountService {
 		AppAccountDto dto = new AppAccountDto();
 		dto.setUserId(account.getUserId());
 		dto.setNickName(account.getNickName());
-        return jwtUtil.createToken(Constants.JWT_KEY_LOGIN_TOKEN, dto, Constants.JWT_TOKEN_EXPIRE);
+        return jwtUtil.createToken(Constants.JWT_KEY_LOGIN_TOKEN, dto, Constants.JWT_TOKEN_EXPIRE_DAYS);
 	}
 
 	@Override
@@ -208,22 +208,112 @@ public class AppAccountServiceImpl implements AppAccountService {
         return jwtUtil.createToken(Constants.JWT_KEY_LOGIN_TOKEN, dto, Constants.JWT_TOKEN_EXPIRE);
 	}
 
+	@Override
+	public AppAccount getAccountByOpenId(String openId) {
+		// 使用你的 Mapper/DAO 查询 select * from app_account where open_id = ?
+		return appAccountMapper.selectByOpenId(openId);
+	}
 
+	/**
+	 * 微信登录专用：生成 Token
+	 * 逻辑复用原有 login 的核心步骤：更新信息 + 生成 JWT
+	 */
+	@Override
+	public String generateToken(AppAccount account, String ip, String deviceId, String deviceBrand) {
+		if (account == null || account.getUserId() == null) {
+			throw new BusinessException("用户信息异常，无法生成 Token");
+		}
 
+		Date now = new Date();
 
+		// 1. 更新数据库中的最后登录时间和设备信息
+		AppAccount updateBean = new AppAccount();
+		updateBean.setLastLoginTime(now);
+		updateBean.setLastLoginIp(ip);
+		updateBean.setLastUseDeviceId(deviceId);
+		updateBean.setLastUseDeviceBrand(deviceBrand);
 
+		// 注意：这里使用 userId 作为更新条件
+		this.appAccountMapper.updateByUserId(updateBean, account.getUserId());
 
+		// 2. 构建 JWT 需要的 DTO 对象
+		AppAccountDto dto = new AppAccountDto();
+		dto.setUserId(account.getUserId());
+		dto.setNickName(account.getNickName());
+		// 如果有其他需要存入 Token 的信息（如头像、角色），也可以在这里 set
 
+		// 3. 生成并返回 Token
+		// Constants.JWT_KEY_LOGIN_TOKEN: 密钥标识
+		// Constants.JWT_TOKEN_EXPIRE: 过期时间
+		return jwtUtil.createToken(Constants.JWT_KEY_LOGIN_TOKEN, dto, Constants.JWT_TOKEN_EXPIRE);
+	}
 
+	/**
+	 * 微信注册专用：完善注册逻辑
+	 * 补充了 userId 生成、默认昵称处理、密码字段忽略（微信登录不需要密码）
+	 */
+	@Override
+	public void registerByWechat(AppAccount account) {
+		Date now = new Date();
 
+		// 1. 生成唯一的 UserId (复用原有工具)
+		String userId = StringTools.getRandomString(Constants.LENGTH_10);
+		account.setUserId(userId);
 
+		// 2. 处理默认昵称 (如果前端没传或为空)
+		if (StringTools.isEmpty(account.getNickName())) {
+			// 默认昵称：VocabEase + UserId后4位
+			account.setNickName("VocabEase_" + userId.substring(userId.length() - 4));
+		}
 
+		// 3. 设置其他默认字段
+		account.setCreateTime(now);
+		account.setLastLoginTime(now);
+		account.setStatus(AccountStatusEnum.ENABLED.getStatus()); // 使用枚举确保类型一致
 
+		// 微信登录不需要密码，但如果数据库字段非空且无默认值，可能需要设个随机值或确保数据库允许 null
+		// account.setPassword(null);
 
+		// 4. 插入用户表
+		int insertCount = this.appAccountMapper.insert(account);
+		if (insertCount <= 0) {
+			throw new BusinessException("注册用户失败");
+		}
 
+		// 5. 插入/更新设备表 (复用原有逻辑)
+		if (!StringTools.isEmpty(account.getLastUseDeviceId())) {
+			AppDevice device = new AppDevice();
+			device.setDeviceId(account.getLastUseDeviceId());
+			device.setDeviceBrand(account.getLastUseDeviceBrand());
+			device.setCreateTime(now);
+			device.setLastUseTime(now);
+			device.setLastLoginIp(account.getLastLoginIp());
+			// 假设设备表也需要关联 userId，如果有该字段请加上
+			// device.setUserId(userId);
+			this.appDeviceMapper.insert(device);
+		}
+	}
 
+	/**
+	 * 更新用户设备信息
+	 * 增加了空值检查，防止 NullPointerException
+	 */
+	@Override
+	public void updateAccountDevice(AppAccount account) {
+		if (account == null || StringTools.isEmpty(account.getUserId())) {
+			return;
+		}
 
+		AppAccount updateBean = new AppAccount();
+		updateBean.setLastUseDeviceId(account.getLastUseDeviceId());
+		updateBean.setLastUseDeviceBrand(account.getLastUseDeviceBrand());
+		updateBean.setLastLoginTime(new Date()); // 顺便更新最后活跃时间
 
+		this.appAccountMapper.updateByUserId(updateBean, account.getUserId());
+
+		// 如果需要更新 AppDevice 表，可以在这里补充逻辑
+		// 例如：根据 deviceId 更新 last_use_time
+	}
 
 
 }

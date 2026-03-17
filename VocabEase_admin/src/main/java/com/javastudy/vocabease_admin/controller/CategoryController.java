@@ -8,6 +8,7 @@ import com.javastudy.vocabease_common.entity.query.CategoryQuery;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.service.CategoryService;
 import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,16 +28,16 @@ public class CategoryController extends ABaseController{
 	 */
 	@RequestMapping("/loadCategoryList")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.CATEGORY_LIST)
-	public ResponseVO loadCategoryList(CategoryQuery query){
+	public ResponseVO<List<Category>> loadCategoryList(CategoryQuery query){
 		query.setOrderBy("sort asc");
-		return getSuccessResponseVO(categoryService.findListByParam(query));
+		return getSuccessResponseVO(this.categoryService.findListByParam(query));
 	}
 	/**
 	 * 新增分类
 	 */
 	@RequestMapping("/saveCategory")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.CATEGORY_EDIT)
-	public ResponseVO<Void> saveCategory(Category category){
+	public ResponseVO<Void> saveCategory(@RequestBody Category category){
 		this.categoryService.saveCategory(category);
 		return getSuccessResponseVO(null);
 	}
@@ -54,7 +55,7 @@ public class CategoryController extends ABaseController{
 	 */
 	@RequestMapping("/updateSort")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.CATEGORY_EDIT)
-	public ResponseVO<Void> updateSort(@VerifyParam(required = true) String  categoryIds){
+	public ResponseVO<Void> updateSort(@VerifyParam(required = true) String categoryIds){
 		this.categoryService.updateSort(categoryIds);
 		return getSuccessResponseVO(null);
 	}
@@ -63,8 +64,8 @@ public class CategoryController extends ABaseController{
 	 */
 	@RequestMapping("/loadCategoryByType")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.CATEGORY_LIST)
-	public ResponseVO loadCategoryByType(@VerifyParam(required = true) Integer categoryType){
-		List<Category> categoryList = categoryService.getCategoryListByType(categoryType);
+	public ResponseVO<List<Category>> loadCategoryByType(@VerifyParam(required = true) Integer categoryType){
+		List<Category> categoryList = this.categoryService.getCategoryListByType(categoryType);
 		return getSuccessResponseVO(categoryList);
 	}
 }

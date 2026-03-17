@@ -31,7 +31,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
 	@Resource
-	private CategoryMapper<Category, CategoryQuery> categoryMapper;
+	private CategoryMapper categoryMapper;
 	@Resource
 	private Article2categoryMapper<Article2category, Article2categoryQuery> article2categoryMapper;
 	@Resource
@@ -125,6 +125,14 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	/**
+	 * 根据CategoryName获取对象
+	 */
+	@Override
+	public Integer getCategoryIdByCategoryName(String categoryName) {
+		return this.categoryMapper.selectCategoryIdByCategoryName(categoryName);
+	}
+
+	/**
 	 * 根据CategoryId修改
 	 */
 	@Override
@@ -194,9 +202,9 @@ public class CategoryServiceImpl implements CategoryService {
 		if (categoryTypeFromEnum == null)
 			throw new BusinessException(ResponseCodeEnum.CODE_400);
 		CategoryQuery query = new CategoryQuery();
-		query.setTypes(new Integer[] {categoryTypeFromEnum.getType(), CategoryTypeEnum.ARTICLE_QUESTION.getType()});
+		query.setType(categoryTypeFromEnum.getType());
 		query.setOrderBy("sort asc");
-		return List.of();
+		return this.categoryMapper.selectList(query);
 	}
 
 }

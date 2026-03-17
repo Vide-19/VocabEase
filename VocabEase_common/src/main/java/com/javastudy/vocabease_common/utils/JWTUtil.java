@@ -26,7 +26,11 @@ public class JWTUtil<T> {
     public String createToken(String key, T data, Integer expireDay) {
         String token = null;//👇根据my_project改生成，不仅仅是base64加密
         try {
-             Date expiresAt = new Date(System.currentTimeMillis() + expireDay * 24 * 60 * 60 * 1000);
+            long expireMillis = expireDay.longValue() * 24L * 60L * 60L * 1000L;
+            Date expiresAt = new Date(System.currentTimeMillis() + expireMillis);
+
+            logger.info("=== [生成 Token] 过期天数={}, 计算出的毫秒增量={}, 过期时间={}",
+                    expireDay, expireMillis, expiresAt);
              token = JWT.create()
                      .withClaim(key, JsonUtil.convertObject2Json(data))
                      .withExpiresAt(expiresAt)
@@ -43,12 +47,16 @@ public class JWTUtil<T> {
         try {
             if (StringTools.isEmpty(token))
                 return null;
-            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(appConfig.getJwtCommonSecret())).build();
+            String currentSecret = appConfig.getJwtCommonSecret();
+            logger.info("=== [验证接口] 验证 Token 使用的密钥：[{}]", currentSecret);
+            logger.info("=== [验证接口] 待验证 Token 前缀：[{}]", token.substring(0, 20) + "...");
+
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(currentSecret)).build();
             DecodedJWT jwt = verifier.verify(token);
             String jsonData = jwt.getClaim(key).asString();
             return JsonUtil.convertJson2Object(jsonData, clazz);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("JWT 验证失败，异常信息:", e);
             return null;
         }
     }

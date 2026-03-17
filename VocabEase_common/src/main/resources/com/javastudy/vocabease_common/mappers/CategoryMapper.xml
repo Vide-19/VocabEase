@@ -15,7 +15,7 @@
 		<result column="icon_path" property="iconPath"  />
 		<!--背景颜色-->
 		<result column="bg_color" property="bgColor"  />
-		<!--0问题 1考题 2问题考题-->
+		<!--1考题 2单词 3文章-->
 		<result column="type" property="type"  />
 	</resultMap>
 
@@ -81,9 +81,15 @@
 	<select id="selectCount" resultType="java.lang.Integer" >
 		SELECT COUNT(*) FROM category
 		<where>
-			<if test="type != null">AND type = #{type}</if>
-			<if test="categoryName != null">AND category_name = #{categoryName}</if>
-			<if test="excludeCategoryId != null">AND category_id != #{excludeCategoryId}</if>
+			<if test="query.type != null">
+				AND type = #{query.type}
+			</if>
+			<if test="query.categoryName != null and query.categoryName != ''">
+				AND category_name = #{query.categoryName}
+			</if>
+			<if test="query.excludeCategoryId != null">
+				AND category_id != #{query.excludeCategoryId}
+			</if>
 		</where>
 	</select>
 
@@ -302,6 +308,11 @@
 	<!-- 根据PrimaryKey获取对象-->
 	<select id="selectByCategoryId" resultMap="base_result_map" >
 		select <include refid="base_column_list" /> from category c where category_id=#{categoryId}
+	</select>
+
+	<!-- 根据name获取id-->
+	<select id="selectCategoryIdByCategoryName" resultType="java.lang.Integer" >
+		select category_id from category where category_name=#{categoryName}
 	</select>
 
 	<update id="updateCategoryName" >

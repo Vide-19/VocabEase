@@ -12,6 +12,7 @@ import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.service.ShareService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
@@ -40,7 +41,7 @@ public class ShareController extends ABaseController{
 	 */
 	@RequestMapping("/saveShare")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SHARE_EDIT)
-	public ResponseVO<Void> saveShare(HttpSession session, @VerifyParam(required = true) Share share) {
+	public ResponseVO<Void> saveShare(HttpSession session, @RequestBody @VerifyParam(required = true) Share share) {
 		SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
 		share.setCreaterId(sessionUserAdminDto.getUserId().toString());
 		this.shareService.saveShare(share, sessionUserAdminDto.getSuperAdmin());

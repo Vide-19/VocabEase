@@ -10,14 +10,12 @@ spring:
       max-request-size: 100MB
   security:
     jwt:
-      key: test123456
+      key: "test123456"
   application:
     name: VocabEase
     domain: "需配置域名"
 server:
   port: 9090
-  servlet:
-    context-path: /api
 project:
   folder: D:/IdeaProject/VocabEase/
 admin:
@@ -32,3 +30,7 @@ mybatis:
   type-aliases-package: com.javastudy.vocabease_common.entity
   configuration:
     map-underscore-to-camel-case: true
+wechat:
+  miniapp:
+    appid: wx95973a304e2b48b8
+    secret: 126061ebff39bc60b1c1c76552e05b45

@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue'
 import {ElAvatar, ElButton, ElIcon, ElMenu, ElMenuItem, ElMessageBox, ElScrollbar} from 'element-plus'
-import {Expand, Fold, House, Setting, SwitchButton, User} from '@element-plus/icons-vue'
+import {
+  Connection,
+  Expand,
+  Fold,
+  Management,
+  OfficeBuilding,
+  Setting,
+  SwitchButton,
+  User
+} from '@element-plus/icons-vue'
 import {useUserStore} from '@/stores/user'
 import {useRoute, useRouter} from 'vue-router' // 👈 同时建议用 useRoute 而不是 $route
 
@@ -18,11 +27,11 @@ const toggleCollapse = () => {
 
 // 菜单数据（可根据权限动态生成）
 const menuItems = [
-  { path: 'dashboard', icon: House, title: '仪表盘' },
-  { path: 'content', icon: User, title: '内容管理' },
-  { path: 'user', icon: User, title: '用户管理' },
-  { path: 'profile', icon: User, title: '个人中心' },
-  { path: 'settings', icon: Setting, title: '系统设置' }
+  {path: 'dashboard', icon: Connection, title: '系统数据'},
+  {path: 'content', icon: Management, title: '内容管理'},
+  {path: 'user', icon: OfficeBuilding, title: '用户管理'},
+  {path: 'profile', icon: User, title: '个人中心'},
+  {path: 'settings', icon: Setting, title: '系统管理'}
 ]
 
 // 计算当前激活的子路径
@@ -55,7 +64,7 @@ function handleLogout() {
       </div>
       <div class="toggle-btn" @click="toggleCollapse">
         <el-icon :size="20">
-          <component :is="isCollapse ? Expand : Fold" />
+          <component :is="isCollapse ? Expand : Fold"/>
         </el-icon>
       </div>
       <div class="user-info">
@@ -64,7 +73,9 @@ function handleLogout() {
         </el-avatar>
         <span class="username">{{ userStore.username }}</span>
         <el-button text @click="handleLogout" size="default">
-          <el-icon><SwitchButton /></el-icon>
+          <el-icon>
+            <SwitchButton/>
+          </el-icon>
         </el-button>
       </div>
     </header>
@@ -88,7 +99,9 @@ function handleLogout() {
                 :key="item.path"
                 :index="item.path"
             >
-              <el-icon><component :is="item.icon" /></el-icon>
+              <el-icon>
+                <component :is="item.icon"/>
+              </el-icon>
               <template #title>{{ item.title }}</template>
             </el-menu-item>
           </el-menu>
@@ -97,7 +110,7 @@ function handleLogout() {
 
       <!-- 内容区 -->
       <main class="content">
-        <router-view />
+        <router-view/>
       </main>
     </div>
   </div>

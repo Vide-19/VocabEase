@@ -21,12 +21,14 @@
         <result column="status" property="status"/>
         <!--作者id-->
         <result column="creater_id" property="createrId"/>
+        <result column="user_name" property="createrName"/>
         <!--浏览量-->
         <result column="read_count" property="readCount"/>
         <!--收藏数-->
         <result column="collect_count" property="collectCount"/>
         <!--发布类型 0内部 1外部-->
         <result column="post_type" property="postType"/>
+        <result column="category_name" property="categoryName" />
     </resultMap>
 
 
@@ -34,7 +36,7 @@
     <sql id="base_column_list">
         a.article_id,a.title,a.level,
 		 a.create_time,a.status,a.creater_id,a.read_count,a.collect_count,
-		 a.post_type
+		 a.post_type,c.category_name as category_name,u.user_name as user_name
     </sql>
 
     <sql id="base_condition_filed">
@@ -71,6 +73,9 @@
         <if test="query.postType != null">
             and a.post_type = #{query.postType}
         </if>
+        <if test="query.categoryId != null">
+            and c.category_id = #{query.categoryId}
+        </if>
     </sql>
 
     <!-- 通用查询条件列-->
@@ -96,13 +101,13 @@
                 and a.creater_id like concat('%', #{query.createrIdFuzzy}, '%')
             </if>
             <if test="query.articleIds!= null and query.articleIds.length>0">
-                and article_id in(<foreach collection="query.articleIds" separator="," item="item">#{item}</foreach> )
+                and a.article_id in(<foreach collection="query.articleIds" separator="," item="item">#{item}</foreach> )
             </if>
             <if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
-                <![CDATA[ and article_id<#{query.currentId} order by article_id desc ]]>
+                <![CDATA[ and a.article_id<#{query.currentId} order by a.article_id desc ]]>
             </if>
             <if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
-                <![CDATA[ and article_id>#{query.currentId} order by article_id asc ]]>
+                <![CDATA[ and a.article_id>#{query.currentId} order by a.article_id asc ]]>
             </if>
         </where>
     </sql>
@@ -115,6 +120,9 @@
             ,body,translation
         </if>
         FROM article a
+        LEFT JOIN article2category a2c ON a.article_id = a2c.article_id
+        LEFT JOIN category c ON a2c.category_id = c.category_id
+        LEFT JOIN account u ON a.creater_id = u.user_id
         <include refid="query_condition"/>
         <if test="query.orderBy!=null">
             order by ${query.orderBy}
@@ -127,6 +135,8 @@
     <!-- 查询数量-->
     <select id="selectCount" resultType="java.lang.Integer">
         SELECT count(1) FROM article a
+        LEFT JOIN article2category a2c ON a.article_id = a2c.article_id
+        LEFT JOIN category c ON a2c.category_id = c.category_id
         <include refid="query_condition"/>
     </select>
 
@@ -474,7 +484,7 @@
     <!-- 根据ArticleIds删除多个对象-->
     <delete id="deleteByArticleIds">
         delete from article where article_id in
-        <foreach collection="articleIds" separator="," item="item">#{item}</foreach>
+        <foreach collection="articleIds" open="(" separator="," close=")" item="item">#{item}</foreach>
         and status=#{status}
         <if test="userId!=null">and creater_id = #{userId}</if>
     </delete>
@@ -483,7 +493,11 @@
     <select id="selectByArticleId" resultMap="base_result_map">
         select
         <include refid="base_column_list"/>
-        from article a where article_id=#{articleId}
+        from article a
+        LEFT JOIN article2category a2c ON a.article_id = a2c.article_id
+        LEFT JOIN category c ON a2c.category_id = c.category_id
+        LEFT JOIN account u ON a.creater_id = u.user_id
+        where a.article_id=#{articleId}
     </select>
 
     <select id="showArticleNext" resultMap="base_result_map">

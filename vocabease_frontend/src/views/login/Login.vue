@@ -34,6 +34,7 @@ const captchaUrl = computed(() => `/api/checkCode?t=${captchaKey.value}`)
 const handleLogin = () => {
   loginFormRef.value?.validate((valid) => {
     if (!valid) return
+
     postWithParams(
         '/api/login',
         {
@@ -42,14 +43,28 @@ const handleLogin = () => {
           checkCode: loginForm.checkCode
         },
         (data) => {
-          // ✅ 正确使用 userStore
-          userStore.setUserInfo(data)
+          // 🎉 修正点 1: 不需要获取 token 了！
+          // 因为认证信息已经通过 Cookie 自动保存在浏览器中了。
+          // data 就是你之前看到的包含 userId, userName, menuList 的对象。
+
+          console.log('登录成功，用户数据:', data)
+
+          // 🎉 修正点 2: 不再调用 setToken，只调用 setUserInfo
+          // 我们只需要保存用户名和头像到 localStorage，用于刷新页面后显示界面信息。
+          // 真正的“登录状态”由浏览器的 Cookie 维持。
+          userStore.setUserInfo({
+            username: data.userName, // 对应后端返回的 userName 字段
+            avatar: data.avatar || '' // 如果后端没返头像，给个空字符串
+          })
+
           ElMessage.success('登录成功')
+
+          // 跳转到首页
           router.push('/index')
         },
         (message) => {
           ElMessage.error(message)
-          refreshCaptcha()
+          refreshCaptcha() // 登录失败刷新验证码
         }
     )
   })
@@ -65,11 +80,14 @@ const handleLogin = () => {
     </div>
 
     <div style="margin-top: 40px; max-width: 300px; margin-left: auto; margin-right: auto;">
-      <el-form :model="loginForm" :rules="{
+      <el-form :model="loginForm"
+               :rules="{
         phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-        checkCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
-      }" ref="loginFormRef" size="default">
+        checkCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }]}"
+               ref="loginFormRef"
+               size="default"
+               @keyup.enter="handleLogin">
 
         <!-- 手机号 -->
         <el-form-item prop="phone">
@@ -79,7 +97,9 @@ const handleLogin = () => {
               maxlength="11"
           >
             <template #prefix>
-              <el-icon><User /></el-icon>
+              <el-icon>
+                <User/>
+              </el-icon>
             </template>
           </el-input>
         </el-form-item>
@@ -93,7 +113,9 @@ const handleLogin = () => {
               show-password
           >
             <template #prefix>
-              <el-icon><Lock /></el-icon>
+              <el-icon>
+                <Lock/>
+              </el-icon>
             </template>
           </el-input>
         </el-form-item>
@@ -107,7 +129,9 @@ const handleLogin = () => {
               style="width: 140px"
           >
             <template #prefix>
-              <el-icon><Picture /></el-icon>
+              <el-icon>
+                <Picture/>
+              </el-icon>
             </template>
           </el-input>
           <img

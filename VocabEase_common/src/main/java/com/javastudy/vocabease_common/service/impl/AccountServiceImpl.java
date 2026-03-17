@@ -222,7 +222,7 @@ public class AccountServiceImpl implements AccountService {
         //新增
         if (account.getUserId() == null) {
             account.setPassword(StringTools.encodeByMd5(account.getPassword()));
-            account.setStatus(AccountStatusEnum.ENABLED.getStatus());
+            account.setStatus(AccountStatusEnum.DISABLED.getStatus());
             account.setCreateTime(new Date());
             if (account.getRoles() == null)
                 account.setRoles(FeedbackEnum.REGULAR.getCode().toString());

@@ -12,6 +12,7 @@ import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.service.ArticleService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
@@ -34,7 +35,7 @@ public class ArticleController extends ABaseController{
 	@RequestMapping("/loadDataList")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.ARTICLE_LIST)
 	public ResponseVO loadDataList(ArticleQuery query){
-		query.setOrderBy("article_id desc)");
+		query.setOrderBy("article_id desc");
 		query.setQueryBodyContent(true);
 		return getSuccessResponseVO(articleService.findListByPage(query));
 	}
@@ -43,10 +44,11 @@ public class ArticleController extends ABaseController{
 	 */
 	@RequestMapping("/saveArticle")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.ARTICLE_EDIT)
-	public ResponseVO<Void> saveArticle(HttpSession session, Article article){
+	public ResponseVO<Void> saveArticle(HttpSession session,
+										@RequestBody @VerifyParam(required = true) Article article){
 		SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
 		article.setCreaterId(sessionUserAdminDto.getUserId());
-		articleService.saveArticle(article, sessionUserAdminDto.getSuperAdmin());
+		this.articleService.saveArticle(article, sessionUserAdminDto.getSuperAdmin());
 		return getSuccessResponseVO(null);
 	}
 	/**

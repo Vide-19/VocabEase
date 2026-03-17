@@ -8,10 +8,12 @@ import com.javastudy.vocabease_common.entity.enums.PermissionCodeEnum;
 import com.javastudy.vocabease_common.entity.enums.PostStatusEnum;
 import com.javastudy.vocabease_common.entity.po.Word;
 import com.javastudy.vocabease_common.entity.query.WordQuery;
+import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.service.WordService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.SessionStatus;
@@ -33,7 +35,7 @@ public class WordController extends ABaseController{
 	 */
 	@RequestMapping("/loadDataList")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.WORD_LIST)
-	public ResponseVO loadDataList(WordQuery query){
+	public ResponseVO<PaginationResultVO<Word>> loadDataList(WordQuery query){
 		query.setOrderBy("word_id desc");
 		return getSuccessResponseVO(wordService.findListByPage(query));
 	}
@@ -42,10 +44,10 @@ public class WordController extends ABaseController{
 	 */
 	@RequestMapping("/saveWord")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.WORD_EDIT)
-	public ResponseVO<Void> saveWord(HttpSession session, Word word) {
+	public ResponseVO<Void> saveWord(HttpSession session, @RequestBody Word word) {
 		SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
 		word.setCreatorId(sessionUserAdminDto.getUserId().toString());
-		wordService.saveWord(word, sessionUserAdminDto.getSuperAdmin());
+		this.wordService.saveWord(word, sessionUserAdminDto.getSuperAdmin());
 		return getSuccessResponseVO(null);
 	}
 	/**
@@ -88,11 +90,11 @@ public class WordController extends ABaseController{
 		return getSuccessResponseVO(null);
 	}
 	/**
-	 * 文章导入
+	 * 单词导入
 	 */
 	@RequestMapping("/importWordByExcel")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.WORD_IMPORT)
-	public ResponseVO importWordByExcel(HttpSession session, MultipartFile file){
+	public ResponseVO<List<ImportErrorItem>> importWordByExcel(HttpSession session, MultipartFile file){
 		SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
 		List<ImportErrorItem> errorItemList = this.wordService.importWord(sessionUserAdminDto, file);
 		return getSuccessResponseVO(errorItemList);

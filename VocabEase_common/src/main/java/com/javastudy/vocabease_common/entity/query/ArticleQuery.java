@@ -81,6 +81,16 @@ public class ArticleQuery extends BaseParam {
 
 	private Boolean queryBodyContent;
 
+	private Integer categoryId;
+
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
+
 	public void setArticleId(Integer articleId){
 		this.articleId = articleId;
 	}

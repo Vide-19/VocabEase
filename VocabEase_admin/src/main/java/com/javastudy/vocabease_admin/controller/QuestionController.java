@@ -6,7 +6,6 @@ import com.javastudy.vocabease_common.entity.dto.ImportErrorItem;
 import com.javastudy.vocabease_common.entity.dto.SessionUserAdminDto;
 import com.javastudy.vocabease_common.entity.enums.PermissionCodeEnum;
 import com.javastudy.vocabease_common.entity.enums.PostStatusEnum;
-import com.javastudy.vocabease_common.entity.enums.QuestionTypeEnum;
 import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
 import com.javastudy.vocabease_common.entity.po.Item4question;
 import com.javastudy.vocabease_common.entity.po.Question;
@@ -21,6 +20,7 @@ import com.javastudy.vocabease_common.utils.JsonUtil;
 import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,25 +48,33 @@ public class QuestionController extends ABaseController{
 	public ResponseVO<PaginationResultVO<Question>> loadDataList(QuestionQuery query){
 		query.setOrderBy("question_id desc");
 		query.setQueryAnswer(true);
-		return getSuccessResponseVO(questionService.findListByPage(query));
+		return getSuccessResponseVO(this.questionService.findListByPage(query));
 	}
 	/**
 	 * 新增/修改
 	 */
 	@RequestMapping("/saveQuestion")
-	@GlobalInterceptor(permissionCode = PermissionCodeEnum.QUESTION_EDIT)
-	public ResponseVO<Void> saveQuestion(HttpSession session, @VerifyParam(required = true) Question question,
-								String questionItemList) {
+	@GlobalInterceptor(permissionCode = PermissionCodeEnum.QUESTION_EDIT)//👇
+	public ResponseVO<Void> saveQuestion(HttpSession session,@RequestBody @VerifyParam(required = true) Question question) {
 		SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
 		question.setCreaterId(sessionUserAdminDto.getUserId().toString());
 		List<Item4question> item4question = new ArrayList<>();
-		// 判断题填空题无需选项；其他题型必须提供选项
-		if (!QuestionTypeEnum.TRUE_OR_FALSE.getType().equals(question.getQuestionType())
-			|| !QuestionTypeEnum.FILL_IN_THE_BLANK.getType().equals(question.getQuestionType())) {
-			if (StringTools.isEmpty(questionItemList))
+		Integer qType = question.getQuestionType();
+		// 判断是否为选择题 (1:单选, 2:多选)
+		boolean isChoice = (qType != null && (qType == 1 || qType == 2));
+		if (isChoice) {
+			// ✅ 获取前端传来的 JSON 字符串
+			String jsonStr = question.getQuestionItemList();
+			if (StringTools.isEmpty(jsonStr))
 				throw new BusinessException(ResponseCodeEnum.CODE_400);
-			item4question = JsonUtil.convertJsonArray2Object(questionItemList, Item4question.class);
+			try {
+				// 手动解析为 List，传给 Service
+				item4question = JsonUtil.convertJsonArray2Object(jsonStr, Item4question.class);
+			} catch (Exception e) {
+				throw new BusinessException(ResponseCodeEnum.CODE_400);
+			}
 		}
+		// 调用 Service (Service 接收的是解析好的 List，不依赖 Question 实体里的字段)
 		this.questionService.saveQuestion(question, item4question, sessionUserAdminDto.getSuperAdmin());
 		return getSuccessResponseVO(null);
 	}

@@ -99,10 +99,10 @@
                 and s.share_id in (<foreach collection="query.shareIds" separator="," item="item">#{item}</foreach> )
             </if>
             <if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
-                <![CDATA[ and share_id<#{query.currentId} order by share_id desc ]]>
+                <![CDATA[ and s.share_id<#{query.currentId} order by s.share_id desc ]]>
             </if>
             <if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
-                <![CDATA[ and share_id>#{query.currentId} order by share_id asc ]]>
+                <![CDATA[ and s.share_id>#{query.currentId} order by s.share_id asc ]]>
             </if>
         </where>
     </sql>

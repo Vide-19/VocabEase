@@ -80,4 +80,12 @@ public class Article2categoryController extends ABaseController{
 		article2categoryService.deleteArticle2categoryByArticleIdAndCategoryId(articleId,categoryId);
 		return getSuccessResponseVO(null);
 	}
+
+	/**
+	 * 根据ArticleId查询对象
+	 */
+	@RequestMapping("/getCategoryIdByArticleId")
+	public ResponseVO<Integer> getCategoryIdByArticleId(Integer articleId) {
+		return getSuccessResponseVO(this.article2categoryService.getCategoryIdByArticleId(articleId));
+	}
 }

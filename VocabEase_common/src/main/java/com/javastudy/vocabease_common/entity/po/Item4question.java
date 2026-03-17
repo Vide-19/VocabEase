@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * 问题选项表
  */
-public class 	Item4question implements Serializable {
+public class Item4question implements Serializable {
 
 
 	@Serial
@@ -32,6 +32,18 @@ public class 	Item4question implements Serializable {
 	 */
 	private Integer sort;
 
+	/**
+	 * 是否正确
+	 */
+	private Integer isCorrect;
+
+	public Integer getIsCorrect() {
+		return isCorrect;
+	}
+
+	public void setIsCorrect(Integer isCorrect) {
+		this.isCorrect = isCorrect;
+	}
 
 	public void setItemId(Integer itemId){
 		this.itemId = itemId;

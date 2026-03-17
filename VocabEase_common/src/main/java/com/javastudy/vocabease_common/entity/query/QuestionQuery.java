@@ -100,6 +100,15 @@ public class QuestionQuery extends BaseParam {
 	 */
 	private Integer questionType;
 
+	private Integer categoryId;
+
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
 
 	public void setQuestionId(Integer questionId){
 		this.questionId = questionId;

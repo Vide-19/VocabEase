@@ -1,5 +1,6 @@
 package com.javastudy.vocabease_api.controller;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.javastudy.vocabease_common.entity.config.AppConfig;
 import com.javastudy.vocabease_common.entity.constants.Constants;
 import com.javastudy.vocabease_common.entity.dto.AppAccountDto;
@@ -10,6 +11,9 @@ import com.javastudy.vocabease_common.utils.JWTUtil;
 import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 public class ABaseController {
@@ -84,24 +88,11 @@ public class ABaseController {
         content = content.replace(Constants.READ_IMG_PATH, appConfig.getAppDomain() + Constants.READ_IMG_PATH);
         return content;
     }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    @ResponseBody
+    public ResponseVO<T> handleTokenExpired(TokenExpiredException e) {
+        BusinessException businessException = new BusinessException(ResponseCodeEnum.CODE_401);
+        return getBusinessErrorResponseVO(businessException, null);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

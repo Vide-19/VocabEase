@@ -102,12 +102,12 @@ public class Word2categoryServiceImpl implements Word2categoryService {
 		return this.word2categoryMapper.selectByWordIdAndCategoryId(wordId, categoryId);
 	}
 	/**
-	 * 根据WordIdAndCategoryId修改
+	 * 根据WordId修改
 	 */
-	@Override
-	public Integer updateWord2categoryByWordIdAndCategoryId(Word2category bean, Integer wordId, Integer categoryId) {
-		return this.word2categoryMapper.updateByWordIdAndCategoryId(bean, wordId, categoryId);
-	}
+/*	@Override
+	public void updateWord2categoryByWordId(Integer wordId, Integer categoryId) {
+		this.word2categoryMapper.updateByWordId(wordId, categoryId);
+	}*/
 	/**
 	 * 根据WordIdAndCategoryId删除
 	 */

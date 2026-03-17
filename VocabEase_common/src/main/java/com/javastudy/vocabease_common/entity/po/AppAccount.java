@@ -24,6 +24,11 @@ public class AppAccount implements Serializable {
 	private String userId;
 
 	/**
+	 * 微信小程序 OpenID (固定 28 位)
+	 */
+	private String openId;
+
+	/**
 	 * 用户邮箱
 	 */
 	private String email;
@@ -82,6 +87,13 @@ public class AppAccount implements Serializable {
 	 */
 	private Integer status;
 
+	public String getOpenId() {
+		return openId;
+	}
+
+	public void setOpenId(String openId) {
+		this.openId = openId;
+	}
 
 	public void setUserId(String userId){
 		this.userId = userId;

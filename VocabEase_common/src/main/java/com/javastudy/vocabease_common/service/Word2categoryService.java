@@ -51,7 +51,9 @@ public interface Word2categoryService {
 	/**
 	 * 根据WordIdAndCategoryId修改
 	 */
-	Integer updateWord2categoryByWordIdAndCategoryId(Word2category bean,Integer wordId,Integer categoryId);
+/*
+	void updateWord2categoryByWordId(Integer wordId, Integer categoryId);
+*/
 	/**
 	 * 根据WordIdAndCategoryId删除
 	 */

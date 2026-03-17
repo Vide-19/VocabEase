@@ -7,6 +7,7 @@
 	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppAccount">
 		<!--用户id-->
 		<result column="user_id" property="userId"  />
+		<result column="open_id" property="openId" />
 		<!--用户邮箱-->
 		<result column="email" property="email"  />
 		<!--昵称-->
@@ -34,49 +35,52 @@
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
-		 a.user_id,a.email,a.nick_name,a.avatar,a.password,
+		 a.user_id,a.open_id,a.email,a.nick_name,a.avatar,a.password,
 		 a.gender,a.create_time,a.last_login_time,a.last_use_device_id,a.last_use_device_brand,
 		 a.last_login_ip,a.status
 	</sql>
 
 	<sql id="base_condition_filed">
-			<if test="query.userId != null and query.userId!=''">
-				 and  a.user_id = #{query.userId}
-			</if>
-			<if test="query.email != null and query.email!=''">
-				 and  a.email = #{query.email}
-			</if>
-			<if test="query.nickName != null and query.nickName!=''">
-				 and  a.nick_name = #{query.nickName}
-			</if>
-			<if test="query.avatar != null and query.avatar!=''">
-				 and  a.avatar = #{query.avatar}
-			</if>
-			<if test="query.password != null and query.password!=''">
-				 and  a.password = #{query.password}
-			</if>
-			<if test="query.gender != null">
-				 and  a.gender = #{query.gender}
-			</if>
-			<if test="query.createTime != null and query.createTime!=''">
-				 <![CDATA[ and  a.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
-			</if>
-			<if test="query.lastLoginTime != null and query.lastLoginTime!=''">
-				 <![CDATA[ and  a.last_login_time=str_to_date(#{query.lastLoginTime}, '%Y-%m-%d') ]]>
-			</if>
-			<if test="query.lastUseDeviceId != null and query.lastUseDeviceId!=''">
-				 and  a.last_use_device_id = #{query.lastUseDeviceId}
-			</if>
-			<if test="query.lastUseDeviceBrand != null and query.lastUseDeviceBrand!=''">
-				 and  a.last_use_device_brand = #{query.lastUseDeviceBrand}
-			</if>
-			<if test="query.lastLoginIp != null and query.lastLoginIp!=''">
-				 and  a.last_login_ip = #{query.lastLoginIp}
-			</if>
-			<if test="query.status != null">
-				 and  a.status = #{query.status}
-			</if>
-	</sql>
+        <if test="query.userId != null and query.userId!=''">
+            and a.user_id = #{query.userId}
+        </if>
+        <if test="query.openId != null and query.openId!=''">
+            and a.openId = #{query.openId}
+        </if>
+        <if test="query.email != null and query.email!=''">
+            and a.email = #{query.email}
+        </if>
+        <if test="query.nickName != null and query.nickName!=''">
+            and a.nick_name = #{query.nickName}
+        </if>
+        <if test="query.avatar != null and query.avatar!=''">
+            and a.avatar = #{query.avatar}
+        </if>
+        <if test="query.password != null and query.password!=''">
+            and a.password = #{query.password}
+        </if>
+        <if test="query.gender != null">
+            and a.gender = #{query.gender}
+        </if>
+        <if test="query.createTime != null and query.createTime!=''">
+            <![CDATA[ and  a.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.lastLoginTime != null and query.lastLoginTime!=''">
+            <![CDATA[ and  a.last_login_time=str_to_date(#{query.lastLoginTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.lastUseDeviceId != null and query.lastUseDeviceId!=''">
+            and a.last_use_device_id = #{query.lastUseDeviceId}
+        </if>
+        <if test="query.lastUseDeviceBrand != null and query.lastUseDeviceBrand!=''">
+            and a.last_use_device_brand = #{query.lastUseDeviceBrand}
+        </if>
+        <if test="query.lastLoginIp != null and query.lastLoginIp!=''">
+            and a.last_login_ip = #{query.lastLoginIp}
+        </if>
+        <if test="query.status != null">
+            and a.status = #{query.status}
+        </if>
+    </sql>
 
 	<!-- 通用查询条件列-->
 	<sql id="query_condition">
@@ -85,6 +89,9 @@
 			<if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
 				 and  a.user_id like concat('%', #{query.userIdFuzzy}, '%')
 			</if>
+		 <if test="query.openIdFuzzy!= null  and query.openIdFuzzy!=''">
+			 and  a.open_id like concat('%', #{query.openIdFuzzy}, '%')
+		 </if>
 			<if test="query.emailFuzzy!= null  and query.emailFuzzy!=''">
 				 and  a.email like concat('%', #{query.emailFuzzy}, '%')
 			</if>
@@ -144,6 +151,9 @@
 			<if test="bean.userId != null">
 				 user_id,
 			</if>
+			 <if test="bean.openId != null">
+				 open_id,
+			 </if>
 			<if test="bean.email != null">
 				 email,
 			</if>
@@ -182,6 +192,9 @@
 			<if test="bean.userId!=null">
 				 #{bean.userId},
 			</if>
+			 <if test="bean.openId!=null">
+				 #{bean.openId},
+			 </if>
 			<if test="bean.email!=null">
 				 #{bean.email},
 			</if>
@@ -225,6 +238,9 @@
 			<if test="bean.userId != null">
 				 user_id,
 			</if>
+			 <if test="bean.openId != null">
+				 open_id,
+			 </if>
 			<if test="bean.email != null">
 				 email,
 			</if>
@@ -263,6 +279,9 @@
 			<if test="bean.userId!=null">
 				 #{bean.userId},
 			</if>
+			 <if test="bean.openId!=null">
+				 #{bean.openId},
+			 </if>
 			<if test="bean.email!=null">
 				 #{bean.email},
 			</if>
@@ -302,6 +321,9 @@
 			<if test="bean.userId!=null">
 				 user_id = VALUES(user_id),
 			</if>
+			 <if test="bean.openId!=null">
+				 open_id = VALUES(open_id),
+			 </if>
 			<if test="bean.email!=null">
 				 email = VALUES(email),
 			</if>
@@ -340,42 +362,45 @@
 
 	<!-- 添加 （批量插入）-->
 	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppAccount">
-		 INSERT INTO app_account(
-			 user_id,
-			 email,
-			 nick_name,
-			 avatar,
-			 password,
-			 gender,
-			 create_time,
-			 last_login_time,
-			 last_use_device_id,
-			 last_use_device_brand,
-			 last_login_ip,
-			 status
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.userId},
-				 #{item.email},
-				 #{item.nickName},
-				 #{item.avatar},
-				 #{item.password},
-				 #{item.gender},
-				 #{item.createTime},
-				 #{item.lastLoginTime},
-				 #{item.lastUseDeviceId},
-				 #{item.lastUseDeviceBrand},
-				 #{item.lastLoginIp},
-				 #{item.status}
-			 )
-		 </foreach>
-	</insert>
+        INSERT INTO app_account(
+        user_id,
+        open_id,
+        email,
+        nick_name,
+        avatar,
+        password,
+        gender,
+        create_time,
+        last_login_time,
+        last_use_device_id,
+        last_use_device_brand,
+        last_login_ip,
+        status
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userId},
+             #{item.openId},
+            #{item.email},
+            #{item.nickName},
+            #{item.avatar},
+            #{item.password},
+            #{item.gender},
+            #{item.createTime},
+            #{item.lastLoginTime},
+            #{item.lastUseDeviceId},
+            #{item.lastUseDeviceBrand},
+            #{item.lastLoginIp},
+            #{item.status}
+            )
+        </foreach>
+    </insert>
 
 	<!-- 批量新增修改 （批量插入）-->
 	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppAccount">
 		 INSERT INTO app_account(
 			 user_id,
+		                         open_id,
 			 email,
 			 nick_name,
 			 avatar,
@@ -391,6 +416,7 @@
 		 <foreach collection="list" item="item" separator=",">
 			 (
 				 #{item.userId},
+			  #{item.openId},
 				 #{item.email},
 				 #{item.nickName},
 				 #{item.avatar},
@@ -406,6 +432,7 @@
 		 </foreach>
 			on DUPLICATE key update 
 			user_id = VALUES(user_id),
+			open_id = VALUES(open_id),
 			email = VALUES(email),
 			nick_name = VALUES(nick_name),
 			avatar = VALUES(avatar),
@@ -426,6 +453,9 @@
 			<if test="bean.userId != null">
 				 user_id = #{bean.userId},
 			</if>
+			 <if test="bean.openId != null">
+				 open_id = #{bean.openId},
+			 </if>
 			<if test="bean.email != null">
 				 email = #{bean.email},
 			</if>
@@ -476,6 +506,9 @@
 			<if test="bean.email != null">
 				 email = #{bean.email},
 			</if>
+			 <if test="bean.openId != null">
+				 open_id = #{bean.openId},
+			 </if>
 			<if test="bean.nickName != null">
 				 nick_name = #{bean.nickName},
 			</if>
@@ -518,6 +551,10 @@
 	<!-- 根据PrimaryKey获取对象-->
 	<select id="selectByUserId" resultMap="base_result_map" >
 		select <include refid="base_column_list" /> from app_account a where user_id=#{userId}
+	</select>
+
+	<select id="selectByOpenId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_account a where open_id=#{openId} limit 1
 	</select>
 
 	<select id="selectByEmail" resultMap="base_result_map" >

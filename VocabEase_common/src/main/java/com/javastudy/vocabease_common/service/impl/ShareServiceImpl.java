@@ -1,6 +1,7 @@
 package com.javastudy.vocabease_common.service.impl;
 
 import com.javastudy.vocabease_common.entity.enums.PageSize;
+import com.javastudy.vocabease_common.entity.enums.PostStatusEnum;
 import com.javastudy.vocabease_common.entity.po.Share;
 import com.javastudy.vocabease_common.entity.query.ShareQuery;
 import com.javastudy.vocabease_common.entity.query.SimplePage;
@@ -12,6 +13,7 @@ import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -135,6 +137,10 @@ public class ShareServiceImpl implements ShareService {
 		//新增
 		if (share.getShareId() == null) {
 			share.setCreateTime(new Date());
+			share.setCollectCount(0);
+			share.setReadCount(0);
+			share.setPostType(0);
+			share.setStatus(PostStatusEnum.NO_POST.getStatus());
 			this.shareMapper.insert(share);
 		}
 		//修改
@@ -153,17 +159,27 @@ public class ShareServiceImpl implements ShareService {
 	@Override
 	public void deleteShareByShareIds(String shareIds, Integer userId) {
 		String[] shareIdArray = shareIds.split(",");
-		if (userId != null) {
-			ShareQuery query = new ShareQuery();
-			query.setShareIds(shareIdArray);
-			List<Share> shareList = this.findListByParam(query);
-			List<Share> currentUserList = shareList.stream().filter(item ->
-					!item.getCreaterId().equals(String.valueOf(userId))).toList();
-			if (!currentUserList.isEmpty())
-				throw new BusinessException("非管理员或作者无法删除当前笔记");
-		}
+		// 1. 查询这些笔记的详细信息
 		ShareQuery query = new ShareQuery();
 		query.setShareIds(shareIdArray);
+		List<Share> shareList = this.findListByParam(query);
+		// 2. 校验：是否有已发布的笔记
+		List<String> publishedTitles = new ArrayList<>();
+		for (Share share : shareList)
+			if (share.getStatus() != null &&
+					share.getStatus().equals(PostStatusEnum.IS_POST.getStatus()))
+				publishedTitles.add(share.getTitle());
+		if (!publishedTitles.isEmpty())
+			throw new BusinessException("以下笔记已发布，禁止删除：" + String.join(", ", publishedTitles));
+		// 3. 权限校验：非管理员只能删自己的
+		if (userId != null) {
+			List<Share> notOwnList = shareList.stream()
+					.filter(item -> !item.getCreaterId().equals(String.valueOf(userId)))
+					.toList();
+			if (!notOwnList.isEmpty())
+				throw new BusinessException("非管理员或作者无法删除当前笔记");
+		}
+		// 4. 执行删除
 		this.shareMapper.deleteByParam(query);
 	}
 	/**

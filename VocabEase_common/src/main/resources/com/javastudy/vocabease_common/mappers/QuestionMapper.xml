@@ -31,13 +31,14 @@
 		<result column="post_type" property="postType"  />
 		<!--问题类型 0判断 1单选 2多选 3填空-->
 		<result column="question_type" property="questionType"  />
+        <result column="category_name" property="categoryName" />
 	</resultMap>
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
 		 q.question_id,q.title,q.question,q.level,
 		 q.create_time,q.status,q.creater_id,q.read_count,q.collect_count,
-		 q.post_type,q.question_type
+		 q.post_type,q.question_type,c.category_name as category_name
 	</sql>
 
 	<sql id="base_condition_filed">
@@ -84,7 +85,10 @@
              and category_id in (<foreach collection="query.categoryIds" separator="," item="item">#{item}</foreach> )
         </if>
         <if test="query.questionIdList != null and query.questionIdList.size()>0">
-            and question_id not in (<foreach collection="query.questionIdList" separator="," item="item">#{item}</foreach> )
+            and q.question_id not in (<foreach collection="query.questionIdList" separator="," item="item">#{item}</foreach> )
+        </if>
+        <if test="query.categoryId != null">
+            and c.category_id = #{query.categoryId}
         </if>
     </sql>
 
@@ -114,37 +118,44 @@
                 and q.creater_id like concat('%', #{query.createrIdFuzzy}, '%')
             </if>
             <if test="query.questionIds!=null and query.questionIds.length>0">
-                and question_id in (
+                and q.question_id in (
                 <foreach collection="query.questionIds" separator="," item="item">#{item}</foreach>)
             </if>
             <if test="query.nextType!=null and query.nextType==1 and query.currentId!=null">
-                <![CDATA[ and question_id<#{query.currentId} order by question_id desc ]]>
+                <![CDATA[ and q.question_id<#{query.currentId} order by q.question_id desc ]]>
             </if>
             <if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
-                <![CDATA[ and question_id>#{query.currentId} order by question_id asc ]]>
+                <![CDATA[ and q.question_id>#{query.currentId} order by q.question_id asc ]]>
             </if>
         </where>
     </sql>
 
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
-		 SELECT <include refid="base_column_list" />
-		 <if test="query.isQueryAnswer!=null and query.isQueryAnswer">
-			,answer,answer_analysis
-		 </if>
-		 FROM question q <include refid="query_condition" />
-		 <if test="query.orderBy!=null">
-			 order by ${query.orderBy}
-		 </if>
-		 <if test="query.simplePage!=null">
-			 limit #{query.simplePage.start},#{query.simplePage.end}
-		 </if>
-	</select>
+        SELECT
+        <include refid="base_column_list"/>
+        <if test="query.isQueryAnswer!=null and query.isQueryAnswer">
+            ,answer,answer_analysis
+        </if>
+        FROM question q
+        LEFT JOIN question2category q2c ON q.question_id = q2c.question_id
+        LEFT JOIN category c ON q2c.category_id = c.category_id
+        <include refid="query_condition"/>
+        <if test="query.orderBy!=null">
+            order by ${query.orderBy}
+        </if>
+        <if test="query.simplePage!=null">
+            limit #{query.simplePage.start},#{query.simplePage.end}
+        </if>
+    </select>
 
 	<!-- 查询数量-->
 	<select id="selectCount" resultType="java.lang.Integer" >
-		 SELECT count(1) FROM question q <include refid="query_condition" />
-	</select>
+        SELECT count(1) FROM question q
+        LEFT JOIN question2category q2c ON q.question_id = q2c.question_id
+        LEFT JOIN category c ON q2c.category_id = c.category_id
+        <include refid="query_condition"/>
+    </select>
 
 	<!-- 插入 （匹配有值的字段）-->
 	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.Question">
@@ -538,8 +549,13 @@
 
 	<!-- 根据PrimaryKey获取对象-->
 	<select id="selectByQuestionId" resultMap="base_result_map" >
-		select <include refid="base_column_list" /> from question q where question_id=#{questionId}
-	</select>
+        select
+        <include refid="base_column_list"/>
+        from question q
+        LEFT JOIN question2category q2c on q.question_id=q2c.question_id
+        LEFT JOIN category c on c.category_id=q2c.category_id
+        where q.question_id=#{questionId}
+    </select>
 
 	<select id="showQuestionNext" resultMap="base_result_map">
 		select * from question

@@ -60,6 +60,8 @@ public class Article implements Serializable {
 	 */
 	private Integer createrId;
 
+	private String createrName;
+
 	/**
 	 * 浏览量
 	 */
@@ -79,6 +81,33 @@ public class Article implements Serializable {
 	 */
 	private Integer postType;
 
+	private String categoryName;
+
+	private Integer categoryId;
+
+	public String getCreaterName() {
+		return createrName;
+	}
+
+	public void setCreaterName(String createrName) {
+		this.createrName = createrName;
+	}
+
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
 
 	public void setArticleId(Integer articleId){
 		this.articleId = articleId;

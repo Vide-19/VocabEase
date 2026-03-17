@@ -106,6 +106,15 @@ public class WordQuery extends BaseParam {
 	 */
 	private Integer postType;
 
+	private Integer categoryId;
+
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
 
 	public void setWordId(Integer wordId){
 		this.wordId = wordId;

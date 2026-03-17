@@ -9,12 +9,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
-
 /**
  * 单词表
  */
 public class Word implements Serializable {
-
 
 	@Serial
 	private static final long serialVersionUID = -4699624100947003708L;
@@ -96,6 +94,25 @@ public class Word implements Serializable {
 
 	private Integer collectId;
 
+	private String categoryName;
+
+	private Integer categoryId;
+
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
 
 	public void setWordId(Integer wordId){
 		this.wordId = wordId;

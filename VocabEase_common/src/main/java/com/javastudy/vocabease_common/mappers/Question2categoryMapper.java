@@ -11,19 +11,17 @@ public interface Question2categoryMapper<T,P> extends BaseMapper<T,P> {
 	 * 根据QuestionIdAndCategoryId更新
 	 */
 	 Integer updateByQuestionIdAndCategoryId(@Param("bean") T t,@Param("questionId") Integer questionId,@Param("categoryId") Integer categoryId);
-
-
 	/**
 	 * 根据QuestionIdAndCategoryId删除
 	 */
 	 Integer deleteByQuestionIdAndCategoryId(@Param("questionId") Integer questionId,@Param("categoryId") Integer categoryId);
-
-
 	/**
 	 * 根据QuestionIdAndCategoryId获取对象
 	 */
 	 T selectByQuestionIdAndCategoryId(@Param("questionId") Integer questionId,@Param("categoryId") Integer categoryId);
-
+	/**
+	 * 通过问题id获取分类id
+	 */
 	 Integer selectCategoryIdByQuestionId(@Param("questionId") Integer questionId);
 	/**
 	 * 根据questionIds删除多个对象

@@ -80,4 +80,12 @@ public class Question2categoryController extends ABaseController{
 		question2categoryService.deleteQuestion2categoryByQuestionIdAndCategoryId(questionId,categoryId);
 		return getSuccessResponseVO(null);
 	}
+
+	/**
+	 * 根据QuestionId查询对象
+	 */
+	@RequestMapping("/getCategoryIdByQuestionId")
+	public ResponseVO<Integer> getCategoryIdByQuestionId(Integer questionId) {
+		return getSuccessResponseVO(this.question2categoryService.getCategoryIdByQuestionId(questionId));
+	}
 }

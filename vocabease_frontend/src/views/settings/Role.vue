@@ -206,6 +206,7 @@ const handleSaveRoleInfo = async () => {
       // 不传 menuIdx → 后端不会更新菜单
     })
     ElMessage.success('角色信息更新成功')
+    await fetchData()
     // 不关闭弹窗，方便继续改菜单
   } catch (error) {
     console.error('更新角色信息失败:', error)

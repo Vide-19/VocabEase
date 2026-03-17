@@ -30,7 +30,7 @@ public class ExcelUtil {
             Sheet sheet = workbook.getSheetAt(0);
             if (sheet == null)
                 throw new BusinessException("excel文件解析错误");
-            for (int i = 0; i < sheet.getLastRowNum(); i++) {
+            for (int i = 0; i <= sheet.getLastRowNum(); i++) {
                 rowIndex = i;
                 if (i < startRowIndex)
                     continue;

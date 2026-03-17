@@ -1,6 +1,6 @@
 package com.javastudy.vocabease_common.entity.po;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -10,6 +10,8 @@ import java.io.Serializable;
 public class Question2category implements Serializable {
 
 
+	@Serial
+	private static final long serialVersionUID = -4894837786495789833L;
 	/**
 	 * 问题id
 	 */

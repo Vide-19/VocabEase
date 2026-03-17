@@ -155,81 +155,113 @@ public class QuestionServiceImpl implements QuestionService {
 	@Transactional(rollbackFor = Exception.class)
 	public void saveQuestion(Question question, List<Item4question> itemList, Boolean isSuperAdmin) {
 		Integer questionId = question.getQuestionId();
-		Category category = this.categoryService.getCategoryByCategoryId(
-				this.question2categoryService.getCategoryIdByQuestionId(questionId));
+		// 校验分类
+		Category category = this.categoryService.getCategoryByCategoryId(question.getCategoryId());
 		if (category == null)
 			throw new BusinessException(ResponseCodeEnum.CODE_400);
 		// ========== 1. 处理题目主表（Question）==========
-		//新增
-		if (questionId == null){
+		if (questionId == null) {
+			// 新增逻辑
 			question.setCreateTime(new Date());
+			question.setStatus(PostStatusEnum.NO_POST.getStatus());
+			question.setReadCount(0);
+			question.setCollectCount(0);
+			question.setPostType(0);
 			this.questionMapper.insert(question);
-		}
-		//修改
-		else {
-			question.setQuestionType(null);
-			// 查询数据库中的原始题目
+			// 新增后，questionId 已被 MyBatis 回填
+		} else {
+			// 修改逻辑
 			Question questionDB = this.questionMapper.selectByQuestionId(questionId);
-			// 权限控制：仅创建者或超级管理员可修改
+			if (questionDB == null) throw new BusinessException("题目不存在");
+			// 权限控制
 			if (!questionDB.getCreaterId().equals(question.getCreaterId()) && !isSuperAdmin)
 				throw new BusinessException("无法修改当前问题");
-			question.setCreateTime(null);
-			question.setCreaterId(null);
+			// 更新主表 (注意：这里不要 set null 掉不该空的字段，确保 update 语句只更新非 null 字段或使用动态 SQL)
+			// 如果 updateByQuestionId 是动态 SQL (只更新非 null 值)，则直接调用即可
 			this.questionMapper.updateByQuestionId(question, questionId);
+			// 删除旧关联 (先删后加，确保分类变更生效)
+			this.question2categoryService.deleteQuestion2categoryByQuestionIds(new String[]{questionId.toString()});
 		}
+		// 重新绑定分类
+		Question2category question2category = new Question2category();
+		question2category.setQuestionId(question.getQuestionId());
+		question2category.setCategoryId(question.getCategoryId());
+		this.question2categoryService.add(question2category);
 		// ========== 2. 同步处理选项（Item4question）==========
-		// 为所有选项设置关联的题目 ID（新增题目时，此处依赖 MyBatis 回填的 questionId）
-		itemList.forEach(item -> {
-			item.setQuestionId(question.getQuestionId());
-		});
-		//新增的选项
-		List<Item4question> addItemList = itemList.stream().filter(item ->
-				item.getItemId() == null).toList();
-		//更新的选项
-		List<Item4question> updateItemList = itemList.stream().filter(item ->
-				item.getItemId() != null).toList();
-		// 构建更新项的 Map，便于快速查找
-		Map<Integer, Item4question> updataItemMap = updateItemList.stream().collect(
-				Collectors.toMap(Item4question::getItemId, Function.identity(), (data1, data2) -> data2));
-		//数据库中question已有的item
+		// 如果题目不是选择题，前端传来的 itemList 应该为空，这里做防御性判断
+		if (itemList == null)
+			itemList = new ArrayList<>();
+		// 为所有选项设置关联的题目 ID
+		itemList.forEach(item -> item.setQuestionId(question.getQuestionId()));
+		// 分离新增和更新
+		List<Item4question> addItemList = itemList.stream()
+				.filter(item -> item.getItemId() == null).toList();
+		List<Item4question> updateItemList = itemList.stream()
+				.filter(item -> item.getItemId() != null).toList();
+		// 构建“前端希望保留/更新”的 ID 集合 (使用 Set 提高查找效率)
+		Set<Integer> frontEndItemIds = updateItemList.stream()
+				.map(Item4question::getItemId)
+				.collect(Collectors.toSet());
+		// 查询数据库中现有的所有选项
 		Item4questionQuery itemQuery = new Item4questionQuery();
 		itemQuery.setQuestionId(questionId);
 		List<Item4question> itemListDB = this.item4questionMapper.selectList(itemQuery);
-		// ========== 3. 计算需要删除的选项（软同步）==========
+		// ========== 3. 计算需要删除的选项 (🔥 核心修复点) ==========
 		List<Integer> deleteList = new ArrayList<>();
-		if (!updataItemMap.isEmpty())
-			for (Item4question db : itemListDB)
-				//更新itemId在db中找不到，则先删除
-				if (updataItemMap.get(db.getItemId()) == null)
-					deleteList.add(db.getItemId());
-		// ========== 4. 批量执行数据库操作（保持事务一致性）==========
+		if (itemListDB != null && !itemListDB.isEmpty())
+			for (Item4question dbItem : itemListDB)
+				// 如果数据库中的 ID 不在前端传来的 ID 集合中，说明需要删除
+				// 无论前端传的是空列表还是部分列表，这个逻辑都成立
+				if (!frontEndItemIds.contains(dbItem.getItemId()))
+					deleteList.add(dbItem.getItemId());
+		// ========== 4. 批量执行数据库操作 ==========
 		if (!addItemList.isEmpty())
-			this.item4questionMapper.insertBatch(addItemList);// 批量插入新选项
-		for (Item4question item : updateItemList)
-			this.item4questionMapper.updateByItemId(item, item.getItemId());//修改选项
+			this.item4questionMapper.insertBatch(addItemList);
+		if (!updateItemList.isEmpty())
+			for (Item4question item : updateItemList)
+				this.item4questionMapper.updateByItemId(item, item.getItemId());
 		if (!deleteList.isEmpty())
-			this.item4questionMapper.deleteByItemIdBatch(deleteList);// 批量删除废弃选项
+			this.item4questionMapper.deleteByItemIdBatch(deleteList);
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void deleteQuestionBatch(String questionIds, Integer userId) {
 		String[] questionIdArray = questionIds.split(",");
-		if (userId != null) {
-			QuestionQuery questionQuery = new QuestionQuery();
-			questionQuery.setQuestionIds(questionIdArray);
-			List<Question> questionList = this.questionMapper.selectList(questionQuery);
-			List<Question> questionListNotFromUser = questionList.stream().filter(item ->
-					!item.getCreaterId().equals(String.valueOf(userId))).toList();
-			if (!questionListNotFromUser.isEmpty())
-				throw new BusinessException("无法删除当前问题");
+		// 1. 查询题目详情
+		QuestionQuery questionQuery = new QuestionQuery();
+		questionQuery.setQuestionIds(questionIdArray);
+		List<Question> questionList = this.questionMapper.selectList(questionQuery);
+		// 2. 检查是否有已发布的题目
+		List<String> publishedQuestions = new ArrayList<>();
+		for (Question question : questionList) {
+			if (question.getStatus() != null &&
+					question.getStatus().equals(PostStatusEnum.IS_POST.getStatus())) {
+				// 可用题干前20字作为标识，避免太长
+				String snippet = question.getQuestion();
+				if (snippet != null && snippet.length() > 20)
+					snippet = snippet.substring(0, 20) + "...";
+				publishedQuestions.add(snippet == null ? "题目" + question.getQuestionId() : snippet);
+			}
 		}
+		if (!publishedQuestions.isEmpty())
+			throw new BusinessException("以下题目已发布，禁止删除：" + String.join(", ", publishedQuestions));
+		// 3. 权限校验
+		if (userId != null) {
+			List<Question> notOwnList = questionList.stream()
+					.filter(item -> !item.getCreaterId().equals(String.valueOf(userId)))
+					.toList();
+			if (!notOwnList.isEmpty())
+				throw new BusinessException("无法删除非本人创建的问题");
+		}
+		// 4. 执行删除
 		this.item4questionMapper.deleteByQuestionIdBatch(questionIdArray, PostStatusEnum.NO_POST.getStatus(), userId);
 		this.question2categoryService.deleteQuestion2categoryByQuestionIds(questionIdArray);
-		QuestionQuery questionQuery = new QuestionQuery();//两种方式
-		questionQuery.setQuestionIds(questionIdArray);
-		questionQuery.setStatus(PostStatusEnum.NO_POST.getStatus());
-		this.questionMapper.deleteByParam(questionQuery);
+		// 删除主表（可选：其实上面 deleteByQuestionIdBatch 可能已处理，但保留原逻辑）
+		QuestionQuery delQuery = new QuestionQuery();
+		delQuery.setQuestionIds(questionIdArray);
+		delQuery.setStatus(PostStatusEnum.NO_POST.getStatus());
+		this.questionMapper.deleteByParam(delQuery);
 	}
 
 	@Override
@@ -242,6 +274,7 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public List<ImportErrorItem> importQuestion(SessionUserAdminDto sessionUserAdminDto, MultipartFile file) {
 		List<Category> categoryList = this.categoryService.getCategoryListByType(
 				CategoryTypeEnum.QUESTION.getType());
@@ -260,7 +293,7 @@ public class QuestionServiceImpl implements QuestionService {
 			dataRowNum++;
 			List<String> errorItemList = new ArrayList<>();
 			int index = 0;
-			// String[]{"标题", "问题描述", "问题类型", "问题选项", "答案", "答案解析", "难度", "分类"}
+			// String[]{"标题", "问题描述", "问题类型", "问题选项", "答案解析", "答案", "难度", "分类"}
 			String title = row.get(index++);
 			if (StringTools.isEmpty(title) || title.length() > Constants.LENGTH_150)
 				errorItemList.add("标题不能为空，同时长度不能超过" + Constants.LENGTH_150);
@@ -268,12 +301,13 @@ public class QuestionServiceImpl implements QuestionService {
 			String questionItself = row.get(index++);
 
 			String questionType = row.get(index++);
-			QuestionTypeEnum typeEnum = QuestionTypeEnum.getTypeByDescription(questionType);
+			QuestionTypeEnum typeEnum = QuestionTypeEnum.getEnumByType(questionType);
 			if (typeEnum == null)
 				errorItemList.add("问题类型错误");
 
 			String questionItem = row.get(index++);
-			if (typeEnum != null && typeEnum != QuestionTypeEnum.TRUE_OR_FALSE && StringTools.isEmpty(questionItem))
+			if (typeEnum != null && typeEnum != QuestionTypeEnum.TRUE_OR_FALSE
+					&& typeEnum != QuestionTypeEnum.FILL_IN_THE_BLANK && StringTools.isEmpty(questionItem))
 				errorItemList.add("问题选项不能为空");
 			List<String> questionItemList = new ArrayList<>();
 			if (!StringTools.isEmpty(questionItem)) {
@@ -281,8 +315,12 @@ public class QuestionServiceImpl implements QuestionService {
 						.map(String::trim)
 						.filter(s -> !s.isEmpty())
 						.map(opt -> opt.replaceFirst("^[A-Z]、", "")) // ← 关键清洗
-						.collect(Collectors.toList());
+						.toList();
 			}
+
+			String answerAnalysis = row.get(index++);
+			if (StringTools.isEmpty(answerAnalysis))
+				errorItemList.add("答案解析不可为空");
 
 			String questionAnswer = row.get(index++);
 			if (!StringTools.isEmpty(questionAnswer) && typeEnum != null) {
@@ -317,7 +355,7 @@ public class QuestionServiceImpl implements QuestionService {
 								break; // 任一无效即失败
 							}
 						}
-						if (allValid && builder.length() > 0)
+						if (allValid && !builder.isEmpty())
 							// 移除末尾逗号
 							questionAnswer = builder.substring(0, builder.length() - 1);
 						else
@@ -326,10 +364,6 @@ public class QuestionServiceImpl implements QuestionService {
 				}
 			} else
 				errorItemList.add("答案输入错误，请按模板重新填写");
-
-			String answerAnalysis = row.get(index++);
-			if (StringTools.isEmpty(answerAnalysis))
-				errorItemList.add("答案解析不可为空");
 
 			String difficultyLevel = row.get(index++);
 			int difficultyLevelInt = -1;
@@ -340,7 +374,7 @@ public class QuestionServiceImpl implements QuestionService {
 			} else
 				errorItemList.add("难度只能是正整数1~4");
 
-			String categoryName = row.get(index++);
+			String categoryName = row.get(index);
 			Category category = categoryMap.get(categoryName);
 			if (category == null)
 				errorItemList.add("分类名称不存在");

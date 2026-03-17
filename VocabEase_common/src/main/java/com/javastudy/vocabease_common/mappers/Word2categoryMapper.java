@@ -10,7 +10,9 @@ public interface Word2categoryMapper<T,P> extends BaseMapper<T,P> {
 	/**
 	 * 根据WordIdAndCategoryId更新
 	 */
-	 Integer updateByWordIdAndCategoryId(@Param("bean") T t,@Param("wordId") Integer wordId,@Param("categoryId") Integer categoryId);
+/*
+	 void updateByWordId(@Param("wordId") Integer wordId,@Param("categoryId") Integer categoryId);
+*/
 	/**
 	 * 根据WordIdAndCategoryId删除
 	 */

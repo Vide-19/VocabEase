@@ -18,7 +18,9 @@ import com.javastudy.vocabease_common.utils.CopyUtil;
 import com.javastudy.vocabease_common.utils.ScaleFilterUtil;
 import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,7 +61,7 @@ public class MyInfoController extends ABaseController {
     /**
      * 我的信息
      */
-    @RequestMapping("/loadMyInfo")
+    @GetMapping("/loadMyInfo")
     public ResponseVO<AppUserInfoVO> loadMyInfo(@RequestHeader(value = "token", required = false) String token) {
         AppAccountDto dto = getTokenUserAdminDto(token);
         if (dto == null)
@@ -95,7 +97,7 @@ public class MyInfoController extends ABaseController {
         if (typeEnum.equals(CollectTypeEnum.SHARE)) {
             ShareQuery shareQuery = new ShareQuery();
             shareQuery.setShareIds(objectIdList.toArray(new String[objectIdList.size()]));
-            shareQuery.setOrderBy("field(share_id," + StringUtils.join(objectIdList, ",") + ")");
+            shareQuery.setOrderBy("field(s.share_id," + StringUtils.join(objectIdList, ",") + ")");
             List<Share> shareList = this.shareService.findListByParam(shareQuery);
             for (Share item : shareList) {
                 AppCollect collect = objectIdMap.get(item.getShareId());
@@ -105,7 +107,7 @@ public class MyInfoController extends ABaseController {
         } else if (typeEnum.equals(CollectTypeEnum.WORD)) {
             WordQuery wordQuery = new WordQuery();
             wordQuery.setWordIds(objectIdList.toArray(new String[objectIdList.size()]));
-            wordQuery.setOrderBy("field(word_id," + StringUtils.join(objectIdList, ",") + ")");
+            wordQuery.setOrderBy("field(w.word_id," + StringUtils.join(objectIdList, ",") + ")");
             List<Word> wordList = this.wordService.findListByParam(wordQuery);
             for (Word item : wordList) {
                 AppCollect collect = objectIdMap.get(item.getWordId());
@@ -115,7 +117,7 @@ public class MyInfoController extends ABaseController {
         } else if (typeEnum.equals(CollectTypeEnum.ARTICLE)) {
             ArticleQuery articleQuery = new ArticleQuery();
             articleQuery.setArticleIds(objectIdList.toArray(new String[objectIdList.size()]));
-            articleQuery.setOrderBy("field(article_id," + StringUtils.join(objectIdList, ",") + ")");
+            articleQuery.setOrderBy("field(a.article_id," + StringUtils.join(objectIdList, ",") + ")");
             List<Article> articleList = this.articleService.findListByParam(articleQuery);
             for (Article item : articleList) {
                 AppCollect collect = objectIdMap.get(item.getArticleId());
@@ -125,7 +127,7 @@ public class MyInfoController extends ABaseController {
         } else if (typeEnum.equals(CollectTypeEnum.QUESTION)) {
             QuestionQuery questionQuery = new QuestionQuery();
             questionQuery.setQuestionIds(objectIdList.toArray(new String[objectIdList.size()]));
-            questionQuery.setOrderBy("field(question_id," + StringUtils.join(objectIdList, ",") + ")");
+            questionQuery.setOrderBy("field(q.question_id," + StringUtils.join(objectIdList, ",") + ")");
             List<Question> questionList = this.questionService.findListByParam(questionQuery);
             for (Question item : questionList) {
                 AppCollect collect = objectIdMap.get(item.getQuestionId());
@@ -197,39 +199,93 @@ public class MyInfoController extends ABaseController {
      */
     @RequestMapping("/uploadMyAvatar")
     @GlobalInterceptor(checkLogin = true)
-    public ResponseVO<Void> uploadMyAvatar(@RequestHeader(value = "token", required = false) String token,
-                                           MultipartFile file) throws IOException {
+    public ResponseVO<String> uploadMyAvatar(@RequestHeader(value = "token", required = false) String token,
+                                             MultipartFile file,
+                                             HttpServletRequest request) throws IOException {
+        // 1. 校验用户
         AppAccountDto dto = getTokenUserAdminDto(token);
-        if (dto == null)
-            return getSuccessResponseVO(null);
+        if (dto == null) {
+            // 建议返回错误信息，而不是成功返回 null
+            return getBusinessErrorResponseVO(new BusinessException(ResponseCodeEnum.CODE_401), "用户未登录或Token失效");
+        }
+
+        // 2. 校验文件
+        if (file == null || file.isEmpty()) {
+            return getBusinessErrorResponseVO(new BusinessException(ResponseCodeEnum.CODE_400), "上传文件不能为空");
+        }
+
+        // 3. 获取文件夹路径并【关键修复】确保目录存在
         String folderName = appConfig.getProjectFolder() + Constants.AVATAR_FOLDER;
         File folder = new File(folderName);
-        if (!folder.exists())
-            folder.exists();
-        String avatarName = dto.getUserId() + StringTools.getFileSuffix(file.getOriginalFilename());
+        if (!folder.exists()) {
+            // 【修复点1】原来写的是 folder.exists() (只是判断)，现在改为 mkdirs() (创建目录)
+            boolean created = folder.mkdirs();
+            if (!created) {
+                return getBusinessErrorResponseVO(new BusinessException(ResponseCodeEnum.CODE_500), "服务器内部错误：无法创建头像目录");
+            }
+        }
+
+        // 4. 生成文件名 (保留用户ID作为文件名，防止重复)
+        String suffix = StringTools.getFileSuffix(file.getOriginalFilename());
+        // 防止 suffix 为空导致文件名错误
+        if (suffix.isEmpty()) {
+            suffix = ".jpg";
+        }
+        String avatarName = dto.getUserId() + suffix;
+
         File avatarFile = new File(folder.getPath() + "/" + avatarName);
+
+        // 5. 保存文件
         file.transferTo(avatarFile);
 
-        ScaleFilterUtil.createThumbnail(avatarFile, Constants.LENGTH_50, Constants.LENGTH_50, avatarFile);
+        // 6. 生成缩略图 (保持你原有的逻辑)
+        // 注意：如果原图很小，缩放可能会报错，建议加个 try-catch 或者判断文件大小
+        try {
+            ScaleFilterUtil.createThumbnail(avatarFile, Constants.LENGTH_50, Constants.LENGTH_50, avatarFile);
+        } catch (Exception e) {
+            // 如果生成缩略图失败，至少原图已经保存了，不要中断流程，打印日志即可
+            System.err.println("生成头像缩略图失败:" + e.getMessage());
+        }
+
+        // 7. 更新数据库
+        // 这里存入数据库的依然是相对路径，例如: "avatar/xxx.jpeg"
         AppAccount account = new AppAccount();
         account.setAvatar(Constants.AVATAR_FOLDER + avatarName);
         this.appAccountService.updateAppAccountByUserId(account, dto.getUserId());
-        return getSuccessResponseVO(null);
+
+        // 1. 获取项目上下文路径 (会自动获取到 "/VocabEase")
+        String contextPath = request.getContextPath();
+
+        // 2. 获取基础地址 (http://localhost:9090)
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+
+        // 3. 拼接完整 URL
+        // 结果示例: http://localhost:9090/VocabEase/avatar/DGRFD56pVa.jpeg
+        String fullImageUrl = baseUrl + contextPath + "/" + Constants.AVATAR_FOLDER + avatarName;
+
+        System.out.println("✅ 返回给前端的完整URL: " + fullImageUrl);
+
+        return getSuccessResponseVO(fullImageUrl);
     }
 
     /**
      * 更新我的信息
      */
     @RequestMapping("/updateMyInfo")
-    @GlobalInterceptor(checkLogin = true)
+    @GlobalInterceptor(checkLogin = true)//邮箱、昵称👇
     public ResponseVO<Void> updateMyInfo(@RequestHeader(value = "token", required = false) String token,
-                                         @VerifyParam(required = true) Integer gender,
+                                         Integer gender,String nickName,
+                                         @VerifyParam(regex = VerifyRegexEnum.EMAIL) String email,
                                          @VerifyParam(regex = VerifyRegexEnum.PASSWORD) String password) throws IOException {
         AppAccountDto dto = getTokenUserAdminDto(token);
         if (dto == null)
             return getSuccessResponseVO(null);
         AppAccount updateInfo = new AppAccount();
         updateInfo.setGender(gender);
+        if (!StringTools.isEmpty(nickName))
+            updateInfo.setNickName(nickName);
+        if (!StringTools.isEmpty(email))
+            updateInfo.setEmail(email);
         if (!StringTools.isEmpty(password))
             updateInfo.setPassword(StringTools.encodeByMd5(password));
         this.appAccountService.updateAppAccountByUserId(updateInfo, dto.getUserId());
