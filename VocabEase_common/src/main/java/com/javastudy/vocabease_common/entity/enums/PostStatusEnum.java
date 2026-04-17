@@ -4,7 +4,8 @@ import java.util.Objects;
 
 public enum PostStatusEnum {
     NO_POST(0, "未发布"),
-    IS_POST(1, "已发布");
+    IS_POST(1, "已发布"),
+    IS_TOP(2, "置顶");
 
     private Integer status;
     private String description;

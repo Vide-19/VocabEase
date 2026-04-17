@@ -203,7 +203,7 @@ public class AccountServiceImpl implements AccountService {
 		List<MenuVO> menuVOList = new ArrayList<>();
 		menuList2 = this.menuService.convertLine2Tree4Menu(menuList2, 1000);
         if (menuList2.isEmpty())
-            throw new BusinessException("暂无角色权限，请联系管理员");
+            throw new BusinessException("暂无角色权限，请联系超级管理员");
 		menuList2.forEach(menu -> {
 			MenuVO menuVO = CopyUtil.copy(menu, MenuVO.class);
 			menuVO.setChildren(CopyUtil.copyList(menu.getChildren(), MenuVO.class));

@@ -142,7 +142,11 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void saveArticle(Article article, Boolean isAdmin) {
+    public void
+    saveArticle(Article article, Boolean isAdmin) {
+        Category categoryDB = this.categoryService.getCategoryByCategoryId(article.getCategoryId());
+        if (categoryDB == null)
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
         //新增
         if (article.getArticleId() == null) {
             article.setCreateTime(new Date());
@@ -325,5 +329,43 @@ public class ArticleServiceImpl implements ArticleService {
             article.setReadCount(article.getReadCount() == null ? 0 : article.getReadCount() + 1);
         }
         return article;
+    }
+
+    /**
+     * 【新增】获取收藏列表中的下一个/上一个文章
+     * 逻辑：基于 app_collect 表的 create_time 排序
+     * @param userId 当前用户ID
+     * @param currentId 当前单词ID
+     * @param nextType 1: 下一个 (时间更早), -1: 上一个 (时间更晚)
+     */
+    @Override
+    public Article showNextCollectedArticle(String userId, Integer currentId, Integer nextType) {
+        if (userId == null || currentId == null || nextType == null)
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
+        ArticleQuery query = new ArticleQuery();
+        query.setUserId(userId);
+        query.setCurrentId(currentId);    // 当前单词ID
+        query.setNextType(nextType);      // 方向
+        // 确保只查有效的单词
+        query.setStatus(1);
+        query.setQueryBodyContent(true);
+        Article article = this.articleMapper.selectNextCollectedArticle(query);
+        if (article == null) {
+            if (nextType == 1)
+                throw new BusinessException("已经是最后一个收藏了");
+            else if (nextType == -1)
+                throw new BusinessException("已经是第一个收藏了");
+        }
+        return article;
+    }
+
+    @Override
+    public void updateCollectCountById(String shareId) {
+        this.articleMapper.updateCount(1,1, Integer.valueOf(shareId));
+    }
+
+    @Override
+    public void updateReadCountById(Integer articleId) {
+        this.articleMapper.updateReadCount(articleId);
     }
 }

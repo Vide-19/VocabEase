@@ -133,6 +133,23 @@ public class QuestionServiceImpl implements QuestionService {
 		return this.questionMapper.selectByQuestionId(questionId);
 	}
 
+	@Override
+	public Question getAppQuestionByQuestionId(Integer questionId) {
+		// 1. 查询主表信息
+		Question question = this.questionMapper.selectByQuestionId(questionId);
+		if (question == null)
+			return null;
+		// 2. 🔥 关键修复：查询并组装选项列表 (Item4question)
+		// 逻辑与 showQuestionNext 保持一致
+		Item4questionQuery itemQuery = new Item4questionQuery();
+		itemQuery.setQuestionId(questionId);
+		itemQuery.setOrderBy("sort asc"); // 确保选项按 A/B/C/D 顺序
+		List<Item4question> itemList = this.item4questionMapper.selectList(itemQuery);
+		// 3. 设置到对象中 (即使为空列表也要设置，防止前端 null 报错)
+		question.setItemList(itemList != null ? itemList : new ArrayList<>());
+		return question;
+	}
+
 	/**
 	 * 根据QuestionId修改
 	 */
@@ -465,6 +482,37 @@ public class QuestionServiceImpl implements QuestionService {
 			throw new BusinessException("已经在第一题");
 		else if (question == null && nextType == 1)
 			throw new BusinessException("已经在最后一题");
+		Item4questionQuery itemQuery = new Item4questionQuery();
+		itemQuery.setQuestionId(question.getQuestionId());
+		itemQuery.setOrderBy("sort asc");
+		List<Item4question> itemList = this.item4questionMapper.selectList(itemQuery);
+		question.setItemList(itemList);
+		return question;
+	}
+
+	/**
+	 * 【新增】获取收藏列表中的下一个/上一个问题
+	 */
+	@Override
+	public Question showNextCollectedQuestion(String userId, Integer currentId, Integer nextType) {
+		if (userId == null || currentId == null || nextType == null)
+			throw new BusinessException(ResponseCodeEnum.CODE_400);
+		QuestionQuery query = new QuestionQuery();
+		query.setUserId(userId);
+		query.setCurrentId(currentId);
+		query.setNextType(nextType);
+		query.setStatus(1); // 只查已发布
+		// 1. 查询主表信息
+		Question question = this.questionMapper.selectNextCollectedQuestion(query);
+		if (question == null) {
+			if (nextType == 1)
+				throw new BusinessException("已经是最后一个收藏了");
+			else if (nextType == -1)
+				throw new BusinessException("已经是第一个收藏了");
+			else
+				throw new BusinessException("没有更多了");
+		}
+		// 2. ⚠️ 必须补充查询选项列表 (Item4question)
 		Item4questionQuery itemQuery = new Item4questionQuery();
 		itemQuery.setQuestionId(question.getQuestionId());
 		itemQuery.setOrderBy("sort asc");

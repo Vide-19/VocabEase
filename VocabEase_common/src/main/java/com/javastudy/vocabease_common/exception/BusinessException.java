@@ -1,9 +1,13 @@
 package com.javastudy.vocabease_common.exception;
 import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
 
+import java.io.Serial;
+
 
 public class BusinessException extends RuntimeException {
 
+    @Serial
+    private static final long serialVersionUID = 308184189918847563L;
     private ResponseCodeEnum codeEnum;
 
     private Integer code;

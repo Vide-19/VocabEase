@@ -87,8 +87,8 @@ public class MyInfoController extends ABaseController {
         query.setCollectType(collectType);
         query.setUserId(dto.getUserId());
         query.setOrderBy("collect_time desc");
-        PaginationResultVO vo = this.appCollectService.findListByPage(query);
-        List<AppCollect> appCollectList = vo.getList();
+        PaginationResultVO vo = this.appCollectService.findListByPage(query);//👈
+        List<AppCollect> appCollectList = vo.getList();//👈
         List<String> objectIdList = appCollectList.stream().map(AppCollect::getObjectId).toList();
         if (objectIdList.isEmpty())
             return getSuccessResponseVO(vo);
@@ -102,6 +102,7 @@ public class MyInfoController extends ABaseController {
             for (Share item : shareList) {
                 AppCollect collect = objectIdMap.get(item.getShareId());
                 item.setCollectId(collect.getCollectId());
+                item.setCollectTime(collect.getCollectTime());
             }
             vo.setList(shareList);
         } else if (typeEnum.equals(CollectTypeEnum.WORD)) {
@@ -112,6 +113,7 @@ public class MyInfoController extends ABaseController {
             for (Word item : wordList) {
                 AppCollect collect = objectIdMap.get(item.getWordId());
                 item.setCollectId(collect.getCollectId());
+                item.setCollectTime(collect.getCollectTime());
             }
             vo.setList(wordList);
         } else if (typeEnum.equals(CollectTypeEnum.ARTICLE)) {
@@ -122,6 +124,7 @@ public class MyInfoController extends ABaseController {
             for (Article item : articleList) {
                 AppCollect collect = objectIdMap.get(item.getArticleId());
                 item.setCollectId(collect.getCollectId());
+                item.setCollectTime(collect.getCollectTime());
             }
             vo.setList(articleList);
         } else if (typeEnum.equals(CollectTypeEnum.QUESTION)) {
@@ -132,6 +135,7 @@ public class MyInfoController extends ABaseController {
             for (Question item : questionList) {
                 AppCollect collect = objectIdMap.get(item.getQuestionId());
                 item.setCollectId(collect.getCollectId());
+                item.setCollectTime(collect.getCollectTime());
             }
             vo.setList(questionList);
         }
@@ -289,6 +293,24 @@ public class MyInfoController extends ABaseController {
         if (!StringTools.isEmpty(password))
             updateInfo.setPassword(StringTools.encodeByMd5(password));
         this.appAccountService.updateAppAccountByUserId(updateInfo, dto.getUserId());
+        return getSuccessResponseVO(null);
+    }
+
+    /**
+     * 更新学习设置
+     */
+    @RequestMapping("/updateStudySettings")
+    @GlobalInterceptor
+    public ResponseVO<Void> updateSettings(@RequestHeader("token") String token, Integer dailyNewCount,
+                                           Integer dailyReviewCount, Integer wordDifficulty) {
+        AppAccountDto user = getTokenUserAdminDto(token);
+        if (user == null)
+            return getBusinessErrorResponseVO(new BusinessException(ResponseCodeEnum.CODE_401), null);
+        AppAccount updateAccount = new AppAccount();
+        updateAccount.setDailyNewCount(dailyNewCount);
+        updateAccount.setDailyReviewCount(dailyReviewCount);
+        updateAccount.setWordDifficulty(wordDifficulty);
+        this.appAccountService.updateAppAccountByUserId(updateAccount, user.getUserId());
         return getSuccessResponseVO(null);
     }
 

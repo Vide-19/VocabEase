@@ -23,6 +23,7 @@
 		<result column="status" property="status"  />
 		<!--作者id-->
 		<result column="creater_id" property="createrId"  />
+        <result column="user_name" property="createrName" />
 		<!--浏览量-->
 		<result column="read_count" property="readCount"  />
 		<!--收藏数-->
@@ -38,7 +39,7 @@
 	<sql id="base_column_list">
 		 q.question_id,q.title,q.question,q.level,
 		 q.create_time,q.status,q.creater_id,q.read_count,q.collect_count,
-		 q.post_type,q.question_type,c.category_name as category_name
+		 q.post_type,q.question_type,c.category_name as category_name, a.user_name as user_name
 	</sql>
 
 	<sql id="base_condition_filed">
@@ -140,6 +141,7 @@
         FROM question q
         LEFT JOIN question2category q2c ON q.question_id = q2c.question_id
         LEFT JOIN category c ON q2c.category_id = c.category_id
+        LEFT JOIN account a on q.creater_id = a.user_id
         <include refid="query_condition"/>
         <if test="query.orderBy!=null">
             order by ${query.orderBy}
@@ -550,17 +552,57 @@
 	<!-- 根据PrimaryKey获取对象-->
 	<select id="selectByQuestionId" resultMap="base_result_map" >
         select
-        <include refid="base_column_list"/>
+        <include refid="base_column_list"/>, q.answer, q.answer_analysis
         from question q
         LEFT JOIN question2category q2c on q.question_id=q2c.question_id
         LEFT JOIN category c on c.category_id=q2c.category_id
+        LEFT JOIN account a on q.creater_id = a.user_id
         where q.question_id=#{questionId}
     </select>
 
-	<select id="showQuestionNext" resultMap="base_result_map">
-		select * from question
-		<include refid="query_condition"/>
-		limit 0,1
-	</select>
+    <select id="showQuestionNext" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from question q
+        LEFT JOIN question2category q2c ON q.question_id = q2c.question_id
+        LEFT JOIN category c ON q2c.category_id = c.category_id
+        LEFT JOIN account a on q.creater_id = a.user_id
+        <include refid="query_condition"/>
+        limit 0,1
+    </select>
+
+    <select id="selectNextCollectedQuestion" resultMap="base_result_map">
+        SELECT
+        <include refid="base_column_list"/>
+        FROM question q
+        INNER JOIN app_collect ac ON q.question_id = CAST(ac.object_id AS UNSIGNED) <!-- 假设 object_id 是字符串类型，需转换 -->
+        LEFT JOIN question2category q2c ON q.question_id = q2c.question_id
+        LEFT JOIN category c ON q2c.category_id = c.category_id
+        LEFT JOIN account a on q.creater_id = a.user_id
+        <where>
+            <!-- 1. 必须是当前用户的收藏 -->
+            AND ac.user_id = #{query.userId}
+            <!-- 2. 收藏类型必须是题目 (假设题目类型为 3，请根据你的 CollectTypeEnum 修改) -->
+            AND ac.collect_type = 3
+            <!-- 3. 题目必须已发布 -->
+            AND q.status = 1
+
+            <!-- 4. 方向逻辑 -->
+            <if test="query.nextType != null and query.nextType == 1">
+                <!-- 下一题：找 ID 比当前小的 (因为通常按 ID 倒序排列，ID 越小越新？或者反之) -->
+                <!-- 注意：这里逻辑取决于你的列表排序。如果是 ID 降序排列(新在前)，下一题是 ID 更小的 -->
+                <!-- 如果列表是 ID 升序 (旧在前)，下一题是 ID 更大的。 -->
+                <!-- 参考你之前的 showQuestionNext 逻辑：nextType=1 对应 question_id < currentId -->
+                AND q.question_id &lt; #{query.currentId}
+                ORDER BY q.question_id DESC
+            </if>
+            <if test="query.nextType != null and query.nextType == -1">
+                <!-- 上一题：找 ID 比当前大的 -->
+                AND q.question_id &gt; #{query.currentId}
+                ORDER BY q.question_id ASC
+            </if>
+        </where>
+        LIMIT 0, 1
+    </select>
 
 </mapper>

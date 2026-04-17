@@ -3,7 +3,9 @@ package com.javastudy.vocabease_api.controller;
 import com.javastudy.vocabease_api.annotation.GlobalInterceptor;
 import com.javastudy.vocabease_common.entity.annotation.VerifyParam;
 import com.javastudy.vocabease_common.entity.dto.AppAccountDto;
+import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
+import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.service.AppCollectService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,6 +28,8 @@ public class AppCollectController extends ABaseController {
                                        @VerifyParam(required = true) String objectId,
                                        @VerifyParam(required = true) Integer collectType) {
         AppAccountDto dto = getTokenUserAdminDto(token);
+        if (dto == null)
+            return getBusinessErrorResponseVO(new BusinessException(ResponseCodeEnum.CODE_401),null);
         this.appCollectService.addCollect(dto.getUserId(), objectId, collectType);
         return getSuccessResponseVO(null);
     }
@@ -38,6 +42,8 @@ public class AppCollectController extends ABaseController {
                                        @VerifyParam(required = true) String objectId,
                                        @VerifyParam(required = true) Integer collectType) {
         AppAccountDto dto = getTokenUserAdminDto(token);
+        if (dto == null)
+            return getBusinessErrorResponseVO(new BusinessException(ResponseCodeEnum.CODE_401),null);
         this.appCollectService.cancelCollect(dto.getUserId(), objectId, collectType);
         return getSuccessResponseVO(null);
     }

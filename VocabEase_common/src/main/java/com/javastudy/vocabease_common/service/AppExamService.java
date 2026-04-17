@@ -5,6 +5,7 @@ import com.javastudy.vocabease_common.entity.dto.AppExamPostDto;
 import com.javastudy.vocabease_common.entity.po.AppExam;
 import com.javastudy.vocabease_common.entity.query.AppExamQuery;
 import com.javastudy.vocabease_common.entity.query.AppQuestion4examQuery;
+import com.javastudy.vocabease_common.entity.vo.AppExamVO;
 import com.javastudy.vocabease_common.entity.vo.ExamQuestionVO;
 import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 
@@ -82,4 +83,7 @@ public interface AppExamService {
 
 	void cancelExam(AppAccountDto accountDto, Integer examId);
 
+	AppExamVO generateExamPaper(AppAccountDto userDto, Integer difficulty, Integer pageIndex);
+
+	List<ExamQuestionVO> getWrongQuestionsByExamId(Integer examId, String userId);
 }

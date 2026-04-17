@@ -1,5 +1,7 @@
 package com.javastudy.vocabease_common.entity.query;
 
+import java.util.List;
+
 /**
  * 笔记表参数
  */
@@ -16,6 +18,8 @@ public class ShareQuery extends BaseParam {
 	private Integer currentId;
 
 	private Integer nextType;
+
+	private String userId;
 
 	/**
 	 * 标题
@@ -55,9 +59,11 @@ public class ShareQuery extends BaseParam {
 	private String createTimeEnd;
 
 	/**
-	 * 状态 0未发布 1已发布
+	 * 状态 0未发布 1已发布 2置顶
 	 */
 	private Integer status;
+
+	private List<Integer> statusList;
 
 	/**
 	 * 作者id
@@ -76,11 +82,56 @@ public class ShareQuery extends BaseParam {
 	 */
 	private Integer collectCount;
 
+	private Integer collectType;
+
 	/**
 	 * 发布类型 0内部 1外部
 	 */
 	private Integer postType;
 
+	private Integer relateId;
+
+	private Integer relateType;
+
+	public List<Integer> getStatusList() {
+		return statusList;
+	}
+
+	public void setStatusList(List<Integer> statusList) {
+		this.statusList = statusList;
+	}
+
+	public Integer getCollectType() {
+		return collectType;
+	}
+
+	public void setCollectType(Integer collectType) {
+		this.collectType = collectType;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public Integer getRelateId() {
+		return relateId;
+	}
+
+	public void setRelateId(Integer relateId) {
+		this.relateId = relateId;
+	}
+
+	public Integer getRelateType() {
+		return relateType;
+	}
+
+	public void setRelateType(Integer relateType) {
+		this.relateType = relateType;
+	}
 
 	public void setShareId(Integer shareId){
 		this.shareId = shareId;

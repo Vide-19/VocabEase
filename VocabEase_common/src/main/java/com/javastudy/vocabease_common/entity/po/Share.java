@@ -50,8 +50,12 @@ public class Share implements Serializable {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date collectTime;
+
 	/**
-	 * 状态 0未发布 1已发布
+	 * 状态 0未发布 1已发布 2置顶
 	 */
 	private Integer status;
 
@@ -59,6 +63,10 @@ public class Share implements Serializable {
 	 * 作者id
 	 */
 	private String createrId;
+
+	private String createrName;
+
+	private String nickName;
 
 	/**
 	 * 浏览量
@@ -79,6 +87,49 @@ public class Share implements Serializable {
 	 */
 	private Integer postType;
 
+	private Integer relateId;
+
+	private Integer relateType;
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public Integer getRelateId() {
+		return relateId;
+	}
+
+	public void setRelateId(Integer relateId) {
+		this.relateId = relateId;
+	}
+
+	public Integer getRelateType() {
+		return relateType;
+	}
+
+	public void setRelateType(Integer relateType) {
+		this.relateType = relateType;
+	}
+
+	public String getCreaterName() {
+		return createrName;
+	}
+
+	public void setCreaterName(String createrName) {
+		this.createrName = createrName;
+	}
+
+	public Date getCollectTime() {
+		return collectTime;
+	}
+
+	public void setCollectTime(Date collectTime) {
+		this.collectTime = collectTime;
+	}
 
 	public void setShareId(Integer shareId){
 		this.shareId = shareId;

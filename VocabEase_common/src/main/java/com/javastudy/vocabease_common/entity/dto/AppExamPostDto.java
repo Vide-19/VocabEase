@@ -1,13 +1,11 @@
 package com.javastudy.vocabease_common.entity.dto;
 
-import com.javastudy.vocabease_common.entity.po.AppQuestion4exam;
-
 import java.util.List;
 
 public class AppExamPostDto {
     private Integer examId;
     private String remark;
-    private List<AppQuestion4exam> appQuestion4examList;
+    private List<AppQuestionSubmitDto> appQuestion4examList;
 
     public Integer getExamId() {
         return examId;
@@ -25,11 +23,11 @@ public class AppExamPostDto {
         this.remark = remark;
     }
 
-    public List<AppQuestion4exam> getAppQuestion4examList() {
+    public List<AppQuestionSubmitDto> getAppQuestion4examList() {
         return appQuestion4examList;
     }
 
-    public void setAppQuestion4examList(List<AppQuestion4exam> appQuestion4examList) {
+    public void setAppQuestion4examList(List<AppQuestionSubmitDto> appQuestion4examList) {
         this.appQuestion4examList = appQuestion4examList;
     }
 }

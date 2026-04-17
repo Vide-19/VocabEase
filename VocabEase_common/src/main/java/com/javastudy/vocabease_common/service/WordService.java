@@ -75,4 +75,10 @@ public interface WordService {
 	List<ImportErrorItem> importWord(SessionUserAdminDto sessionUserAdminDto, MultipartFile file);
 
 	Word showWordNext(WordQuery wordQuery, Integer currentId, Integer nextType);
+
+	Word showNextCollectedWord(String userId, Integer currentId, Integer nextType);
+
+	List<Word> getStudyList(Integer difficulty, Integer lastWordId, Integer limit);
+
+	Word getFirst(WordQuery wordQuery);
 }

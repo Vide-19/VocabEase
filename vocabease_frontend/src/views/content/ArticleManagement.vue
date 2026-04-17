@@ -4,7 +4,7 @@
     <!-- 查询条件 -->
     <el-form :model="searchForm" inline label-width="80px" style="margin-bottom: 20px">
       <el-form-item label="标题">
-        <el-input v-model="searchForm.titleFuzzy" placeholder="模糊搜索" clearable />
+        <el-input v-model="searchForm.titleFuzzy" placeholder="模糊搜索" clearable/>
       </el-form-item>
 
       <!-- ✅ 新增：分类查询 -->
@@ -21,22 +21,23 @@
 
       <el-form-item label="难度">
         <el-select v-model="searchForm.level" placeholder="请选择难度" clearable style="width: 120px">
-          <el-option :label="'1 - 初级'" :value="1" />
-          <el-option :label="'2 - 中级'" :value="2" />
-          <el-option :label="'3 - 高级'" :value="3" />
-          <el-option :label="'4 - 专家'" :value="4" />
+          <el-option :label="'1 - 初级'" :value="1"/>
+          <el-option :label="'2 - 中级'" :value="2"/>
+          <el-option :label="'3 - 高级'" :value="3"/>
+          <el-option :label="'4 - 专家'" :value="4"/>
         </el-select>
       </el-form-item>
 
       <el-form-item label="状态">
         <el-select v-model="searchForm.status" placeholder="请选择状态" clearable style="width: 120px">
-          <el-option label="未发布" :value="0" />
-          <el-option label="已发布" :value="1" />
+          <el-option label="未发布" :value="0"/>
+          <el-option label="已发布" :value="1"/>
+          <el-option label="已置顶" :value="2"/>
         </el-select>
       </el-form-item>
 
       <el-form-item label="创建人ID">
-        <el-input v-model="searchForm.createrIdFuzzy" placeholder="用户ID" clearable style="width: 120px" />
+        <el-input v-model="searchForm.createrIdFuzzy" placeholder="用户ID" clearable style="width: 120px"/>
       </el-form-item>
 
       <el-form-item>
@@ -63,9 +64,9 @@
         @selection-change="handleSelectionChange"
         style="width: 100%"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="articleId" label="ID" width="50" />
-      <el-table-column prop="title" label="标题" min-width="150" />
+      <el-table-column type="selection" width="55"/>
+      <el-table-column prop="articleId" label="ID" width="50"/>
+      <el-table-column prop="title" label="标题" min-width="150"/>
 
       <!-- ✅ 新增：分类列 -->
       <el-table-column prop="categoryName" label="分类" width="120">
@@ -82,15 +83,15 @@
       </el-table-column>
       <el-table-column prop="status" label="状态" width="100">
         <template #default="{ row }">
-          <el-tag :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? '已发布' : '未发布' }}
+          <el-tag :type="row.status === 1 ? 'success' : ( row.status === 2 ? 'danger' : 'info' )">
+            {{ row.status === 1 ? '已发布' : ( row.status === 2 ? '已置顶' : '未发布' ) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createrId" label="创建人ID" width="100" />
-      <el-table-column prop="createTime" label="创建时间" width="180" />
+      <el-table-column prop="createrId" label="创建人ID" width="100"/>
+      <el-table-column prop="createTime" label="创建时间" width="170"/>
 
-      <el-table-column label="操作" fixed="right" width="180">
+      <el-table-column label="操作" fixed="right" width="195">
         <template #default="{ row }">
           <el-button size="small" link type="primary" @click="openEditDialog(row)">编辑</el-button>
           <el-button
@@ -100,6 +101,14 @@
               @click="togglePublish(row.articleId, row.status)"
           >
             {{ row.status === 1 ? '取消发布' : '发布' }}
+          </el-button>
+          <el-button
+              size="small"
+              link
+              :type="row.status === 2 ? 'warning' : 'danger'"
+              @click="toTop(row.articleId, row.status)"
+          >
+            {{ row.status === 2 ? '取消置顶' : '置顶' }}
           </el-button>
         </template>
       </el-table-column>
@@ -121,7 +130,7 @@
     <el-dialog :title="dialogTitle" v-model="dialogVisible" width="700px" top="5vh">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" placeholder="请输入标题" maxlength="150" show-word-limit />
+          <el-input v-model="form.title" placeholder="请输入标题" maxlength="150" show-word-limit/>
         </el-form-item>
 
         <!-- ✅ 分类选择 (编辑时会自动回填) -->
@@ -173,7 +182,7 @@
     <el-dialog title="批量导入文章" v-model="importDialogVisible" width="500px">
       <div class="model">
         <span style="font-size: 13px; color: #606266;">
-          <el-icon style="vertical-align: middle; margin-right: 4px;"><Download /></el-icon>
+          <el-icon style="vertical-align: middle; margin-right: 4px;"><Download/></el-icon>
           请先下载模板，填写后再上传
         </span>
         <el-button size="small" type="primary" link @click="downloadTemplate(0)">
@@ -243,11 +252,11 @@ const form = reactive({
 })
 
 const rules = {
-  title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-  categoryId: [{ required: true, message: '请选择分类', trigger: 'change' }],
-  level: [{ required: true, message: '请选择难度', trigger: 'change' }],
-  body: [{ required: true, message: '请输入正文', trigger: 'blur' }],
-  translation: [{ required: true, message: '请输入翻译', trigger: 'blur' }]
+  title: [{required: true, message: '请输入标题', trigger: 'blur'}],
+  categoryId: [{required: true, message: '请选择分类', trigger: 'change'}],
+  level: [{required: true, message: '请选择难度', trigger: 'change'}],
+  body: [{required: true, message: '请输入正文', trigger: 'blur'}],
+  translation: [{required: true, message: '请输入翻译', trigger: 'blur'}]
 }
 
 // 导入
@@ -257,7 +266,7 @@ const importFile = ref(null)
 
 // ================== 工具方法 ==================
 const getLevelText = (level) => {
-  const map = { 1: '初级', 2: '中级', 3: '高级', 4: '专家' }
+  const map = {1: '初级', 2: '中级', 3: '高级', 4: '专家'}
   return map[level] || '未知'
 }
 
@@ -278,7 +287,7 @@ onMounted(() => {
 // 加载分类（type=3 表示文章，请根据实际后端枚举调整）
 const loadCategories = async () => {
   try {
-    const res = await axios.post('/category/loadCategoryList', {}, { params: { type: 3 } })
+    const res = await axios.post('/category/loadCategoryList', {}, {params: {type: 3}})
     if (res.data.status === 'success') {
       categoryOptions.value = res.data.data || []
     }
@@ -374,7 +383,7 @@ const openEditDialog = (row) => {
 const getCategoryByArticleId = async (articleId) => {
   try {
     const res = await axios.post('/article2category/getCategoryIdByArticleId', null, {
-      params: { articleId }
+      params: {articleId}
     })
     const data = res.data.data
     if (data === null || data === undefined) return null
@@ -413,9 +422,9 @@ const saveArticle = async () => {
 const togglePublish = (articleId, currentStatus) => {
   const newStatus = currentStatus === 1 ? 0 : 1
   const action = newStatus === 1 ? '发布' : '下架'
-  ElMessageBox.confirm(`确定${action}该文章？`, '提示', { type: 'warning' }).then(async () => {
+  ElMessageBox.confirm(`确定${action}该文章？`, '提示', {type: 'warning'}).then(async () => {
     await axios.post('/article/' + (newStatus === 1 ? 'postArticle' : 'cancelPostArticle'), null, {
-      params: { articleIds: String(articleId) }
+      params: {articleIds: String(articleId)}
     })
     ElMessage.success(`${action}成功`)
     await loadData()
@@ -425,18 +434,31 @@ const togglePublish = (articleId, currentStatus) => {
 const batchPost = async (status) => {
   const action = status === 1 ? '发布' : '下架'
   await axios.post('/article/' + (status === 1 ? 'postArticle' : 'cancelPostArticle'), null, {
-    params: { articleIds: selectedIds.value.join(',') }
+    params: {articleIds: selectedIds.value.join(',')}
   })
   ElMessage.success(`批量${action}成功`)
   await loadData()
 }
 
+// ================== 置顶 ==================
+const toTop = (articleId, currentStatus) => {
+  const newStatus = currentStatus === 2 ? 1 : 2
+  const action = newStatus === 2 ? '置顶' : '取消置顶'
+  ElMessageBox.confirm(`确定${action}该文章？`, '提示', {type: 'warning'}).then(async () => {
+    await axios.post('/article/' + (newStatus === 2 ? 'topArticle' : 'postArticle'), null, {
+      params: {articleIds: String(articleId)}
+    })
+    ElMessage.success(`${action}成功`)
+    await loadData()
+  })
+}
+
 // ================== 删除 ==================
 const batchDelete = () => {
-  ElMessageBox.confirm(`确定删除选中的 ${selectedIds.value.length} 篇文章？`, '提示', { type: 'warning' }).then(async () => {
+  ElMessageBox.confirm(`确定删除选中的 ${selectedIds.value.length} 篇文章？`, '提示', {type: 'warning'}).then(async () => {
     try {
       const response = await axios.post('/article/deleteArticleBatch', null, {
-        params: { articleIds: selectedIds.value.join(',') }
+        params: {articleIds: selectedIds.value.join(',')}
       });
       if (response.data.status === 'success') {
         ElMessage.success('删除成功');
@@ -447,7 +469,8 @@ const batchDelete = () => {
     } catch (error) {
       ElMessage.error('请求失败，请稍后重试');
     }
-  }).catch(() => {});
+  }).catch(() => {
+  });
 };
 
 // ================== 批量导入 ==================
@@ -465,7 +488,7 @@ const confirmImport = async () => {
 
   try {
     const res = await axios.post('/article/importArticleByExcel', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: {'Content-Type': 'multipart/form-data'}
     })
     if (res.data.status === 'success') {
       const errors = res.data.data || []
@@ -493,6 +516,7 @@ const handleBatchImport = () => {
 .article-management {
   padding: 20px;
 }
+
 .model {
   margin-bottom: 15px;
   padding: 10px;

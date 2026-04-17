@@ -78,6 +78,10 @@ public class Word implements Serializable {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date collectTime;
+
 	/**
 	 * 更新时间
 	 */
@@ -97,6 +101,14 @@ public class Word implements Serializable {
 	private String categoryName;
 
 	private Integer categoryId;
+
+	public Date getCollectTime() {
+		return collectTime;
+	}
+
+	public void setCollectTime(Date collectTime) {
+		this.collectTime = collectTime;
+	}
 
 	public Integer getCategoryId() {
 		return categoryId;

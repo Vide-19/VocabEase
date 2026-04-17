@@ -61,6 +61,29 @@ public class AppExamVO implements Serializable {
 	private BigDecimal useTime;
 
 	private List<ExamQuestionVO> examQuestionList;
+	/**
+	 * 考试分数
+	 */
+	private Integer score; // 新增字段
+
+	private List<ExamQuestionVO> wrongQuestions;
+
+	// 生成 Getter 和 Setter
+	public List<ExamQuestionVO> getWrongQuestions() {
+		return wrongQuestions;
+	}
+
+	public void setWrongQuestions(List<ExamQuestionVO> wrongQuestions) {
+		this.wrongQuestions = wrongQuestions;
+	}
+
+	public Integer getScore() {
+		return score;
+	}
+
+	public void setScore(Integer score) {
+		this.score = score;
+	}
 
 	public List<ExamQuestionVO> getExamQuestionList() {
 		return examQuestionList;

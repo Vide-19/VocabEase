@@ -16,6 +16,8 @@ public class ExamQuestionVO implements Serializable {
 	@Serial
 	private static final long serialVersionUID = -8044696147942209378L;
 
+	private Integer id;
+
 	/**
 	 * 测试id
 	 */
@@ -69,6 +71,14 @@ public class ExamQuestionVO implements Serializable {
 	private List<Item4question> itemList;
 
 	private Boolean isCollect;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public Integer getExamId() {
 		return examId;

@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.AppWrongWordMapper">
+
+	<!--实体映射-->
+	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppWrongWord">
+		<!---->
+		<id column="id" property="id"  />
+		<!--用户ID-->
+		<result column="user_id" property="userId"  />
+		<!--单词ID-->
+		<result column="word_id" property="wordId"  />
+		<!--错误次数-->
+		<result column="wrong_count" property="wrongCount"  />
+		<!--最后错误时间-->
+		<result column="last_wrong_time" property="lastWrongTime"  />
+		<!--创建时间-->
+		<result column="create_time" property="createTime"  />
+		<!--上次复习时间-->
+		<result column="last_review_time" property="lastReviewTime"  />
+		<!--下次复习时间-->
+		<result column="next_review_time" property="nextReviewTime"  />
+		<association property="wordInfo" javaType="com.javastudy.vocabease_common.entity.po.Word" columnPrefix="w_">
+			<id column="id" property="wordId" /> <!-- 注意：word 表的主键字段名也是 id -->
+			<result column="word" property="word" />
+			<result column="phonetic" property="phonetic" />
+			<result column="definition" property="definition" />
+			<result column="example_sentence" property="exampleSentence" />
+			<result column="image_url" property="imageUrl" />
+			<!-- 映射其他你需要的字段 -->
+		</association>
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="base_column_list">
+		a.id,a.user_id,a.word_id,a.wrong_count,a.last_wrong_time,
+		 a.create_time,w.word_id as w_id, w.word as w_word, w.phonetic as w_phonetic,
+    w.definition as w_definition, w.example_sentence as w_example_sentence,
+    w.image_url as w_image_url
+	</sql>
+
+	<sql id="base_condition_filed">
+			<if test="query.id != null">
+				 and  a.id = #{query.id}
+			</if>
+			<if test="query.userId != null and query.userId!=''">
+				 and  a.user_id = #{query.userId}
+			</if>
+			<if test="query.wordId != null">
+				 and  a.word_id = #{query.wordId}
+			</if>
+			<if test="query.wrongCount != null">
+				 and  a.wrong_count = #{query.wrongCount}
+			</if>
+			<if test="query.lastWrongTime != null and query.lastWrongTime!=''">
+				 <![CDATA[ and  a.last_wrong_time=str_to_date(#{query.lastWrongTime}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createTime != null and query.createTime!=''">
+				 <![CDATA[ and  a.create_time=str_to_date(#{query.createTime}, '%Y-%m-%d') ]]>
+			</if>
+	</sql>
+
+	<!-- 通用查询条件列-->
+	<sql id="query_condition">
+	 <where>
+			<include refid="base_condition_filed" />
+			<if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
+				 and  a.user_id like concat('%', #{query.userIdFuzzy}, '%')
+			</if>
+			<if test="query.lastWrongTimeStart!= null and query.lastWrongTimeStart!=''">
+				 <![CDATA[ and  a.last_wrong_time>=str_to_date(#{query.lastWrongTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.lastWrongTimeEnd!= null and query.lastWrongTimeEnd!=''">
+				 <![CDATA[ and  a.last_wrong_time< date_sub(str_to_date(#{query.lastWrongTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+			<if test="query.createTimeStart!= null and query.createTimeStart!=''">
+				 <![CDATA[ and  a.create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
+			</if>
+			<if test="query.createTimeEnd!= null and query.createTimeEnd!=''">
+				 <![CDATA[ and  a.create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+			</if>
+	 </where>
+	</sql>
+
+	<!-- 查询集合-->
+	<select id="selectList" resultMap="base_result_map" >
+		 SELECT <include refid="base_column_list" /> FROM app_wrong_word a
+		INNER JOIN word w ON a.word_id = w.word_id
+		<include refid="query_condition" />
+		 <if test="query.orderBy!=null">
+			 order by ${query.orderBy}
+		 </if>
+		 <if test="query.simplePage!=null">
+			 limit #{query.simplePage.start},#{query.simplePage.end}
+		 </if>
+	</select>
+
+	<!-- 查询数量-->
+	<select id="selectCount" resultType="java.lang.Integer" >
+		 SELECT count(1) FROM app_wrong_word a <include refid="query_condition" />
+	</select>
+
+	<!-- 插入 （匹配有值的字段）-->
+	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongWord">
+		<selectKey keyProperty="bean.id" resultType="Integer" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		 INSERT INTO app_wrong_word
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="bean.userId != null">
+				 user_id,
+			</if>
+			<if test="bean.wordId != null">
+				 word_id,
+			</if>
+			<if test="bean.wrongCount != null">
+				 wrong_count,
+			</if>
+			<if test="bean.lastWrongTime != null">
+				 last_wrong_time,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="bean.userId!=null">
+				 #{bean.userId},
+			</if>
+			<if test="bean.wordId!=null">
+				 #{bean.wordId},
+			</if>
+			<if test="bean.wrongCount!=null">
+				 #{bean.wrongCount},
+			</if>
+			<if test="bean.lastWrongTime!=null">
+				 #{bean.lastWrongTime},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 插入或者更新 （匹配有值的字段）-->
+	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongWord">
+		 INSERT INTO app_wrong_word
+		 <trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bean.id != null">
+				 id,
+			</if>
+			<if test="bean.userId != null">
+				 user_id,
+			</if>
+			<if test="bean.wordId != null">
+				 word_id,
+			</if>
+			<if test="bean.wrongCount != null">
+				 wrong_count,
+			</if>
+			<if test="bean.lastWrongTime != null">
+				 last_wrong_time,
+			</if>
+			<if test="bean.createTime != null">
+				 create_time,
+			</if>
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bean.id!=null">
+				 #{bean.id},
+			</if>
+			<if test="bean.userId!=null">
+				 #{bean.userId},
+			</if>
+			<if test="bean.wordId!=null">
+				 #{bean.wordId},
+			</if>
+			<if test="bean.wrongCount!=null">
+				 #{bean.wrongCount},
+			</if>
+			<if test="bean.lastWrongTime!=null">
+				 #{bean.lastWrongTime},
+			</if>
+			<if test="bean.createTime!=null">
+				 #{bean.createTime},
+			</if>
+		 </trim>
+		 on DUPLICATE key update 
+		 <trim prefix="" suffix="" suffixOverrides=",">
+			<if test="bean.userId!=null">
+				 user_id = VALUES(user_id),
+			</if>
+			<if test="bean.wordId!=null">
+				 word_id = VALUES(word_id),
+			</if>
+			<if test="bean.wrongCount!=null">
+				 wrong_count = VALUES(wrong_count),
+			</if>
+			<if test="bean.lastWrongTime!=null">
+				 last_wrong_time = VALUES(last_wrong_time),
+			</if>
+			<if test="bean.createTime!=null">
+				 create_time = VALUES(create_time),
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 添加 （批量插入）-->
+	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongWord" useGeneratedKeys="true" keyProperty="id">
+		 INSERT INTO app_wrong_word(
+			 user_id,
+			 word_id,
+			 wrong_count,
+			 last_wrong_time,
+			 create_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.userId},
+				 #{item.wordId},
+				 #{item.wrongCount},
+				 #{item.lastWrongTime},
+				 #{item.createTime}
+			 )
+		 </foreach>
+	</insert>
+
+	<!-- 批量新增修改 （批量插入）-->
+	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongWord">
+		 INSERT INTO app_wrong_word(
+			 user_id,
+			 word_id,
+			 wrong_count,
+			 last_wrong_time,
+			 create_time
+		 )values
+		 <foreach collection="list" item="item" separator=",">
+			 (
+				 #{item.userId},
+				 #{item.wordId},
+				 #{item.wrongCount},
+				 #{item.lastWrongTime},
+				 #{item.createTime}
+			 )
+		 </foreach>
+			on DUPLICATE key update 
+			user_id = VALUES(user_id),
+			word_id = VALUES(word_id),
+			wrong_count = VALUES(wrong_count),
+			last_wrong_time = VALUES(last_wrong_time),
+			create_time = VALUES(create_time)
+	</insert>
+
+	<!--多条件修改-->
+	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppWrongWordQuery">
+		 UPDATE app_wrong_word a
+ 		 <set> 
+			<if test="bean.userId != null">
+				 user_id = #{bean.userId},
+			</if>
+			<if test="bean.wordId != null">
+				 word_id = #{bean.wordId},
+			</if>
+			<if test="bean.wrongCount != null">
+				 wrong_count = #{bean.wrongCount},
+			</if>
+			<if test="bean.lastWrongTime != null">
+				 last_wrong_time = #{bean.lastWrongTime},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+ 		 </set>
+ 		 <include refid="query_condition" />
+	</update>
+
+	<!--多条件删除-->
+	<delete id="deleteByParam">
+		 delete a from app_wrong_word a
+ 		 <include refid="query_condition" />
+	</delete>
+
+	<!-- 根据Id修改-->
+	<update id="updateById" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongWord">
+        UPDATE app_wrong_word
+        <set>
+            <if test="bean.userId != null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.wordId != null">
+                word_id = #{bean.wordId},
+            </if>
+            <if test="bean.wrongCount != null">
+                wrong_count = #{bean.wrongCount},
+            </if>
+            <if test="bean.lastWrongTime != null">
+                last_wrong_time = #{bean.lastWrongTime},
+            </if>
+            <if test="bean.createTime != null">
+                create_time = #{bean.createTime},
+            </if>
+            <if test="bean.lastReviewTime != null">
+                last_review_time = #{bean.lastReviewTime},
+            </if>
+            <if test="bean.nextReviewTime != null">
+                next_review_time = #{bean.nextReviewTime},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+	<!-- 根据Id删除-->
+	<delete id="deleteById">
+		delete from app_wrong_word where id=#{id}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectById" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_wrong_word a where id=#{id}
+	</select>
+
+	<!-- 根据UserIdAndWordId修改-->
+	<update id="updateByUserIdAndWordId" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongWord">
+		 UPDATE app_wrong_word
+ 		 <set> 
+			<if test="bean.wrongCount != null">
+				 wrong_count = #{bean.wrongCount},
+			</if>
+			<if test="bean.lastWrongTime != null">
+				 last_wrong_time = #{bean.lastWrongTime},
+			</if>
+			<if test="bean.createTime != null">
+				 create_time = #{bean.createTime},
+			</if>
+ 		 </set>
+ 		 where user_id=#{userId} and word_id=#{wordId}
+	</update>
+
+	<!-- 根据UserIdAndWordId删除-->
+	<delete id="deleteByUserIdAndWordId">
+		delete from app_wrong_word where user_id=#{userId} and word_id=#{wordId}
+	</delete>
+
+	<!-- 根据PrimaryKey获取对象-->
+	<select id="selectByUserIdAndWordId" resultMap="base_result_map" >
+		select <include refid="base_column_list" /> from app_wrong_word a where user_id=#{userId} and word_id=#{wordId}
+	</select>
+
+	<select id="selectNextWrongWord" resultType="com.javastudy.vocabease_common.entity.po.Word">
+		SELECT
+		w.word_id, w.word, w.phonetic, w.definition, w.example_sentence, w.image_url, w.level, w.status
+		FROM word w
+		INNER JOIN app_wrong_word aww ON w.word_id = aww.word_id
+		<where>
+			<!-- 用户ID筛选 -->
+			AND aww.user_id = #{query.userId}
+			<!-- 单词状态正常 -->
+			AND w.status = #{query.status}
+			AND aww.next_review_time <![CDATA[ <= ]]> NOW()
+		</where>
+		<!-- 1. 错误次数越多，优先级越高 (DESC) -->
+		<!-- 2. 错误次数相同，上次复习时间越早，优先级越高 (ASC) -->
+		ORDER BY aww.wrong_count DESC, aww.last_review_time ASC
+		LIMIT 1
+	</select>
+
+</mapper>

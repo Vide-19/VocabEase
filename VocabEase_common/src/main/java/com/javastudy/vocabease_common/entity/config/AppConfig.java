@@ -15,7 +15,10 @@ public class AppConfig {
     private String applicationName;
     @Value("${spring.application.domain}")
     private String appDomain;
+    @Value("${ai.api-key}")
+    private String apiKey;
 
+    public String getApiKey() {return apiKey;}
     public String getProjectFolder() {return projectFolder;}
     public String getSuperAdminPhone() {return superAdminPhone;}
     public String getJwtCommonSecret() {return jwtCommonSecret;}

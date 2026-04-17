@@ -4,7 +4,8 @@ public enum CollectTypeEnum {
     SHARE(0, "分享"),
     WORD(1, "单词"),
     ARTICLE(2, "文章"),
-    QUESTION(3, "问题");
+    QUESTION(3, "问题"),
+    OUTSIDE(4, "外部");
 
     private Integer type;
     private String description;

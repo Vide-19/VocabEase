@@ -87,6 +87,37 @@ public class AppAccount implements Serializable {
 	 */
 	private Integer status;
 
+	/**
+	 * 每天新学 每天复习 难度
+	 */
+	private Integer dailyNewCount;
+	private Integer dailyReviewCount;
+	private Integer wordDifficulty;
+
+	public Integer getWordDifficulty() {
+		return wordDifficulty;
+	}
+
+	public void setWordDifficulty(Integer wordDifficulty) {
+		this.wordDifficulty = wordDifficulty;
+	}
+
+	public Integer getDailyNewCount() {
+		return dailyNewCount;
+	}
+
+	public void setDailyNewCount(Integer dailyNewCount) {
+		this.dailyNewCount = dailyNewCount;
+	}
+
+	public Integer getDailyReviewCount() {
+		return dailyReviewCount;
+	}
+
+	public void setDailyReviewCount(Integer dailyReviewCount) {
+		this.dailyReviewCount = dailyReviewCount;
+	}
+
 	public String getOpenId() {
 		return openId;
 	}

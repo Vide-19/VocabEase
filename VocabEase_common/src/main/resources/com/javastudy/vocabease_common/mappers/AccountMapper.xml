@@ -23,6 +23,22 @@
 		<result column="create_time" property="createTime"  />
 	</resultMap>
 
+	<resultMap id="account_with_app_map" type="com.javastudy.vocabease_common.entity.po.AppAccount" extends="base_result_map">
+		<!-- 注意：这里的 property 需要与 AppAccount 类中的字段名一致 -->
+		<result column="open_id" property="openId" />
+		<result column="email" property="email" />
+		<result column="nick_name" property="nickName" />
+		<result column="avatar" property="avatar" />
+		<result column="gender" property="gender" />
+		<result column="last_login_time" property="lastLoginTime" />
+		<result column="last_use_device_id" property="lastUseDeviceId" />
+		<result column="last_use_device_brand" property="lastUseDeviceBrand" />
+		<result column="last_login_ip" property="lastLoginIp" />
+		<result column="daily_new_count" property="dailyNewCount" />
+		<result column="daily_review_count" property="dailyReviewCount" />
+		<result column="word_difficulty" property="wordDifficulty" />
+	</resultMap>
+
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">

@@ -3,10 +3,7 @@ package com.javastudy.vocabease_common.service.impl;
 import com.javastudy.vocabease_common.entity.constants.Constants;
 import com.javastudy.vocabease_common.entity.dto.ImportErrorItem;
 import com.javastudy.vocabease_common.entity.dto.SessionUserAdminDto;
-import com.javastudy.vocabease_common.entity.enums.CategoryTypeEnum;
-import com.javastudy.vocabease_common.entity.enums.PageSize;
-import com.javastudy.vocabease_common.entity.enums.PostStatusEnum;
-import com.javastudy.vocabease_common.entity.enums.VerifyRegexEnum;
+import com.javastudy.vocabease_common.entity.enums.*;
 import com.javastudy.vocabease_common.entity.po.Category;
 import com.javastudy.vocabease_common.entity.po.Word;
 import com.javastudy.vocabease_common.entity.po.Word2category;
@@ -151,6 +148,9 @@ public class WordServiceImpl implements WordService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveWord(Word word, Boolean isAdmin) {
+        Category categoryDB = this.categoryService.getCategoryByCategoryId(word.getCategoryId());
+        if (categoryDB == null)
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
         Date currentDate = new Date();
         if (word.getWordId() == null) {
             word.setCreateTime(currentDate);
@@ -312,12 +312,8 @@ public class WordServiceImpl implements WordService {
 
     @Override
     public Word showWordNext(WordQuery wordQuery, Integer currentId, Integer nextType) {
-        if (nextType == null)
-            wordQuery.setWordId(currentId);
-        else {
-            wordQuery.setWordId(nextType);
-            wordQuery.setCurrentId(currentId);
-        }
+        wordQuery.setCurrentId(currentId);
+        wordQuery.setNextType(nextType);
         Word word = this.wordMapper.showWordNext(wordQuery);
         if (word == null && nextType == null)
             throw new BusinessException("抱歉，没有更多了");
@@ -326,5 +322,38 @@ public class WordServiceImpl implements WordService {
         else if (word == null && nextType == 1)
             throw new BusinessException("已经在最后一页");
         return word;
+    }
+
+    /**
+     * 获取收藏列表中的下一个/上一个单词
+     */
+    @Override
+    public Word showNextCollectedWord(String userId, Integer currentId, Integer nextType) {
+        if (userId == null || currentId == null || nextType == null)
+            throw new BusinessException(ResponseCodeEnum.CODE_400);
+        WordQuery query = new WordQuery();
+        query.setUserId(userId);
+        query.setCurrentId(currentId);    // 当前单词ID
+        query.setNextType(nextType);      // 方向
+        // 确保只查有效的单词
+        query.setStatus(1);
+        Word word = this.wordMapper.selectNextCollectedWord(query);
+        if (word == null) {
+            if (nextType == 1)
+                throw new BusinessException("已经是最后一个收藏了");
+            else if (nextType == -1)
+                throw new BusinessException("已经是第一个收藏了");
+        }
+        return word;
+    }
+
+    @Override
+    public List<Word> getStudyList(Integer difficulty, Integer lastWordId, Integer limit) {
+        return this.wordMapper.selectStudyList(difficulty, lastWordId, limit);
+    }
+
+    @Override
+    public Word getFirst(WordQuery wordQuery) {
+        return this.wordMapper.selectFirst(wordQuery);
     }
 }

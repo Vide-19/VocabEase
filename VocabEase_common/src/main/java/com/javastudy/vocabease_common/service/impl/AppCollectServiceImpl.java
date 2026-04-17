@@ -10,10 +10,13 @@ import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.mappers.AppCollectMapper;
 import com.javastudy.vocabease_common.service.AppCollectService;
+import com.javastudy.vocabease_common.service.ArticleService;
+import com.javastudy.vocabease_common.service.ShareService;
 import com.javastudy.vocabease_common.utils.StringTools;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -25,6 +28,10 @@ public class AppCollectServiceImpl implements AppCollectService {
 
 	@Resource
 	private AppCollectMapper<AppCollect, AppCollectQuery> appCollectMapper;
+	@Resource
+	private ShareService shareService;
+	@Resource
+	private ArticleService articleService;
 
 	/**
 	 * 根据条件查询列表
@@ -144,6 +151,11 @@ public class AppCollectServiceImpl implements AppCollectService {
 		appCollect.setUserId(userId);
 		appCollect.setObjectId(objectId);
 		appCollect.setCollectType(collectType);
+		appCollect.setCollectTime(new Date());
+		if (type.equals(CollectTypeEnum.SHARE))
+			this.shareService.updateCollectCountById(objectId);
+		else if (type.equals(CollectTypeEnum.ARTICLE))
+			this.articleService.updateCollectCountById(objectId);
 		this.appCollectMapper.insert(appCollect);
 	}
 
@@ -177,6 +189,4 @@ public class AppCollectServiceImpl implements AppCollectService {
 			throw new BusinessException("已经在最后一页");
 		return collect;
 	}
-
-
 }

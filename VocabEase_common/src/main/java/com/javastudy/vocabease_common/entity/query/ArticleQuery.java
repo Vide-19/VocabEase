@@ -1,6 +1,8 @@
 package com.javastudy.vocabease_common.entity.query;
 
 
+import java.util.List;
+
 /**
  * 文章表参数
  */
@@ -16,6 +18,8 @@ public class ArticleQuery extends BaseParam {
 	private Integer currentId;
 
 	private Integer nextType;
+
+	private String userId;
 
 	/**
 	 * 标题
@@ -53,9 +57,11 @@ public class ArticleQuery extends BaseParam {
 	private String createTimeEnd;
 
 	/**
-	 * 状态 0未发布 1已发布
+	 * 状态 0未发布 1已发布 2置顶
 	 */
 	private Integer status;
+
+	private List<Integer> statusList;
 
 	/**
 	 * 作者id
@@ -74,6 +80,8 @@ public class ArticleQuery extends BaseParam {
 	 */
 	private Integer collectCount;
 
+	private Integer collectType;
+
 	/**
 	 * 发布类型 0内部 1外部
 	 */
@@ -82,6 +90,30 @@ public class ArticleQuery extends BaseParam {
 	private Boolean queryBodyContent;
 
 	private Integer categoryId;
+
+	public List<Integer> getStatusList() {
+		return statusList;
+	}
+
+	public void setStatusList(List<Integer> statusList) {
+		this.statusList = statusList;
+	}
+
+	public Integer getCollectType() {
+		return collectType;
+	}
+
+	public void setCollectType(Integer collectType) {
+		this.collectType = collectType;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
 	public Integer getCategoryId() {
 		return categoryId;

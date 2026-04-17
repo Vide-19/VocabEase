@@ -76,7 +76,7 @@ public interface ShareService {
 	/**
 	 * 删除分享
 	 */
-	void deleteShareByShareIds(String shareIds, Integer userId);
+	void deleteShareByShareIds(String shareIds, String userId);
 	/**
 	 * 修改发布状态
 	 */
@@ -84,4 +84,9 @@ public interface ShareService {
 
 	Share showShareNext(ShareQuery shareQuery, Integer currentId, Integer nextType, Boolean isUpdateReadCount);
 
+	Share showNextCollectedShare(String userId, Integer currentId, Integer nextType);
+
+	void updateCollectCountById(String shareId);
+
+	void updateReadCountById(Integer shareId);
 }

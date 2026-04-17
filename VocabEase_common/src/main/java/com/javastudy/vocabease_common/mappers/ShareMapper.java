@@ -28,6 +28,9 @@ public interface ShareMapper<T,P> extends BaseMapper<T,P> {
 
 	Share showShareNext(@Param("query") ShareQuery shareQuery);
 
+	Share selectNextCollectedShare(@Param("query") ShareQuery shareQuery);
+
 	void updateCount(@Param("readCount") Integer readCount, @Param("collectCount") Integer collectCount, @Param("shareId") Integer shareId);
 
+	void updateReadCount(@Param("shareId") Integer shareId);
 }

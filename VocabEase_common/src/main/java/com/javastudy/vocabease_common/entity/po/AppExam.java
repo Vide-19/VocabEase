@@ -64,6 +64,18 @@ public class AppExam implements Serializable {
 	 */
 	private String remark;
 
+	/**
+	 * 考试分数
+	 */
+	private Integer score; // 新增字段
+
+	public Integer getScore() {
+		return score;
+	}
+
+	public void setScore(Integer score) {
+		this.score = score;
+	}
 
 	public void setExamId(Integer examId){
 		this.examId = examId;

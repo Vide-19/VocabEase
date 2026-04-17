@@ -50,8 +50,12 @@ public class Article implements Serializable {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date collectTime;
+
 	/**
-	 * 状态 0未发布 1已发布
+	 * 状态 0未发布 1已发布 2置顶
 	 */
 	private Integer status;
 
@@ -84,6 +88,14 @@ public class Article implements Serializable {
 	private String categoryName;
 
 	private Integer categoryId;
+
+	public Date getCollectTime() {
+		return collectTime;
+	}
+
+	public void setCollectTime(Date collectTime) {
+		this.collectTime = collectTime;
+	}
 
 	public String getCreaterName() {
 		return createrName;

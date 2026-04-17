@@ -21,13 +21,14 @@
 		<result column="status" property="status"  />
 		<!--备注-->
 		<result column="remark" property="remark"  />
+		<result column="score" property="score" />
 	</resultMap>
 
 
 	<!-- 通用查询结果列-->
 	<sql id="base_column_list">
 		 a.exam_id,a.user_id,a.nick_name,a.create_time,a.start_time,
-		 a.end_time,a.status,a.remark
+		 a.end_time,a.status,a.remark, a.score
 	</sql>
 
 	<sql id="base_condition_filed">
@@ -109,223 +110,244 @@
 
 	<!-- 插入 （匹配有值的字段）-->
 	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppExam">
-		<selectKey keyProperty="bean.examId" resultType="Integer" order="AFTER">
-			SELECT LAST_INSERT_ID()
-		</selectKey>
-		 INSERT INTO app_exam
-		 <trim prefix="(" suffix=")" suffixOverrides="," >
-			<if test="bean.userId != null">
-				 user_id,
-			</if>
-			<if test="bean.nickName != null">
-				 nick_name,
-			</if>
-			<if test="bean.createTime != null">
-				 create_time,
-			</if>
-			<if test="bean.startTime != null">
-				 start_time,
-			</if>
-			<if test="bean.endTime != null">
-				 end_time,
-			</if>
-			<if test="bean.status != null">
-				 status,
-			</if>
-			<if test="bean.remark != null">
-				 remark,
-			</if>
-		 </trim>
-		 <trim prefix="values (" suffix=")" suffixOverrides="," >
-			<if test="bean.userId!=null">
-				 #{bean.userId},
-			</if>
-			<if test="bean.nickName!=null">
-				 #{bean.nickName},
-			</if>
-			<if test="bean.createTime!=null">
-				 #{bean.createTime},
-			</if>
-			<if test="bean.startTime!=null">
-				 #{bean.startTime},
-			</if>
-			<if test="bean.endTime!=null">
-				 #{bean.endTime},
-			</if>
-			<if test="bean.status!=null">
-				 #{bean.status},
-			</if>
-			<if test="bean.remark!=null">
-				 #{bean.remark},
-			</if>
-		 </trim>
-	</insert>
+        <selectKey keyProperty="bean.examId" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO app_exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.nickName != null">
+                nick_name,
+            </if>
+            <if test="bean.createTime != null">
+                create_time,
+            </if>
+            <if test="bean.startTime != null">
+                start_time,
+            </if>
+            <if test="bean.endTime != null">
+                end_time,
+            </if>
+            <if test="bean.status != null">
+                status,
+            </if>
+            <if test="bean.remark != null">
+                remark,
+            </if>
+            <if test="bean.score != null">
+                score,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.userId!=null">
+                #{bean.userId},
+            </if>
+            <if test="bean.nickName!=null">
+                #{bean.nickName},
+            </if>
+            <if test="bean.createTime!=null">
+                #{bean.createTime},
+            </if>
+            <if test="bean.startTime!=null">
+                #{bean.startTime},
+            </if>
+            <if test="bean.endTime!=null">
+                #{bean.endTime},
+            </if>
+            <if test="bean.status!=null">
+                #{bean.status},
+            </if>
+            <if test="bean.remark!=null">
+                #{bean.remark},
+            </if>
+            <if test="bean.score!=null">
+                #{bean.score},
+            </if>
+        </trim>
+    </insert>
 
 	<!-- 插入或者更新 （匹配有值的字段）-->
 	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppExam">
-		 INSERT INTO app_exam
-		 <trim prefix="(" suffix=")" suffixOverrides=",">
-			<if test="bean.examId != null">
-				 exam_id,
-			</if>
-			<if test="bean.userId != null">
-				 user_id,
-			</if>
-			<if test="bean.nickName != null">
-				 nick_name,
-			</if>
-			<if test="bean.createTime != null">
-				 create_time,
-			</if>
-			<if test="bean.startTime != null">
-				 start_time,
-			</if>
-			<if test="bean.endTime != null">
-				 end_time,
-			</if>
-			<if test="bean.status != null">
-				 status,
-			</if>
-			<if test="bean.remark != null">
-				 remark,
-			</if>
-		 </trim>
-		 <trim prefix="values (" suffix=")" suffixOverrides=",">
-			<if test="bean.examId!=null">
-				 #{bean.examId},
-			</if>
-			<if test="bean.userId!=null">
-				 #{bean.userId},
-			</if>
-			<if test="bean.nickName!=null">
-				 #{bean.nickName},
-			</if>
-			<if test="bean.createTime!=null">
-				 #{bean.createTime},
-			</if>
-			<if test="bean.startTime!=null">
-				 #{bean.startTime},
-			</if>
-			<if test="bean.endTime!=null">
-				 #{bean.endTime},
-			</if>
-			<if test="bean.status!=null">
-				 #{bean.status},
-			</if>
-			<if test="bean.remark!=null">
-				 #{bean.remark},
-			</if>
-		 </trim>
-		 on DUPLICATE key update 
-		 <trim prefix="" suffix="" suffixOverrides=",">
-			<if test="bean.userId!=null">
-				 user_id = VALUES(user_id),
-			</if>
-			<if test="bean.nickName!=null">
-				 nick_name = VALUES(nick_name),
-			</if>
-			<if test="bean.createTime!=null">
-				 create_time = VALUES(create_time),
-			</if>
-			<if test="bean.startTime!=null">
-				 start_time = VALUES(start_time),
-			</if>
-			<if test="bean.endTime!=null">
-				 end_time = VALUES(end_time),
-			</if>
-			<if test="bean.status!=null">
-				 status = VALUES(status),
-			</if>
-			<if test="bean.remark!=null">
-				 remark = VALUES(remark),
-			</if>
-		 </trim>
-	</insert>
+        INSERT INTO app_exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.examId != null">
+                exam_id,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.nickName != null">
+                nick_name,
+            </if>
+            <if test="bean.createTime != null">
+                create_time,
+            </if>
+            <if test="bean.startTime != null">
+                start_time,
+            </if>
+            <if test="bean.endTime != null">
+                end_time,
+            </if>
+            <if test="bean.status != null">
+                status,
+            </if>
+            <if test="bean.remark != null">
+                remark,
+            </if>
+            <if test="bean.score != null">
+                score,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.examId!=null">
+                #{bean.examId},
+            </if>
+            <if test="bean.userId!=null">
+                #{bean.userId},
+            </if>
+            <if test="bean.nickName!=null">
+                #{bean.nickName},
+            </if>
+            <if test="bean.createTime!=null">
+                #{bean.createTime},
+            </if>
+            <if test="bean.startTime!=null">
+                #{bean.startTime},
+            </if>
+            <if test="bean.endTime!=null">
+                #{bean.endTime},
+            </if>
+            <if test="bean.status!=null">
+                #{bean.status},
+            </if>
+            <if test="bean.remark!=null">
+                #{bean.remark},
+            </if>
+            <if test="bean.score!=null">
+                #{bean.score},
+            </if>
+        </trim>
+        on DUPLICATE key update
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="bean.userId!=null">
+                user_id = VALUES(user_id),
+            </if>
+            <if test="bean.nickName!=null">
+                nick_name = VALUES(nick_name),
+            </if>
+            <if test="bean.createTime!=null">
+                create_time = VALUES(create_time),
+            </if>
+            <if test="bean.startTime!=null">
+                start_time = VALUES(start_time),
+            </if>
+            <if test="bean.endTime!=null">
+                end_time = VALUES(end_time),
+            </if>
+            <if test="bean.status!=null">
+                status = VALUES(status),
+            </if>
+            <if test="bean.remark!=null">
+                remark = VALUES(remark),
+            </if>
+            <if test="bean.score!=null">
+                score = VALUES(score),
+            </if>
+        </trim>
+    </insert>
 
 	<!-- 添加 （批量插入）-->
 	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppExam" useGeneratedKeys="true" keyProperty="examId">
-		 INSERT INTO app_exam(
-			 user_id,
-			 nick_name,
-			 create_time,
-			 start_time,
-			 end_time,
-			 status,
-			 remark
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.userId},
-				 #{item.nickName},
-				 #{item.createTime},
-				 #{item.startTime},
-				 #{item.endTime},
-				 #{item.status},
-				 #{item.remark}
-			 )
-		 </foreach>
-	</insert>
+        INSERT INTO app_exam(
+        user_id,
+        nick_name,
+        create_time,
+        start_time,
+        end_time,
+        status,
+        remark,
+        score
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userId},
+            #{item.nickName},
+            #{item.createTime},
+            #{item.startTime},
+            #{item.endTime},
+            #{item.status},
+            #{item.remark},
+            #{item.score}
+            )
+        </foreach>
+    </insert>
 
 	<!-- 批量新增修改 （批量插入）-->
 	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppExam">
-		 INSERT INTO app_exam(
-			 user_id,
-			 nick_name,
-			 create_time,
-			 start_time,
-			 end_time,
-			 status,
-			 remark
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.userId},
-				 #{item.nickName},
-				 #{item.createTime},
-				 #{item.startTime},
-				 #{item.endTime},
-				 #{item.status},
-				 #{item.remark}
-			 )
-		 </foreach>
-			on DUPLICATE key update 
-			user_id = VALUES(user_id),
-			nick_name = VALUES(nick_name),
-			create_time = VALUES(create_time),
-			start_time = VALUES(start_time),
-			end_time = VALUES(end_time),
-			status = VALUES(status),
-			remark = VALUES(remark)
-	</insert>
+        INSERT INTO app_exam(
+        user_id,
+        nick_name,
+        create_time,
+        start_time,
+        end_time,
+        status,
+        remark,
+        score
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userId},
+            #{item.nickName},
+            #{item.createTime},
+            #{item.startTime},
+            #{item.endTime},
+            #{item.status},
+            #{item.remark},
+            #{itme.score}
+            )
+        </foreach>
+        on DUPLICATE key update
+        user_id = VALUES(user_id),
+        nick_name = VALUES(nick_name),
+        create_time = VALUES(create_time),
+        start_time = VALUES(start_time),
+        end_time = VALUES(end_time),
+        status = VALUES(status),
+        remark = VALUES(remark),
+        score = VALUES(score),
+    </insert>
 
 	<!--多条件修改-->
 	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppExamQuery">
-		 UPDATE app_exam a
- 		 <set> 
-			<if test="bean.userId != null">
-				 user_id = #{bean.userId},
-			</if>
-			<if test="bean.nickName != null">
-				 nick_name = #{bean.nickName},
-			</if>
-			<if test="bean.createTime != null">
-				 create_time = #{bean.createTime},
-			</if>
-			<if test="bean.startTime != null">
-				 start_time = #{bean.startTime},
-			</if>
-			<if test="bean.endTime != null">
-				 end_time = #{bean.endTime},
-			</if>
-			<if test="bean.status != null">
-				 status = #{bean.status},
-			</if>
-			<if test="bean.remark != null">
-				 remark = #{bean.remark},
-			</if>
- 		 </set>
- 		 <include refid="query_condition" />
-	</update>
+        UPDATE app_exam a
+        <set>
+            <if test="bean.userId != null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.nickName != null">
+                nick_name = #{bean.nickName},
+            </if>
+            <if test="bean.createTime != null">
+                create_time = #{bean.createTime},
+            </if>
+            <if test="bean.startTime != null">
+                start_time = #{bean.startTime},
+            </if>
+            <if test="bean.endTime != null">
+                end_time = #{bean.endTime},
+            </if>
+            <if test="bean.status != null">
+                status = #{bean.status},
+            </if>
+            <if test="bean.remark != null">
+                remark = #{bean.remark},
+            </if>
+            <if test="bean.score != null">score = #{bean.score},</if>
+        </set>
+        <include refid="query_condition"/>
+    </update>
 
 	<!--多条件删除-->
 	<delete id="deleteByParam">
@@ -335,32 +357,33 @@
 
 	<!-- 根据ExamId修改-->
 	<update id="updateByExamId" parameterType="com.javastudy.vocabease_common.entity.po.AppExam">
-		 UPDATE app_exam
- 		 <set> 
-			<if test="bean.userId != null">
-				 user_id = #{bean.userId},
-			</if>
-			<if test="bean.nickName != null">
-				 nick_name = #{bean.nickName},
-			</if>
-			<if test="bean.createTime != null">
-				 create_time = #{bean.createTime},
-			</if>
-			<if test="bean.startTime != null">
-				 start_time = #{bean.startTime},
-			</if>
-			<if test="bean.endTime != null">
-				 end_time = #{bean.endTime},
-			</if>
-			<if test="bean.status != null">
-				 status = #{bean.status},
-			</if>
-			<if test="bean.remark != null">
-				 remark = #{bean.remark},
-			</if>
- 		 </set>
- 		 where exam_id=#{examId}
-	</update>
+        UPDATE app_exam
+        <set>
+            <if test="bean.userId != null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.nickName != null">
+                nick_name = #{bean.nickName},
+            </if>
+            <if test="bean.createTime != null">
+                create_time = #{bean.createTime},
+            </if>
+            <if test="bean.startTime != null">
+                start_time = #{bean.startTime},
+            </if>
+            <if test="bean.endTime != null">
+                end_time = #{bean.endTime},
+            </if>
+            <if test="bean.status != null">
+                status = #{bean.status},
+            </if>
+            <if test="bean.remark != null">
+                remark = #{bean.remark},
+            </if>
+            <if test="bean.score != null">score = #{bean.score},</if>
+        </set>
+        where exam_id=#{examId}
+    </update>
 
 	<!-- 根据ExamId删除-->
 	<delete id="deleteByExamId">

@@ -1,6 +1,9 @@
 package com.javastudy.vocabease_common.mappers;
 
+import com.javastudy.vocabease_common.entity.po.AppQuestion4exam;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 测试问题表 数据库操作接口
@@ -24,5 +27,8 @@ public interface AppQuestion4examMapper<T,P> extends BaseMapper<T,P> {
 	 */
 	 T selectById(@Param("id") Integer id);
 
-
+	/**
+	 * 批量更新
+	 */
+	void updateBatch(@Param("list") List<AppQuestion4exam> list);
 }

@@ -74,6 +74,10 @@ export default defineConfig({
       '/appFeedback': {
         target: 'http://localhost:9091',
         changeOrigin: true
+      },
+      '/appAccount': {
+        target: 'http://localhost:9091',
+        changeOrigin: true
       }
     }
   }

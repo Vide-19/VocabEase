@@ -17,6 +17,8 @@ public class WordQuery extends BaseParam {
 
 	private Integer nextType;
 
+	private String userId;
+
 	/**
 	 * 单词本身（英文）
 	 */
@@ -107,6 +109,14 @@ public class WordQuery extends BaseParam {
 	private Integer postType;
 
 	private Integer categoryId;
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
 	public Integer getCategoryId() {
 		return categoryId;

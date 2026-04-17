@@ -4,6 +4,8 @@ import com.javastudy.vocabease_common.entity.po.Word;
 import com.javastudy.vocabease_common.entity.query.WordQuery;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 单词表 数据库操作接口
  */
@@ -24,8 +26,15 @@ public interface WordMapper<T,P> extends BaseMapper<T,P> {
 	/**
 	 * 根据WordIds删除多个对象
 	 */
-	void deleteByWordIds(@Param("wordIds") String[] wordIds, @Param("status") Integer status, @Param("userId") Integer userId);
+	void deleteByWordIds(@Param("wordIds") String[] wordIds,
+						 @Param("status") Integer status, @Param("userId") Integer userId);
 
 	Word showWordNext(@Param("query") WordQuery wordQuery);
 
+	Word selectNextCollectedWord(@Param("query") WordQuery wordQuery);
+
+	List<Word> selectStudyList(@Param("difficulty") Integer difficulty,
+							   @Param("lastWordId") Integer lastWordId, @Param("limit") Integer limit);
+
+	Word selectFirst(@Param("query") WordQuery wordQuery);
 }

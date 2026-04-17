@@ -109,20 +109,43 @@
             <if test="query.nextType!=null and query.nextType==-1 and query.currentId!=null">
                 <![CDATA[ and a.article_id>#{query.currentId} order by a.article_id asc ]]>
             </if>
+            <if test="query.statusList != null and query.statusList.size > 0">
+                AND a.status IN
+                <foreach item="item" index="index" collection="query.statusList" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
         </where>
     </sql>
 
     <!-- 查询集合-->
     <select id="selectList" resultMap="base_result_map">
         SELECT
-        <include refid="base_column_list"/>
+        a.article_id,
+        a.title,
+        a.level,
+        a.read_count,
+        a.status,
+        a.creater_id,
+        u.user_name as user_name,
+        a.create_time,
+        CASE
+        WHEN ac.user_id = #{query.userId} THEN 1
+        ELSE 0
+        END AS is_collect,
+        ac.collect_id,
+        (SELECT COUNT(*) FROM app_collect ac2
+        WHERE ac2.object_id = a.article_id
+        AND ac2.collect_type = #{query.collectType}) AS collect_count
         <if test="query.queryBodyContent!=null and query.queryBodyContent">
-            ,body,translation
+            ,a.body,a.translation
         </if>
         FROM article a
         LEFT JOIN article2category a2c ON a.article_id = a2c.article_id
         LEFT JOIN category c ON a2c.category_id = c.category_id
         LEFT JOIN account u ON a.creater_id = u.user_id
+        LEFT JOIN app_collect ac ON a.article_id = ac.object_id
+        AND ac.collect_type = #{query.collectType}
         <include refid="query_condition"/>
         <if test="query.orderBy!=null">
             order by ${query.orderBy}
@@ -492,7 +515,7 @@
     <!-- 根据PrimaryKey获取对象-->
     <select id="selectByArticleId" resultMap="base_result_map">
         select
-        <include refid="base_column_list"/>
+        <include refid="base_column_list"/>, a.body, a.translation
         from article a
         LEFT JOIN article2category a2c ON a.article_id = a2c.article_id
         LEFT JOIN category c ON a2c.category_id = c.category_id
@@ -521,4 +544,69 @@
         </where>
     </update>
 
+    <select id="selectNextCollectedArticle" resultMap="base_result_map">
+        SELECT
+        <include refid="base_column_list"/>
+        <if test="query.queryBodyContent!=null and query.queryBodyContent">
+            ,a.body,a.translation
+        </if>
+        FROM article a
+        LEFT JOIN article2category a2c ON a.article_id = a2c.article_id
+        LEFT JOIN category c ON a2c.category_id = c.category_id
+        LEFT JOIN account u ON a.creater_id = u.user_id
+        <!-- 关键：内联收藏表 -->
+        INNER JOIN app_collect ac ON a.article_id = ac.object_id
+
+        <where>
+            <!-- 1. 【核心修正】必须是当前登录用户 (收藏者) 的收藏 -->
+            <!-- 使用新加的 userId 字段，而不是 creatorId -->
+            AND ac.user_id = #{query.userId}
+
+            AND ac.collect_type = 2 <!-- 假设 1 代表文章收藏 -->
+
+            <!-- 2. 文章状态正常 -->
+            AND a.status = 1
+
+            <!-- 3. 排除当前文章自己 -->
+            AND a.article_id != #{query.currentId}
+
+            <!-- 4. 时间逻辑 (保持不变) -->
+            <!-- 下一个：找收藏时间更早的 -->
+            <if test="query.nextType == 1">
+                AND ac.collect_time &lt; (
+                SELECT ac2.collect_time
+                FROM app_collect ac2
+                WHERE ac2.user_id = #{query.userId}
+                AND ac2.object_id = #{query.currentId}
+                AND ac2.collect_type = 2
+                )
+            </if>
+
+            <!-- 上一个：找收藏时间更晚的 -->
+            <if test="query.nextType == -1">
+                AND ac.collect_time &gt; (
+                SELECT ac2.collect_time
+                FROM app_collect ac2
+                WHERE ac2.user_id = #{query.userId}
+                AND ac2.object_id = #{query.currentId}
+                AND ac2.collect_type = 2
+                )
+            </if>
+        </where>
+
+        <!-- 5. 排序 (保持不变) -->
+        <if test="query.nextType == 1">
+            ORDER BY ac.collect_time DESC
+        </if>
+        <if test="query.nextType == -1">
+            ORDER BY ac.collect_time ASC
+        </if>
+        LIMIT 0, 1
+    </select>
+
+    <update id="updateReadCount">
+        UPDATE article
+        SET read_count = read_count + 1
+        WHERE article_id = #{articleId}
+    </update>
 </mapper>

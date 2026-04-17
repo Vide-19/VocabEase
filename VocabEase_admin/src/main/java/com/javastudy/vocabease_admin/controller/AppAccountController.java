@@ -15,6 +15,7 @@ import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.service.AppAccountService;
 import com.javastudy.vocabease_common.service.AppDeviceService;
 import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +45,7 @@ public class AppAccountController extends ABaseController{
 	 */
 	@RequestMapping("/loadAccountList")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.APP_USER_DEVICE)
-	public ResponseVO<PaginationResultVO<AppAccount>> loadAccountList(AppAccountQuery query){
+	public ResponseVO<PaginationResultVO<AppAccount>> loadAccountList(@RequestBody AppAccountQuery query){
 		query.setOrderBy("create_time desc");
 		return getSuccessResponseVO(this.appAccountService.findListByPage(query));
 	}
@@ -61,6 +62,16 @@ public class AppAccountController extends ABaseController{
 		AppAccount appAccount = new AppAccount();
 		appAccount.setStatus(status);
 		this.appAccountService.updateAppAccountByUserId(appAccount, userId);
+		return getSuccessResponseVO(null);
+	}
+
+	/**
+	 * 更新我的信息
+	 */
+	@RequestMapping("/updateAppAccount")
+	@GlobalInterceptor(checkLogin = true)//邮箱、昵称👇
+	public ResponseVO<Void> updateAppAccount(@RequestBody @VerifyParam(required = true) AppAccount appAccount) {
+		this.appAccountService.updateAppAccountByUserId(appAccount, appAccount.getUserId());
 		return getSuccessResponseVO(null);
 	}
 }

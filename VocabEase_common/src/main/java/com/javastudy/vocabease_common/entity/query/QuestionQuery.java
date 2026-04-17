@@ -16,6 +16,8 @@ public class QuestionQuery extends BaseParam {
 
 	private Integer currentId;
 
+	private String userId;
+
 	private Integer nextType;
 
 	private Boolean isQuestionItem;
@@ -23,6 +25,8 @@ public class QuestionQuery extends BaseParam {
 	private String[] categoryIds;
 
 	private List<Integer> questionIdList;
+
+	private Integer offset;
 
 	/**
 	 * 标题
@@ -101,6 +105,22 @@ public class QuestionQuery extends BaseParam {
 	private Integer questionType;
 
 	private Integer categoryId;
+
+	public Integer getOffset() {
+		return offset;
+	}
+
+	public void setOffset(Integer offset) {
+		this.offset = offset;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 
 	public Integer getCategoryId() {
 		return categoryId;

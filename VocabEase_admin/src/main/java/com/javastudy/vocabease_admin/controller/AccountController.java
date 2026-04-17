@@ -10,6 +10,7 @@ import com.javastudy.vocabease_common.entity.enums.ResponseCodeEnum;
 import com.javastudy.vocabease_common.entity.enums.VerifyRegexEnum;
 import com.javastudy.vocabease_common.entity.po.Account;
 import com.javastudy.vocabease_common.entity.query.AccountQuery;
+import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.exception.BusinessException;
 import com.javastudy.vocabease_common.service.AccountService;
@@ -35,10 +36,10 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
      */
     @RequestMapping("/loadAccountList")
     @GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ACCOUNT_LIST)
-    public ResponseVO loadAccountList(AccountQuery query) {
+    public ResponseVO<PaginationResultVO<Account>> loadAccountList(@RequestBody AccountQuery query) {
         query.setOrderBy("create_time desc");
         query.setRolesQuery(true);
-        return getSuccessResponseVO(accountService.findListByPage(query));
+        return getSuccessResponseVO(this.accountService.findListByPage(query));
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.javastudy.vocabease_common.mappers;
 
+import com.javastudy.vocabease_common.entity.po.AppAccount;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -10,7 +11,7 @@ public interface AppAccountMapper<T, P> extends BaseMapper<T, P> {
     /**
      * 根据UserId更新
      */
-    Integer updateByUserId(@Param("bean") T t, @Param("userId") String userId);
+    Integer updateByUserId(@Param("bean") AppAccount account, @Param("userId") String userId);
 
 
     /**

@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.javastudy.vocabease_common.mappers.AppQuestion4examMapper">
 
-	<!--实体映射-->
-	<resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
-		<!--id-->
-		<id column="id" property="id"  />
-		<!--测试id-->
-		<result column="exam_id" property="examId"  />
-		<!--用户id-->
-		<result column="user_id" property="userId"  />
-		<!--问题id-->
-		<result column="question_id" property="questionId"  />
-		<!--作答内容-->
-		<result column="answer" property="answer"  />
-		<!--判断 0未作答 1正确 2错误-->
-		<result column="result" property="result"  />
-	</resultMap>
+    <!--实体映射-->
+    <resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
+        <!--id-->
+        <id column="id" property="id"/>
+        <!--测试id-->
+        <result column="exam_id" property="examId"/>
+        <!--用户id-->
+        <result column="user_id" property="userId"/>
+        <!--问题id-->
+        <result column="question_id" property="questionId"/>
+        <!--作答内容-->
+        <result column="answer" property="answer"/>
+        <!--判断 0未作答 1正确 2错误-->
+        <result column="result" property="result"/>
+    </resultMap>
 
 
-	<!-- 通用查询结果列-->
-	<sql id="base_column_list">
-		 a.id,a.exam_id,a.user_id,a.question_id,a.answer,
+    <!-- 通用查询结果列-->
+    <sql id="base_column_list">
+        a.id,a.exam_id,a.user_id,a.question_id,a.answer,
 		 a.result
-	</sql>
+    </sql>
 
-	<sql id="base_condition_filed">
-			<if test="query.id != null">
-				 and  a.id = #{query.id}
-			</if>
-			<if test="query.examId != null">
-				 and  a.exam_id = #{query.examId}
-			</if>
-			<if test="query.userId != null and query.userId!=''">
-				 and  a.user_id = #{query.userId}
-			</if>
-			<if test="query.questionId != null">
-				 and  a.question_id = #{query.questionId}
-			</if>
-			<if test="query.answer != null and query.answer!=''">
-				 and  a.answer = #{query.answer}
-			</if>
-			<if test="query.result != null">
-				 and  a.result = #{query.result}
-			</if>
-	</sql>
+    <sql id="base_condition_filed">
+        <if test="query.id != null">
+            and a.id = #{query.id}
+        </if>
+        <if test="query.examId != null">
+            and a.exam_id = #{query.examId}
+        </if>
+        <if test="query.userId != null and query.userId!=''">
+            and a.user_id = #{query.userId}
+        </if>
+        <if test="query.questionId != null">
+            and a.question_id = #{query.questionId}
+        </if>
+        <if test="query.answer != null and query.answer!=''">
+            and a.answer = #{query.answer}
+        </if>
+        <if test="query.result != null">
+            and a.result = #{query.result}
+        </if>
+    </sql>
 
-	<!-- 通用查询条件列-->
-	<sql id="query_condition">
-	 <where>
-			<include refid="base_condition_filed" />
-			<if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
-				 and  a.user_id like concat('%', #{query.userIdFuzzy}, '%')
-			</if>
-			<if test="query.answerFuzzy!= null  and query.answerFuzzy!=''">
-				 and  a.answer like concat('%', #{query.answerFuzzy}, '%')
-			</if>
-	 </where>
-	</sql>
+    <!-- 通用查询条件列-->
+    <sql id="query_condition">
+        <where>
+            <include refid="base_condition_filed"/>
+            <if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
+                and a.user_id like concat('%', #{query.userIdFuzzy}, '%')
+            </if>
+            <if test="query.answerFuzzy!= null  and query.answerFuzzy!=''">
+                and a.answer like concat('%', #{query.answerFuzzy}, '%')
+            </if>
+        </where>
+    </sql>
 
-	<!-- 查询集合-->
-	<select id="selectList" resultMap="base_result_map" >
+    <!-- 查询集合-->
+    <select id="selectList" resultMap="base_result_map">
         SELECT
         <include refid="base_column_list"/>
         FROM app_question4exam a
@@ -74,222 +74,245 @@
         </if>
     </select>
 
-	<!-- 查询数量-->
-	<select id="selectCount" resultType="java.lang.Integer" >
-		 SELECT count(1) FROM app_question4exam a <include refid="query_condition" />
-	</select>
+    <!-- 查询数量-->
+    <select id="selectCount" resultType="java.lang.Integer">
+        SELECT count(1) FROM app_question4exam a
+        <include refid="query_condition"/>
+    </select>
 
-	<!-- 插入 （匹配有值的字段）-->
-	<insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
-		<selectKey keyProperty="bean.id" resultType="Integer" order="AFTER">
-			SELECT LAST_INSERT_ID()
-		</selectKey>
-		 INSERT INTO app_question4exam
-		 <trim prefix="(" suffix=")" suffixOverrides="," >
-			<if test="bean.examId != null">
-				 exam_id,
-			</if>
-			<if test="bean.userId != null">
-				 user_id,
-			</if>
-			<if test="bean.questionId != null">
-				 question_id,
-			</if>
-			<if test="bean.answer != null">
-				 answer,
-			</if>
-			<if test="bean.result != null">
-				 result,
-			</if>
-		 </trim>
-		 <trim prefix="values (" suffix=")" suffixOverrides="," >
-			<if test="bean.examId!=null">
-				 #{bean.examId},
-			</if>
-			<if test="bean.userId!=null">
-				 #{bean.userId},
-			</if>
-			<if test="bean.questionId!=null">
-				 #{bean.questionId},
-			</if>
-			<if test="bean.answer!=null">
-				 #{bean.answer},
-			</if>
-			<if test="bean.result!=null">
-				 #{bean.result},
-			</if>
-		 </trim>
-	</insert>
+    <!-- 插入 （匹配有值的字段）-->
+    <insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
+        <selectKey keyProperty="bean.id" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO app_question4exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.examId != null">
+                exam_id,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.questionId != null">
+                question_id,
+            </if>
+            <if test="bean.answer != null">
+                answer,
+            </if>
+            <if test="bean.result != null">
+                result,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.examId!=null">
+                #{bean.examId},
+            </if>
+            <if test="bean.userId!=null">
+                #{bean.userId},
+            </if>
+            <if test="bean.questionId!=null">
+                #{bean.questionId},
+            </if>
+            <if test="bean.answer!=null">
+                #{bean.answer},
+            </if>
+            <if test="bean.result!=null">
+                #{bean.result},
+            </if>
+        </trim>
+    </insert>
 
-	<!-- 插入或者更新 （匹配有值的字段）-->
-	<insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
-		 INSERT INTO app_question4exam
-		 <trim prefix="(" suffix=")" suffixOverrides=",">
-			<if test="bean.id != null">
-				 id,
-			</if>
-			<if test="bean.examId != null">
-				 exam_id,
-			</if>
-			<if test="bean.userId != null">
-				 user_id,
-			</if>
-			<if test="bean.questionId != null">
-				 question_id,
-			</if>
-			<if test="bean.answer != null">
-				 answer,
-			</if>
-			<if test="bean.result != null">
-				 result,
-			</if>
-		 </trim>
-		 <trim prefix="values (" suffix=")" suffixOverrides=",">
-			<if test="bean.id!=null">
-				 #{bean.id},
-			</if>
-			<if test="bean.examId!=null">
-				 #{bean.examId},
-			</if>
-			<if test="bean.userId!=null">
-				 #{bean.userId},
-			</if>
-			<if test="bean.questionId!=null">
-				 #{bean.questionId},
-			</if>
-			<if test="bean.answer!=null">
-				 #{bean.answer},
-			</if>
-			<if test="bean.result!=null">
-				 #{bean.result},
-			</if>
-		 </trim>
-		 on DUPLICATE key update 
-		 <trim prefix="" suffix="" suffixOverrides=",">
-			<if test="bean.examId!=null">
-				 exam_id = VALUES(exam_id),
-			</if>
-			<if test="bean.userId!=null">
-				 user_id = VALUES(user_id),
-			</if>
-			<if test="bean.questionId!=null">
-				 question_id = VALUES(question_id),
-			</if>
-			<if test="bean.answer!=null">
-				 answer = VALUES(answer),
-			</if>
-			<if test="bean.result!=null">
-				 result = VALUES(result),
-			</if>
-		 </trim>
-	</insert>
+    <!-- 插入或者更新 （匹配有值的字段）-->
+    <insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
+        INSERT INTO app_question4exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.id != null">
+                id,
+            </if>
+            <if test="bean.examId != null">
+                exam_id,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.questionId != null">
+                question_id,
+            </if>
+            <if test="bean.answer != null">
+                answer,
+            </if>
+            <if test="bean.result != null">
+                result,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.id!=null">
+                #{bean.id},
+            </if>
+            <if test="bean.examId!=null">
+                #{bean.examId},
+            </if>
+            <if test="bean.userId!=null">
+                #{bean.userId},
+            </if>
+            <if test="bean.questionId!=null">
+                #{bean.questionId},
+            </if>
+            <if test="bean.answer!=null">
+                #{bean.answer},
+            </if>
+            <if test="bean.result!=null">
+                #{bean.result},
+            </if>
+        </trim>
+        on DUPLICATE key update
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="bean.examId!=null">
+                exam_id = VALUES(exam_id),
+            </if>
+            <if test="bean.userId!=null">
+                user_id = VALUES(user_id),
+            </if>
+            <if test="bean.questionId!=null">
+                question_id = VALUES(question_id),
+            </if>
+            <if test="bean.answer!=null">
+                answer = VALUES(answer),
+            </if>
+            <if test="bean.result!=null">
+                result = VALUES(result),
+            </if>
+        </trim>
+    </insert>
 
-	<!-- 添加 （批量插入）-->
-	<insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam" useGeneratedKeys="true" keyProperty="id">
-		 INSERT INTO app_question4exam(
-			 exam_id,
-			 user_id,
-			 question_id,
-			 answer,
-			 result
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.examId},
-				 #{item.userId},
-				 #{item.questionId},
-				 #{item.answer},
-				 #{item.result}
-			 )
-		 </foreach>
-	</insert>
+    <!-- 添加 （批量插入）-->
+    <insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO app_question4exam(
+        exam_id,
+        user_id,
+        question_id,
+        answer,
+        result
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.examId},
+            #{item.userId},
+            #{item.questionId},
+            #{item.answer},
+            #{item.result}
+            )
+        </foreach>
+    </insert>
 
-	<!-- 批量新增修改 （批量插入）-->
-	<insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
-		 INSERT INTO app_question4exam(
-			 exam_id,
-			 user_id,
-			 question_id,
-			 answer,
-			 result
-		 )values
-		 <foreach collection="list" item="item" separator=",">
-			 (
-				 #{item.examId},
-				 #{item.userId},
-				 #{item.questionId},
-				 #{item.answer},
-				 #{item.result}
-			 )
-		 </foreach>
-			on DUPLICATE key update 
-			exam_id = VALUES(exam_id),
-			user_id = VALUES(user_id),
-			question_id = VALUES(question_id),
-			answer = VALUES(answer),
-			result = VALUES(result)
-	</insert>
+    <!-- 批量新增修改 （批量插入）-->
+    <insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
+        INSERT INTO app_question4exam(
+        id,
+        exam_id,
+        user_id,
+        question_id,
+        answer,
+        result
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.examId},
+            #{item.userId},
+            #{item.questionId},
+            #{item.answer},
+            #{item.result}
+            )
+        </foreach>
+        on DUPLICATE key update
+        exam_id = VALUES(exam_id),
+        user_id = VALUES(user_id),
+        question_id = VALUES(question_id),
+        answer = VALUES(answer),
+        result = VALUES(result)
+    </insert>
 
-	<!--多条件修改-->
-	<update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppQuestion4examQuery">
-		 UPDATE app_question4exam a
- 		 <set> 
-			<if test="bean.examId != null">
-				 exam_id = #{bean.examId},
-			</if>
-			<if test="bean.userId != null">
-				 user_id = #{bean.userId},
-			</if>
-			<if test="bean.questionId != null">
-				 question_id = #{bean.questionId},
-			</if>
-			<if test="bean.answer != null">
-				 answer = #{bean.answer},
-			</if>
-			<if test="bean.result != null">
-				 result = #{bean.result},
-			</if>
- 		 </set>
- 		 <include refid="query_condition" />
-	</update>
+    <!--多条件修改-->
+    <update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppQuestion4examQuery">
+        UPDATE app_question4exam a
+        <set>
+            <if test="bean.examId != null">
+                exam_id = #{bean.examId},
+            </if>
+            <if test="bean.userId != null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.questionId != null">
+                question_id = #{bean.questionId},
+            </if>
+            <if test="bean.answer != null">
+                answer = #{bean.answer},
+            </if>
+            <if test="bean.result != null">
+                result = #{bean.result},
+            </if>
+        </set>
+        <include refid="query_condition"/>
+    </update>
 
-	<!--多条件删除-->
-	<delete id="deleteByParam">
-		 delete a from app_question4exam a
- 		 <include refid="query_condition" />
-	</delete>
+    <!--多条件删除-->
+    <delete id="deleteByParam">
+        delete a from app_question4exam a
+        <include refid="query_condition"/>
+    </delete>
 
-	<!-- 根据Id修改-->
-	<update id="updateById" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
-		 UPDATE app_question4exam
- 		 <set> 
-			<if test="bean.examId != null">
-				 exam_id = #{bean.examId},
-			</if>
-			<if test="bean.userId != null">
-				 user_id = #{bean.userId},
-			</if>
-			<if test="bean.questionId != null">
-				 question_id = #{bean.questionId},
-			</if>
-			<if test="bean.answer != null">
-				 answer = #{bean.answer},
-			</if>
-			<if test="bean.result != null">
-				 result = #{bean.result},
-			</if>
- 		 </set>
- 		 where id=#{id}
-	</update>
+    <!-- 根据Id修改-->
+    <update id="updateById" parameterType="com.javastudy.vocabease_common.entity.po.AppQuestion4exam">
+        UPDATE app_question4exam
+        <set>
+            <if test="bean.examId != null">
+                exam_id = #{bean.examId},
+            </if>
+            <if test="bean.userId != null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.questionId != null">
+                question_id = #{bean.questionId},
+            </if>
+            <if test="bean.answer != null">
+                answer = #{bean.answer},
+            </if>
+            <if test="bean.result != null">
+                result = #{bean.result},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
 
-	<!-- 根据Id删除-->
-	<delete id="deleteById">
-		delete from app_question4exam where id=#{id}
-	</delete>
+    <!-- 根据Id删除-->
+    <delete id="deleteById">
+        delete
+        from app_question4exam
+        where id = #{id}
+    </delete>
 
-	<!-- 根据PrimaryKey获取对象-->
-	<select id="selectById" resultMap="base_result_map" >
-		select <include refid="base_column_list" /> from app_question4exam a where id=#{id}
-	</select>
+    <!-- 根据PrimaryKey获取对象-->
+    <select id="selectById" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from app_question4exam a where id=#{id}
+    </select>
+
+    <update id="updateBatch">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE app_question4exam
+            <set>
+                <if test="item.answer != null">
+                    answer = #{item.answer},
+                </if>
+                <if test="item.result != null">
+                    result = #{item.result},
+                </if>
+            </set>
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
 
 </mapper>

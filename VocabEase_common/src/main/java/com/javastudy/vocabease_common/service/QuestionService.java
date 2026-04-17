@@ -61,6 +61,7 @@ public interface QuestionService {
 	 */
 	Question getQuestionByQuestionId(Integer questionId);
 
+	Question getAppQuestionByQuestionId(Integer questionId);
 
 	/**
 	 * 根据QuestionId修改
@@ -83,5 +84,6 @@ public interface QuestionService {
 
 	Question showQuestionNext(QuestionQuery questionQuery, Integer currentId, Integer nextType);
 
+	Question showNextCollectedQuestion(String userId, Integer currentId, Integer nextType);
 
 }

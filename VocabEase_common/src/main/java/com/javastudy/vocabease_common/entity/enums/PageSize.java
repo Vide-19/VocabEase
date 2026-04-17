@@ -2,6 +2,9 @@ package com.javastudy.vocabease_common.entity.enums;
 
 
 public enum PageSize {
+	SIZE5(5),
+	SIZE8(8),
+	SIZE10(10),
 	SIZE15(15),
 	SIZE20(20),
 	SIZE30(30),

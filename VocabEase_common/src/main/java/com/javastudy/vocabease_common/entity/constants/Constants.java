@@ -10,6 +10,7 @@ public class Constants {
     public static final String APP_UPDATE_FOLDER = "/app/";
     public static final String READ_IMG_PATH = "/api/file/getImage/";
     public static final String AVATAR_FOLDER = "avatar/";
+    public static final String UPLOAD_FOLDER = "202603/";
     public static final Integer LENGTH_8 = 8;
     public static final Integer LENGTH_10 = 10;
     public static final Integer LENGTH_20 = 20;

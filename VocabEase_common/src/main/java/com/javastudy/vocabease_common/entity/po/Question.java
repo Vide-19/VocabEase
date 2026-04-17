@@ -62,6 +62,10 @@ public class Question implements Serializable {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date collectTime;
+
 	/**
 	 * 状态 0未发布 1已发布
 	 */
@@ -71,6 +75,8 @@ public class Question implements Serializable {
 	 * 作者id
 	 */
 	private String createrId;
+
+	private String createrName;
 
 	/**
 	 * 浏览量
@@ -83,6 +89,8 @@ public class Question implements Serializable {
 	private Integer collectCount;
 
 	private Integer collectId;
+
+	private Boolean isCollect;
 
 	/**
 	 * 发布类别 0内部 1外部
@@ -102,6 +110,30 @@ public class Question implements Serializable {
 	private String categoryName;
 
 	private Integer categoryId;
+
+	public Boolean getCollect() {
+		return isCollect;
+	}
+
+	public void setCollect(Boolean collect) {
+		isCollect = collect;
+	}
+
+	public Date getCollectTime() {
+		return collectTime;
+	}
+
+	public void setCollectTime(Date collectTime) {
+		this.collectTime = collectTime;
+	}
+
+	public String getCreaterName() {
+		return createrName;
+	}
+
+	public void setCreaterName(String createrName) {
+		this.createrName = createrName;
+	}
 
 	public String getQuestionItemList() {
 		return questionItemList;

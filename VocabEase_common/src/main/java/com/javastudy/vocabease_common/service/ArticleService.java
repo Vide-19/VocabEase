@@ -75,4 +75,10 @@ public interface ArticleService {
 	List<ImportErrorItem> importArticle(SessionUserAdminDto sessionUserAdminDto, MultipartFile file);
 
 	Article showArticleNext(ArticleQuery articleQuery, Integer currentId, Integer nextType, Boolean isUpdateReadCount);
+
+	Article showNextCollectedArticle(String userId, Integer currentId, Integer nextType);
+
+	void updateCollectCountById(String shareId);
+
+	void updateReadCountById(Integer articleId);
 }

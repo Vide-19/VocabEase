@@ -2,9 +2,11 @@ package com.javastudy.vocabease_common.service.impl;
 
 import com.javastudy.vocabease_common.entity.dto.AppAccountDto;
 import com.javastudy.vocabease_common.entity.dto.AppExamPostDto;
+import com.javastudy.vocabease_common.entity.dto.AppQuestionSubmitDto;
 import com.javastudy.vocabease_common.entity.enums.*;
 import com.javastudy.vocabease_common.entity.po.*;
 import com.javastudy.vocabease_common.entity.query.*;
+import com.javastudy.vocabease_common.entity.vo.AppExamVO;
 import com.javastudy.vocabease_common.entity.vo.ExamQuestionVO;
 import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 import com.javastudy.vocabease_common.exception.BusinessException;
@@ -37,6 +39,8 @@ public class AppExamServiceImpl implements AppExamService {
     private Item4questionMapper<Item4question, Item4questionQuery> item4questionMapper;
     @Resource
     private AppCollectMapper<AppCollect, AppCollectQuery> appCollectMapper;
+    @Resource
+    private AppWrongExamMapper<AppWrongExam, AppWrongExamQuery> appWrongExamMapper;
 
     /**
      * 根据条件查询列表
@@ -247,6 +251,7 @@ public class AppExamServiceImpl implements AppExamService {
                 continue;
             AppQuestion4exam appQuestion4exam = appQuestion4examMap.get(item.getQuestionId());
             if (appQuestion4exam != null) {
+                item.setId(appQuestion4exam.getId());
                 item.setResult(appQuestion4exam.getResult());
                 item.setUserAnswer(appQuestion4exam.getAnswer());
             }
@@ -257,57 +262,93 @@ public class AppExamServiceImpl implements AppExamService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AppExam endExam(AppAccountDto accountDto, AppExamPostDto examPostDto) {
-        // 1. 校验考试是否存在，且属于当前用户
+        // 1. 基础校验（用户、状态等）
         AppExam appExam = this.checkAppExam(accountDto, examPostDto.getExamId());
         if (appExam == null || !Objects.equals(appExam.getUserId(), accountDto.getUserId()))
             throw new BusinessException(ResponseCodeEnum.CODE_400);
-        // 2. 校验考试状态：仅允许提交“未完成”的考试
+
         if (!appExam.getStatus().equals(ExamStatusEnum.NO_FINISH.getStatus()))
             throw new BusinessException("该测试已被提交");
-        // 3. 获取用户提交的答题记录列表
-        List<AppQuestion4exam> userAnswerList = examPostDto.getAppQuestion4examList();
+
+        List<AppQuestionSubmitDto> userAnswerList = examPostDto.getAppQuestion4examList();
         if (userAnswerList == null || userAnswerList.isEmpty())
             throw new BusinessException(ResponseCodeEnum.CODE_400);
-        // 4. 查询数据库中该考试关联的所有题目（用于校验提交的题目是否合法）
+
+        // 2. 查询题目与标准答案
         AppQuestion4examQuery query = new AppQuestion4examQuery();
         query.setExamId(examPostDto.getExamId());
         List<AppQuestion4exam> questionListDB = this.appQuestion4examMapper.selectList(query);
-        // 5. 提取数据库中题目的 ID 列表（转为 String，适配 QuestionQuery 的入参要求）
+
         List<String> questionIdDB = questionListDB.stream().map(item ->
                 item.getQuestionId().toString()).toList();
-        // 6. 批量查询这些题目的标准答案（用于自动判分）
+
         QuestionQuery questionQuery = new QuestionQuery();
         questionQuery.setQuestionIds(questionIdDB.toArray(new String[questionIdDB.size()]));
-        questionQuery.setQueryAnswer(true);// 确保返回 answer 字段
+        questionQuery.setQueryAnswer(true);
         List<Question> questionList = this.questionMapper.selectList(questionQuery);
-        // 7. 构建题目 ID -> 题目实体的映射，便于快速查找标准答案
+
         Map<Integer, Question> itemMap = questionList.stream().collect(
                 Collectors.toMap(Question::getQuestionId, Function.identity(), (data1, data2) -> data2));
-        // 8. 遍历用户提交的每一道题，进行判分并补充必要字段
-        for (AppQuestion4exam item : userAnswerList) {
-            Question question = itemMap.get(item.getQuestionId());
-            // 校验：提交的题目必须属于本次考试（防止伪造题号）
+
+        int correctCount = 0;
+        int totalQuestions = questionList.size();
+
+        // 3. 准备一个列表，用于存放转换后的数据库实体对象
+        List<AppQuestion4exam> saveEntityList = new ArrayList<>();
+
+        // 4. 遍历处理
+        for (AppQuestionSubmitDto submitDto : userAnswerList) {
+            Question question = itemMap.get(submitDto.getQuestionId());
             if (question == null)
                 throw new BusinessException(ResponseCodeEnum.CODE_400);
-            // 补充考试ID和用户ID（前端可能未传，由服务端填充）
-            item.setExamId(appExam.getExamId());
-            item.setUserId(accountDto.getUserId());
-            // 自动判分：比对用户答案与标准答案
-            if (question.getAnswer().equals(item.getAnswer()))
-                item.setResult(ExamStatusEnum.TRUE.getStatus());
-            else
-                item.setResult(ExamStatusEnum.FALSE.getStatus());
+
+            // --- 核心修改：数据格式转换 ---
+            Object answerObj = submitDto.getAnswer();
+            String dbAnswerFormat = "";
+
+            if (answerObj instanceof List) {
+                List<?> list = (List<?>) answerObj;
+                if (!list.isEmpty())
+                    dbAnswerFormat = String.join(",", list.stream().map(Object::toString).toArray(String[]::new));
+            } else if (answerObj instanceof String)
+                dbAnswerFormat = (String) answerObj;
+
+            // --- 核心修改：创建数据库实体对象 ---
+            AppQuestion4exam entity = new AppQuestion4exam();
+
+            // 拷贝基础数据
+            entity.setId(submitDto.getId());
+            entity.setQuestionId(submitDto.getQuestionId());
+            entity.setAnswer(dbAnswerFormat); // 设置格式化后的答案
+            entity.setExamId(appExam.getExamId());
+            entity.setUserId(accountDto.getUserId());
+
+            // 判分
+            if (question.getAnswer().equals(dbAnswerFormat)) {
+                entity.setResult(ExamStatusEnum.TRUE.getStatus());
+                correctCount++;
+            } else
+                entity.setResult(ExamStatusEnum.FALSE.getStatus());
+
+            saveEntityList.add(entity);
         }
-        // 9. 批量保存或更新用户的答题记录（支持覆盖重答）
-        this.appQuestion4examMapper.insertOrUpdateBatch(userAnswerList);
-        // 10. 更新考试主记录状态为“已完成”，并设置结束时间
-        // 注意：此处先构造更新对象，但实际更新在下一步通过条件更新完成
+
+        // 5. 计算分数
+        int finalScore = 0;
+        if (totalQuestions > 0)
+            finalScore = (correctCount * 100) / totalQuestions;
+
+        // 6. 批量保存答题记录
+        this.appQuestion4examMapper.insertOrUpdateBatch(saveEntityList);
+
+        // 7. 更新考试主表状态和分数
         Date currentDate = new Date();
         AppExam updateExam = new AppExam();
         updateExam.setStatus(ExamStatusEnum.IS_FINISH.getStatus());
         updateExam.setEndTime(currentDate);
         updateExam.setRemark(examPostDto.getRemark());
-        // 11. 【关键】再次校验：确保数据库中仍存在一条“未完成”状态的考试记录（防止并发重复提交）
+        updateExam.setScore(finalScore);
+
         AppExamQuery appExamQuery = new AppExamQuery();
         appExamQuery.setExamId(appExam.getExamId());
         appExamQuery.setUserId(accountDto.getUserId());
@@ -315,13 +356,89 @@ public class AppExamServiceImpl implements AppExamService {
         Integer count = this.appExamMapper.selectCount(appExamQuery);
         if (count == 0)
             throw new BusinessException("测试提交失败");
-        // 12. 执行考试状态更新
-        Integer update = this.appExamMapper.updateByExamId(updateExam, appExam.getExamId());
+
+        // ==========================================
+        // 8. 错题记录逻辑优化 (核心修改部分)
+        // ==========================================
+
+        // 8.1 提取本次考试中答错的题目ID列表
+        List<Integer> currentWrongQuestionIds = saveEntityList.stream()
+                .filter(q -> q.getResult() != null && q.getResult().equals(ExamStatusEnum.FALSE.getStatus()))
+                .map(AppQuestion4exam::getQuestionId)
+                .collect(Collectors.toList());
+
+        if (!currentWrongQuestionIds.isEmpty()) {
+            Date now = new Date();
+
+            // 8.2 查询数据库中该用户已有的错题记录 (只查本次答错的题)
+            // 注意：这里假设你的 BaseMapper 支持 selectList 和类似的 Query 对象
+            AppWrongExamQuery existQuery = new AppWrongExamQuery();
+            existQuery.setUserId(accountDto.getUserId());
+            // 将 Integer 列表转换为 String 数组以匹配 Query
+            existQuery.setQuestionIds(currentWrongQuestionIds.stream().map(String::valueOf).toArray(String[]::new));
+
+            List<AppWrongExam> existWrongList = this.appWrongExamMapper.selectList(existQuery);
+
+            // 8.3 将数据库已有的错题转为 Map，方便快速查找 (Key: questionId, Value: AppWrongExam实体)
+            Map<Integer, AppWrongExam> existWrongMap = existWrongList.stream()
+                    .collect(Collectors.toMap(AppWrongExam::getQuestionId, Function.identity()));
+
+            List<AppWrongExam> saveWrongList = new ArrayList<>(); // 用于存放需要新增的记录
+            List<AppWrongExam> updateWrongList = new ArrayList<>(); // 用于存放需要更新的记录
+
+            // 8.4 遍历本次答错的题目，决定是新增还是更新
+            for (AppQuestion4exam userRecord : saveEntityList) {
+                if (userRecord.getResult() != null && userRecord.getResult().equals(ExamStatusEnum.FALSE.getStatus())) {
+                    Integer qId = userRecord.getQuestionId();
+                    AppWrongExam existItem = existWrongMap.get(qId);
+
+                    if (existItem != null) {
+                        // --- 情况A：数据库已存在该错题 -> 准备更新 ---
+                        AppWrongExam toUpdate = new AppWrongExam();
+                        toUpdate.setId(existItem.getId());
+                        toUpdate.setExamId(appExam.getExamId()); // 更新所属试卷（可选，看需求）
+                        toUpdate.setQuestionId(qId);
+                        toUpdate.setWrongTime(now);             // 更新最后错误时间
+                        toUpdate.setUserId(accountDto.getUserId());
+                        // 错误次数 + 1
+                        Integer currentCount = existItem.getWrongCount();
+                        if (currentCount == null)
+                            currentCount = 0;
+                        toUpdate.setWrongCount(currentCount + 1);
+
+                        updateWrongList.add(toUpdate);
+                    } else {
+                        if (qId == null)
+                            continue; // 跳过这条无效数据，不要存入数据库
+                        // --- 情况B：数据库不存在该错题 -> 准备新增 ---
+                        AppWrongExam toSave = new AppWrongExam();
+                        toSave.setUserId(accountDto.getUserId());
+                        toSave.setExamId(appExam.getExamId());
+                        toSave.setQuestionId(qId);
+                        toSave.setWrongTime(now);
+                        toSave.setUserAnswer(userRecord.getAnswer());
+                        toSave.setIsReviewed(0);
+                        toSave.setWrongCount(1); // 首次错误，次数为1
+
+                        saveWrongList.add(toSave);
+                    }
+                }
+            }
+
+            // 8.5 执行批量操作
+            if (!saveWrongList.isEmpty())
+                this.appWrongExamMapper.insertBatch(saveWrongList);
+            if (!updateWrongList.isEmpty())
+                this.appWrongExamMapper.updateBatch(updateWrongList);
+        }
+
+        // 9. 执行更新考试主表
+        Integer update = this.appExamMapper.updateByParam(updateExam, appExamQuery);
         if (update != 1)
             throw new BusinessException(ResponseCodeEnum.CODE_400);
-        // remark 由前端传入，直接设置到原对象（后续用于返回）👇remark可以不要
-        // 13. 返回更新后的考试信息
-        appExam.setRemark(examPostDto.getRemark());
+
+        // 10. 返回结果
+        appExam.setScore(finalScore);
         appExam.setEndTime(currentDate);
         appExam.setStatus(ExamStatusEnum.IS_FINISH.getStatus());
         return appExam;
@@ -336,5 +453,80 @@ public class AppExamServiceImpl implements AppExamService {
         query.setUserId(appExam.getUserId());
         this.appQuestion4examMapper.deleteByParam(query);
         this.appExamMapper.deleteByExamId(examId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AppExamVO generateExamPaper(AppAccountDto userDto, Integer difficulty, Integer pageIndex) {
+        int currentPageNo = (pageIndex != null ? pageIndex : 0) + 1;
+        int pageSize = PageSize.SIZE5.getSize();
+        if (difficulty == 2)
+            pageSize = PageSize.SIZE8.getSize();
+        else if (difficulty == 3)
+            pageSize = PageSize.SIZE10.getSize();
+        QuestionQuery questionQuery = new QuestionQuery();
+        questionQuery.setLevel(difficulty); // 核心：筛选指定难度的题目
+        questionQuery.setStatus(PostStatusEnum.IS_POST.getStatus()); // 只查已发布的
+        questionQuery.setOrderBy("question_id ASC");
+        questionQuery.setSimplePage(new SimplePage(currentPageNo * pageSize, pageSize)); // 假设最多50题
+
+        List<Question> questionList = this.questionMapper.selectList(questionQuery);
+
+        if (questionList.isEmpty())
+            throw new BusinessException("该难度下暂无题目，请联系管理员");
+
+        // 2. 创建新的考试记录 (AppExam)
+        AppExam examNew = new AppExam();
+        examNew.setUserId(userDto.getUserId());
+        examNew.setNickName(userDto.getNickName());
+        examNew.setCreateTime(new Date());
+        examNew.setStartTime(new Date());
+        examNew.setStatus(ExamStatusEnum.NO_FINISH.getStatus());
+        this.appExamMapper.insert(examNew);
+
+        // 3. 构建考试题目关联记录 (AppQuestion4exam)
+        List<AppQuestion4exam> questionLinkList = new ArrayList<>();
+        for (Question q : questionList) {
+            AppQuestion4exam link = new AppQuestion4exam();
+            link.setQuestionId(q.getQuestionId());
+            link.setExamId(examNew.getExamId());
+            link.setUserId(userDto.getUserId());
+            link.setResult(ExamStatusEnum.NO_FINISH.getStatus()); // 未作答状态
+            questionLinkList.add(link);
+        }
+
+        // 4. 批量插入关联记录
+        if (!questionLinkList.isEmpty())
+            this.appQuestion4examMapper.insertBatch(questionLinkList);
+
+        // 5. 构建返回给前端的 VO (包含考试信息和题目列表)
+        AppExamVO examVO = CopyUtil.copy(examNew, AppExamVO.class);
+
+        // 复用 getAppExamQuestion 逻辑来组装题目详情（包含选项）
+        AppQuestion4examQuery query = new AppQuestion4examQuery();
+        query.setExamId(examNew.getExamId());
+        query.setUserId(userDto.getUserId());
+        query.setShowAnswer(true); // 组卷新题，不需要显示答案
+
+        List<ExamQuestionVO> questionVOList = getAppExamQuestion(query);//看看里面有没有带上id👈
+        examVO.setExamQuestionList(questionVOList);
+
+        return examVO;
+    }
+
+    /**
+     * 根据 ExamId 查询错题列表
+     */
+    @Override
+    public List<ExamQuestionVO> getWrongQuestionsByExamId(Integer examId, String userId) {
+        // 1. 构建查询条件：查询该考试下的错题
+        AppQuestion4examQuery query = new AppQuestion4examQuery();
+        query.setExamId(examId);
+        query.setUserId(userId);
+        query.setResult(ExamStatusEnum.FALSE.getStatus()); // 只查答错的题
+        query.setShowAnswer(true); // 需要显示答案解析
+
+        // 2. 复用 getAppExamQuestion 逻辑（因为我们只需要题目详情+用户作答结果）
+        return this.getAppExamQuestion(query);
     }
 }

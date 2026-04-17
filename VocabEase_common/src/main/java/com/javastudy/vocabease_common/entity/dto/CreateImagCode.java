@@ -80,7 +80,7 @@ public class CreateImagCode {
         return new Color(r, g, b);
     }
     private String randomStr(int n) {
-        String str1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+        String str1 = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghjkmnopqrstuvwxyz1234567890";
         String str2 = "";
         int length = str1.length() - 1;
         double r;

@@ -21,6 +21,7 @@
         <el-select v-model="searchForm.status" placeholder="请选择状态" clearable style="width: 120px">
           <el-option label="未发布" :value="0" />
           <el-option label="已发布" :value="1" />
+          <el-option label="已置顶" :value="2"/>
         </el-select>
       </el-form-item>
 
@@ -78,15 +79,15 @@
       </el-table-column>
       <el-table-column prop="status" label="状态" width="100">
         <template #default="{ row }">
-          <el-tag :type="row.status === 1 ? 'success' : 'info'">
-            {{ row.status === 1 ? '已发布' : '未发布' }}
+          <el-tag :type="row.status === 1 ? 'success' : ( row.status === 2 ? 'danger' : 'info' )">
+            {{ row.status === 1 ? '已发布' : ( row.status === 2 ? '已置顶' : '未发布' ) }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="createrId" label="创建人ID" width="100" />
-      <el-table-column prop="createTime" label="创建时间" width="180" />
+      <el-table-column prop="createTime" label="创建时间" width="170" />
 
-      <el-table-column label="操作" fixed="right" width="180">
+      <el-table-column label="操作" fixed="right" width="195">
         <template #default="{ row }">
           <el-button size="small" link type="primary" @click="openEditDialog(row)">
             编辑
@@ -98,6 +99,14 @@
               @click="togglePublish(row.shareId, row.status)"
           >
             {{ row.status === 1 ? '取消发布' : '发布' }}
+          </el-button>
+          <el-button
+              size="small"
+              link
+              :type="row.status === 2 ? 'warning' : 'danger'"
+              @click="toTop(row.shareId, row.status)"
+          >
+            {{ row.status === 2 ? '取消置顶' : '置顶' }}
           </el-button>
         </template>
       </el-table-column>
@@ -315,6 +324,19 @@ const batchPost = async (status) => {
   })
   ElMessage.success(`批量${action}成功`)
   await loadData()
+}
+
+// ================== 置顶 ==================
+const toTop = (shareId, currentStatus) => {
+  const newStatus = currentStatus === 2 ? 1 : 2
+  const action = newStatus === 2 ? '置顶' : '取消置顶'
+  ElMessageBox.confirm(`确定${action}该笔记？`, '提示', {type: 'warning'}).then(async () => {
+    await axios.post('/share/' + (newStatus === 2 ? 'topShare' : 'postShare'), null, {
+      params: {shareIds: String(shareId)}
+    })
+    ElMessage.success(`${action}成功`)
+    await loadData()
+  })
 }
 
 // ================== 删除 ==================

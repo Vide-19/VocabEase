@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javastudy.vocabease_common.mappers.AppWrongExamMapper">
+
+    <!--实体映射-->
+    <resultMap id="base_result_map" type="com.javastudy.vocabease_common.entity.po.AppWrongExam">
+        <!--主键ID-->
+        <id column="id" property="id"/>
+        <!--用户ID-->
+        <result column="user_id" property="userId"/>
+        <!--关联的试卷ID (AppExam表)-->
+        <result column="exam_id" property="examId"/>
+        <!--关联的题目ID (Question表)-->
+        <result column="question_id" property="questionId"/>
+        <!--答错时间-->
+        <result column="wrong_time" property="wrongTime"/>
+        <!--用户当时的答案-->
+        <result column="user_answer" property="userAnswer"/>
+        <!--是否已复习 (0:未复习, 1:已复习)-->
+        <result column="is_reviewed" property="isReviewed"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列-->
+    <sql id="base_column_list">
+        a.id,a.user_id,a.exam_id,a.question_id,a.wrong_time,
+		 a.user_answer,a.is_reviewed
+    </sql>
+
+    <sql id="base_condition_filed">
+        <if test="query.id != null">
+            and a.id = #{query.id}
+        </if>
+        <if test="query.userId != null and query.userId!=''">
+            and a.user_id = #{query.userId}
+        </if>
+        <if test="query.examId != null">
+            and a.exam_id = #{query.examId}
+        </if>
+        <if test="query.questionId != null">
+            and a.question_id = #{query.questionId}
+        </if>
+        <if test="query.wrongTime != null and query.wrongTime!=''">
+            <![CDATA[ and  a.wrong_time=str_to_date(#{query.wrongTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="query.userAnswer != null and query.userAnswer!=''">
+            and a.user_answer = #{query.userAnswer}
+        </if>
+        <if test="query.isReviewed != null">
+            and a.is_reviewed = #{query.isReviewed}
+        </if>
+    </sql>
+
+    <!-- 通用查询条件列-->
+    <sql id="query_condition">
+        <where>
+            <include refid="base_condition_filed"/>
+            <if test="query.userIdFuzzy!= null  and query.userIdFuzzy!=''">
+                and a.user_id like concat('%', #{query.userIdFuzzy}, '%')
+            </if>
+            <if test="query.wrongTimeStart!= null and query.wrongTimeStart!=''">
+                <![CDATA[ and  a.wrong_time>=str_to_date(#{query.wrongTimeStart}, '%Y-%m-%d') ]]>
+            </if>
+            <if test="query.wrongTimeEnd!= null and query.wrongTimeEnd!=''">
+                <![CDATA[ and  a.wrong_time< date_sub(str_to_date(#{query.wrongTimeEnd},'%Y-%m-%d'),interval -1 day) ]]>
+            </if>
+            <if test="query.userAnswerFuzzy!= null  and query.userAnswerFuzzy!=''">
+                and a.user_answer like concat('%', #{query.userAnswerFuzzy}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <!-- 查询集合-->
+    <select id="selectList" resultMap="base_result_map">
+        SELECT
+        <include refid="base_column_list"/>,q.title,q.question_type
+        FROM app_wrong_exam a
+        LEFT JOIN question q ON q.question_id = a.question_id
+        <include refid="query_condition"/>
+        <if test="query.orderBy!=null">
+            order by ${query.orderBy}
+        </if>
+        <if test="query.simplePage!=null">
+            limit #{query.simplePage.start},#{query.simplePage.end}
+        </if>
+    </select>
+
+    <!-- 查询数量-->
+    <select id="selectCount" resultType="java.lang.Integer">
+        SELECT count(1) FROM app_wrong_exam a
+        <include refid="query_condition"/>
+    </select>
+
+    <!-- 插入 （匹配有值的字段）-->
+    <insert id="insert" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongExam">
+        <selectKey keyProperty="bean.id" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO app_wrong_exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.examId != null">
+                exam_id,
+            </if>
+            <if test="bean.questionId != null">
+                question_id,
+            </if>
+            <if test="bean.wrongTime != null">
+                wrong_time,
+            </if>
+            <if test="bean.userAnswer != null">
+                user_answer,
+            </if>
+            <if test="bean.isReviewed != null">
+                is_reviewed,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.userId!=null">
+                #{bean.userId},
+            </if>
+            <if test="bean.examId!=null">
+                #{bean.examId},
+            </if>
+            <if test="bean.questionId!=null">
+                #{bean.questionId},
+            </if>
+            <if test="bean.wrongTime!=null">
+                #{bean.wrongTime},
+            </if>
+            <if test="bean.userAnswer!=null">
+                #{bean.userAnswer},
+            </if>
+            <if test="bean.isReviewed!=null">
+                #{bean.isReviewed},
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 插入或者更新 （匹配有值的字段）-->
+    <insert id="insertOrUpdate" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongExam">
+        INSERT INTO app_wrong_exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bean.id != null">
+                id,
+            </if>
+            <if test="bean.userId != null">
+                user_id,
+            </if>
+            <if test="bean.examId != null">
+                exam_id,
+            </if>
+            <if test="bean.questionId != null">
+                question_id,
+            </if>
+            <if test="bean.wrongTime != null">
+                wrong_time,
+            </if>
+            <if test="bean.userAnswer != null">
+                user_answer,
+            </if>
+            <if test="bean.isReviewed != null">
+                is_reviewed,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bean.id!=null">
+                #{bean.id},
+            </if>
+            <if test="bean.userId!=null">
+                #{bean.userId},
+            </if>
+            <if test="bean.examId!=null">
+                #{bean.examId},
+            </if>
+            <if test="bean.questionId!=null">
+                #{bean.questionId},
+            </if>
+            <if test="bean.wrongTime!=null">
+                #{bean.wrongTime},
+            </if>
+            <if test="bean.userAnswer!=null">
+                #{bean.userAnswer},
+            </if>
+            <if test="bean.isReviewed!=null">
+                #{bean.isReviewed},
+            </if>
+        </trim>
+        on DUPLICATE key update
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="bean.userId!=null">
+                user_id = VALUES(user_id),
+            </if>
+            <if test="bean.examId!=null">
+                exam_id = VALUES(exam_id),
+            </if>
+            <if test="bean.questionId!=null">
+                question_id = VALUES(question_id),
+            </if>
+            <if test="bean.wrongTime!=null">
+                wrong_time = VALUES(wrong_time),
+            </if>
+            <if test="bean.userAnswer!=null">
+                user_answer = VALUES(user_answer),
+            </if>
+            <if test="bean.isReviewed!=null">
+                is_reviewed = VALUES(is_reviewed),
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 添加 （批量插入）-->
+    <insert id="insertBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongExam"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO app_wrong_exam(
+        user_id,
+        exam_id,
+        question_id,
+        wrong_time,
+        user_answer,
+        is_reviewed
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userId},
+            #{item.examId},
+            #{item.questionId},
+            #{item.wrongTime},
+            #{item.userAnswer},
+            #{item.isReviewed}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 批量新增修改 （批量插入）-->
+    <insert id="insertOrUpdateBatch" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongExam">
+        INSERT INTO app_wrong_exam(
+        user_id,
+        exam_id,
+        question_id,
+        wrong_time,
+        user_answer,
+        is_reviewed
+        )values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.userId},
+            #{item.examId},
+            #{item.questionId},
+            #{item.wrongTime},
+            #{item.userAnswer},
+            #{item.isReviewed}
+            )
+        </foreach>
+        on DUPLICATE key update
+        user_id = VALUES(user_id),
+        exam_id = VALUES(exam_id),
+        question_id = VALUES(question_id),
+        wrong_time = VALUES(wrong_time),
+        user_answer = VALUES(user_answer),
+        is_reviewed = VALUES(is_reviewed)
+    </insert>
+
+    <!--多条件修改-->
+    <update id="updateByParam" parameterType="com.javastudy.vocabease_common.entity.query.AppWrongExamQuery">
+        UPDATE app_wrong_exam a
+        <set>
+            <if test="bean.userId != null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.examId != null">
+                exam_id = #{bean.examId},
+            </if>
+            <if test="bean.questionId != null">
+                question_id = #{bean.questionId},
+            </if>
+            <if test="bean.wrongTime != null">
+                wrong_time = #{bean.wrongTime},
+            </if>
+            <if test="bean.userAnswer != null">
+                user_answer = #{bean.userAnswer},
+            </if>
+            <if test="bean.isReviewed != null">
+                is_reviewed = #{bean.isReviewed},
+            </if>
+        </set>
+        <include refid="query_condition"/>
+    </update>
+
+    <!--多条件删除-->
+    <delete id="deleteByParam">
+        delete a from app_wrong_exam a
+        <include refid="query_condition"/>
+    </delete>
+
+    <!-- 根据Id修改-->
+    <update id="updateById" parameterType="com.javastudy.vocabease_common.entity.po.AppWrongExam">
+        UPDATE app_wrong_exam
+        <set>
+            <if test="bean.userId != null">
+                user_id = #{bean.userId},
+            </if>
+            <if test="bean.examId != null">
+                exam_id = #{bean.examId},
+            </if>
+            <if test="bean.questionId != null">
+                question_id = #{bean.questionId},
+            </if>
+            <if test="bean.wrongTime != null">
+                wrong_time = #{bean.wrongTime},
+            </if>
+            <if test="bean.userAnswer != null">
+                user_answer = #{bean.userAnswer},
+            </if>
+            <if test="bean.isReviewed != null">
+                is_reviewed = #{bean.isReviewed},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <!-- 根据Id删除-->
+    <delete id="deleteById">
+        delete
+        from app_wrong_exam
+        where id = #{id}
+    </delete>
+
+    <!-- 根据PrimaryKey获取对象-->
+    <select id="selectById" resultMap="base_result_map">
+        select
+        <include refid="base_column_list"/>
+        from app_wrong_exam a where id=#{id}
+    </select>
+
+    <insert id="updateBatch" parameterType="java.util.List" useGeneratedKeys="false">
+        <!-- 使用 INSERT 语法配合 ON DUPLICATE KEY UPDATE 实现 -->
+        INSERT INTO app_wrong_exam (
+        id,
+        user_id,
+        exam_id,
+        question_id,
+        wrong_time,
+        user_answer,
+        is_reviewed,
+        wrong_count <!-- 注意：这里显式列出字段 -->
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.userId},
+            #{item.examId},
+            #{item.questionId},
+            #{item.wrongTime},
+            #{item.userAnswer},
+            #{item.isReviewed},
+            #{item.wrongCount} <!-- 传入的是 Service 层计算好的新次数 -->
+            )
+        </foreach>
+        <!--
+            当发生唯一键冲突时（即该用户该题目已存在错题记录），
+            执行以下更新操作。
+        -->
+        ON DUPLICATE KEY UPDATE
+        <!-- 更新关联的试卷ID为最新的试卷 -->
+        exam_id = VALUES(exam_id),
+        <!-- 更新最后错误时间为当前提交时间 -->
+        wrong_time = VALUES(wrong_time),
+        <!-- 更新用户最新的答案 -->
+        user_answer = VALUES(user_answer),
+        <!-- 核心逻辑：将数据库中的错误次数 + 1 -->
+        <!-- 注意：这里也可以直接用 VALUES(wrong_count)，取决于 Service 层传的是 1 还是 累加后的值 -->
+        wrong_count = wrong_count + 1,
+        <!-- 如果该题被标记为已复习，再次错时应重置为未复习状态 -->
+        is_reviewed = VALUES(is_reviewed)
+    </insert>
+
+</mapper>
