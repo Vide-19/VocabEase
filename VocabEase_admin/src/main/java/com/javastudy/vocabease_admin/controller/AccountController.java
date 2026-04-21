@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController("accountController")
 @RequestMapping("/settings")
-public class AccountController extends com.javastudy.vocabease_admin.controller.ABaseController {
+public class AccountController extends ABaseController {
     @Resource
     private AccountService accountService;
     @Resource
@@ -105,7 +105,7 @@ public class AccountController extends com.javastudy.vocabease_admin.controller.
         return getSuccessResponseVO(user);
     }
 
-    //修改个人信息👇
+    //修改个人信息
     @PostMapping("/updateMyProfile")
     @GlobalInterceptor
     public ResponseVO<Void> updateMyProfile(HttpSession session,

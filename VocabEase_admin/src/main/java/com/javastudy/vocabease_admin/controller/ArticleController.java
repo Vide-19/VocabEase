@@ -114,7 +114,7 @@ public class ArticleController extends ABaseController {
      */
     @RequestMapping("/importArticleByExcel")
     @GlobalInterceptor(permissionCode = PermissionCodeEnum.ARTICLE_IMPORT)
-    public ResponseVO importArticleByExcel(HttpSession session, MultipartFile file) {
+    public ResponseVO<List<ImportErrorItem>> importArticleByExcel(HttpSession session, MultipartFile file) {
         SessionUserAdminDto sessionUserAdminDto = getSessionUserAdminDto(session);
         List<ImportErrorItem> errorItemList = this.articleService.importArticle(sessionUserAdminDto, file);
         return getSuccessResponseVO(errorItemList);

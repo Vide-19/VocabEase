@@ -51,7 +51,7 @@ public class AppDeviceServiceImpl implements AppDeviceService {
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
 		param.setSimplePage(page);
 		List<AppDevice> list = this.findListByParam(param);
-		PaginationResultVO<AppDevice> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+		PaginationResultVO<AppDevice> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
 

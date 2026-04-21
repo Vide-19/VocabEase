@@ -48,7 +48,7 @@ public class Article2categoryServiceImpl implements Article2categoryService {
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
 		param.setSimplePage(page);
 		List<Article2category> list = this.findListByParam(param);
-		PaginationResultVO<Article2category> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+		PaginationResultVO<Article2category> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
 	/**

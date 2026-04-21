@@ -339,7 +339,7 @@ const loadCategories = async () => {
 const loadData = async () => {
   loading.value = true
   try {
-    const res = await axios.post('/question/loadDataList', searchForm)
+    const res = await axios.get('/question/loadDataList', {params: searchForm})
     if (res.data.status === 'success') {
       const data = res.data.data || {}
       questionList.value = data.list || []

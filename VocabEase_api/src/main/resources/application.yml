@@ -16,8 +16,10 @@ spring:
     domain: "需配置域名"
 server:
   port: 9090
+  address: 0.0.0.0
 project:
-  folder: D:/IdeaProject/VocabEase/
+  folder: /www/VocabEase/
+  #folder: D:/IdeaProject/VocabEase/
 admin:
   phone: 13866668888
 log:

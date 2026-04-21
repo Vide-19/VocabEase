@@ -51,7 +51,7 @@ public class AppCarouselServiceImpl implements AppCarouselService {
         SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
         param.setSimplePage(page);
         List<AppCarousel> list = this.findListByParam(param);
-        PaginationResultVO<AppCarousel> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+        PaginationResultVO<AppCarousel> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
         return result;
     }
 

@@ -63,7 +63,7 @@ public class AppAccountServiceImpl implements AppAccountService {
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
 		param.setSimplePage(page);
 		List<AppAccount> list = this.findListByParam(param);
-		PaginationResultVO<AppAccount> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+		PaginationResultVO<AppAccount> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
 

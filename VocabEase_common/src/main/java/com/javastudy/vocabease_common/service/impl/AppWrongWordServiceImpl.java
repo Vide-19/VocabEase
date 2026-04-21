@@ -52,7 +52,7 @@ public class AppWrongWordServiceImpl implements AppWrongWordService {
         SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
         param.setSimplePage(page);
         List<AppWrongWord> list = this.findListByParam(param);
-        PaginationResultVO<AppWrongWord> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+        PaginationResultVO<AppWrongWord> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
         return result;
     }
 

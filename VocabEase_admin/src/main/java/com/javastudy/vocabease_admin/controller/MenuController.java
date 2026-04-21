@@ -26,7 +26,7 @@ public class MenuController extends ABaseController{
 	 */
 	@RequestMapping("/menuList")
 	@GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_MENU)
-	public ResponseVO loadDataList(){
+	public ResponseVO<List<Menu>> loadDataList(){
 		MenuQuery query = new MenuQuery();
 		query.setFormatter2Tree(true);
 		query.setOrderBy("sort asc");

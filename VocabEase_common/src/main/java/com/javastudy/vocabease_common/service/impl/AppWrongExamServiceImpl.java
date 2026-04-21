@@ -52,7 +52,7 @@ public class AppWrongExamServiceImpl implements AppWrongExamService {
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
 		param.setSimplePage(page);
 		List<AppWrongExam> list = this.findListByParam(param);
-		PaginationResultVO<AppWrongExam> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+		PaginationResultVO<AppWrongExam> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
 

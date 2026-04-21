@@ -55,7 +55,7 @@ public class ShareServiceImpl implements ShareService {
         SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
         param.setSimplePage(page);
         List<Share> list = this.findListByParam(param);
-        PaginationResultVO<Share> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+        PaginationResultVO<Share> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
         return result;
     }
 

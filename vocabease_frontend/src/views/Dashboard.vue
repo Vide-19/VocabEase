@@ -2,39 +2,35 @@
   <div class="dashboard-container">
     <h2 class="page-title">系统数据</h2>
 
-    <!-- 数据卡片 -->
     <el-row :gutter="20" class="stat-cards">
       <el-col :span="6" v-for="item in statData" :key="item.statisticName">
         <el-card shadow="hover" class="stat-card">
           <div class="card-content">
             <div class="title">{{ item.statisticName }}</div>
-            <div class="value">{{ item.count }}</div>
-            <div class="diff" :class="{ 'up': item.preCount < item.count, 'down': item.preCount > item.count }">
-              {{ getDiffText(item) }}
+            <div class="value">{{ item.totalCount }}</div>
+            <div class="sub-info">
+              今日 {{ item.todayCount }}
+              <span class="diff"
+                    :class="{ up: item.todayCount > item.yesterdayCount, down: item.todayCount < item.yesterdayCount }">
+                {{ getDiffText(item) }}
+              </span>
             </div>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <!-- 用户行为趋势 -->
     <el-row :gutter="20" style="margin-top: 24px;">
       <el-col :span="12">
         <el-card shadow="hover">
-          <template #header>
-            <span class="value">近7天用户趋势</span>
-          </template>
-          <div ref="userChartRef" style="width: 100%; height: 300px;"></div>
+          <template #header><span>近7天用户趋势</span></template>
+          <div ref="userChartRef" style="width:100%;height:300px;"></div>
         </el-card>
       </el-col>
-
-      <!-- 内容趋势 -->
       <el-col :span="12">
         <el-card shadow="hover">
-          <template #header>
-            <span class="value">近7天内容统计</span>
-          </template>
-          <div ref="contentChartRef" style="width: 100%; height: 300px;"></div>
+          <template #header><span>近7天内容统计</span></template>
+          <div ref="contentChartRef" style="width:100%;height:300px;"></div>
         </el-card>
       </el-col>
     </el-row>
@@ -46,11 +42,11 @@ import {onMounted, ref} from 'vue'
 import * as echarts from 'echarts'
 import axios from 'axios'
 
-// 类型定义
 interface StatisticDataDto {
   statisticName: string
-  count: number
-  preCount: number
+  totalCount: number
+  todayCount: number
+  yesterdayCount: number
 }
 
 interface StatisticWeekItem {
@@ -59,28 +55,23 @@ interface StatisticWeekItem {
 }
 
 interface StatisticWeekDataDto {
-  dataList: string[] // 日期列表
+  dataList: string[]
   itemDataList: StatisticWeekItem[]
 }
 
-// 响应式数据
 const statData = ref<StatisticDataDto[]>([])
 const userWeekData = ref<StatisticWeekDataDto | null>(null)
 const contentWeekData = ref<StatisticWeekDataDto | null>(null)
-
-// 图表引用
 const userChartRef = ref<HTMLDivElement | null>(null)
 const contentChartRef = ref<HTMLDivElement | null>(null)
 
-// 工具函数
-const getDiffText = (item: StatisticDataDto): string => {
-  const diff = item.count - item.preCount
-  if (diff === 0) return '—'
+const getDiffText = (item: StatisticDataDto) => {
+  const diff = item.todayCount - item.yesterdayCount
+  if (diff === 0) return ' 持平'
   const sign = diff > 0 ? '+' : ''
-  return `${sign}${diff} (昨日)`
+  return ` ${sign}${diff}(较昨日)`
 }
 
-// 获取总览数据
 const fetchAllData = async () => {
   try {
     const res = await axios.get('/index/getAllData')
@@ -90,7 +81,6 @@ const fetchAllData = async () => {
   }
 }
 
-// 获取用户周数据
 const fetchUserWeekData = async () => {
   try {
     const res = await axios.get('/index/getWeekAllData')
@@ -101,7 +91,6 @@ const fetchUserWeekData = async () => {
   }
 }
 
-// 获取内容周数据
 const fetchContentWeekData = async () => {
   try {
     const res = await axios.get('/index/getWeekContentData')
@@ -112,51 +101,28 @@ const fetchContentWeekData = async () => {
   }
 }
 
-// 渲染用户图表
-const renderUserChart = () => {
-  if (!userWeekData.value || !userChartRef.value) return
-  const chart = echarts.init(userChartRef.value)
-  const { dataList: dates, itemDataList: series } = userWeekData.value
-
+const renderChart = (el: any, data: any) => {
+  if (!el || !data) return
+  const chart = echarts.init(el)
   const option = {
-    tooltip: { trigger: 'axis' },
-    legend: { data: series.map(s => s.statisticName) },
-    xAxis: { type: 'category', data: dates },
-    yAxis: { type: 'value' },
-    series: series.map(s => ({
-      name: s.statisticName,
+    tooltip: {trigger: 'axis'},
+    legend: {data: data.itemDataList.map((i: any) => i.statisticName)},
+    xAxis: {type: 'category', data: data.dataList},
+    yAxis: {type: 'value'},
+    series: data.itemDataList.map((i: any) => ({
+      name: i.statisticName,
       type: 'line',
-      data: s.dataList,
-      smooth: true
+      smooth: true,
+      data: i.dataList
     }))
   }
   chart.setOption(option)
   window.addEventListener('resize', () => chart.resize())
 }
 
-// 渲染内容图表
-const renderContentChart = () => {
-  if (!contentWeekData.value || !contentChartRef.value) return
-  const chart = echarts.init(contentChartRef.value)
-  const { dataList: dates, itemDataList: series } = contentWeekData.value
+const renderUserChart = () => renderChart(userChartRef.value, userWeekData.value)
+const renderContentChart = () => renderChart(contentChartRef.value, contentWeekData.value)
 
-  const option = {
-    tooltip: { trigger: 'axis' },
-    legend: { data: series.map(s => s.statisticName) },
-    xAxis: { type: 'category', data: dates },
-    yAxis: { type: 'value' },
-    series: series.map(s => ({
-      name: s.statisticName,
-      type: 'line',
-      data: s.dataList,
-      smooth: true
-    }))
-  }
-  chart.setOption(option)
-  window.addEventListener('resize', () => chart.resize())
-}
-
-// 生命周期
 onMounted(() => {
   fetchAllData()
   fetchUserWeekData()
@@ -180,39 +146,47 @@ onMounted(() => {
 }
 
 .stat-card {
-  height: 120px;
+  height: 130px;
 }
 
 .card-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   height: 100%;
 }
 
 .title {
   font-size: 14px;
   color: #999;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .value {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: bold;
   color: #333;
+  margin-bottom: 4px;
+}
+
+.sub-info {
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .diff {
   font-size: 12px;
-  margin-top: 4px;
 }
 
 .diff.up {
-  color: #f56c6c; /* 上升：红色 */
+  color: #67c23a;
 }
 
 .diff.down {
-  color: #67c23a; /* 下降：绿色 */
+  color: #f56c6c;
 }
 </style>

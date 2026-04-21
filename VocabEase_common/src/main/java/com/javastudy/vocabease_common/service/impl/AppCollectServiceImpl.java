@@ -60,7 +60,7 @@ public class AppCollectServiceImpl implements AppCollectService {
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
 		param.setSimplePage(page);
 		List<AppCollect> list = this.findListByParam(param);
-		PaginationResultVO<AppCollect> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+		PaginationResultVO<AppCollect> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
 

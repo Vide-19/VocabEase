@@ -219,7 +219,7 @@ onMounted(() => {
 const loadData = async () => {
   loading.value = true
   try {
-    const res = await axios.post('/share/loadDataList', searchForm)
+    const res = await axios.get('/share/loadDataList', {params: searchForm})
     if (res.data.status === 'success') {
       const data = res.data.data || {}
       shareList.value = data.list || []

@@ -137,7 +137,8 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip> <!-- 关键！ -->
+<!--                    <skip>true</skip> &lt;!&ndash; 关键！ &ndash;&gt;  -->
+                    <classifier>exec</classifier>
                 </configuration>
             </plugin>
 

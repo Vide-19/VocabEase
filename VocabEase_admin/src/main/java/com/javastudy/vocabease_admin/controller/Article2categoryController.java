@@ -2,6 +2,7 @@ package com.javastudy.vocabease_admin.controller;
 
 import com.javastudy.vocabease_common.entity.po.Article2category;
 import com.javastudy.vocabease_common.entity.query.Article2categoryQuery;
+import com.javastudy.vocabease_common.entity.vo.PaginationResultVO;
 import com.javastudy.vocabease_common.entity.vo.ResponseVO;
 import com.javastudy.vocabease_common.service.Article2categoryService;
 import jakarta.annotation.Resource;
@@ -24,8 +25,8 @@ public class Article2categoryController extends ABaseController{
 	 * 根据条件分页查询
 	 */
 	@RequestMapping("/loadDataList")
-	public ResponseVO loadDataList(Article2categoryQuery query){
-		return getSuccessResponseVO(article2categoryService.findListByPage(query));
+	public ResponseVO<PaginationResultVO<Article2category>> loadDataList(Article2categoryQuery query){
+		return getSuccessResponseVO(this.article2categoryService.findListByPage(query));
 	}
 
 	/**
@@ -59,7 +60,7 @@ public class Article2categoryController extends ABaseController{
 	 * 根据ArticleIdAndCategoryId查询对象
 	 */
 	@RequestMapping("/getArticle2categoryByArticleIdAndCategoryId")
-	public ResponseVO getArticle2categoryByArticleIdAndCategoryId(Integer articleId,Integer categoryId) {
+	public ResponseVO<Article2category> getArticle2categoryByArticleIdAndCategoryId(Integer articleId,Integer categoryId) {
 		return getSuccessResponseVO(article2categoryService.getArticle2categoryByArticleIdAndCategoryId(articleId,categoryId));
 	}
 

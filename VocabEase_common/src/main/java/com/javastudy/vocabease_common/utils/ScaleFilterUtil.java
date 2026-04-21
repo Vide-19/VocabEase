@@ -61,9 +61,4 @@ public class ScaleFilterUtil {
         }
         return false;
     }
-
-    public static void main(String[] args ) {
-        createThumbnail(new File("C:\\Users\\Administrator\\Desktop\\test.jpg"), 400,
-                200, new File("C:\\Users\\Administrator\\Desktop\\test.jpg"));
-    }
 }

@@ -14,10 +14,17 @@ spring:
   application:
     name: VocabEase
     domain: "需配置域名"
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 123456
+      database: 0
 server:
   port: 9091
 project:
-  folder: D:/IdeaProject/VocabEase/
+  folder: /www/VocabEase/
+  #folder: D:/IdeaProject/VocabEase/
 admin:
   phone: 13866668888
 log:
@@ -29,3 +36,5 @@ mybatis:
   type-aliases-package: com.javastudy.vocabease_common.entity
   configuration:
     map-underscore-to-camel-case: true
+ai:
+  api-key: sk-e1d4f498aa1b4eadb87b1c37f195c31b

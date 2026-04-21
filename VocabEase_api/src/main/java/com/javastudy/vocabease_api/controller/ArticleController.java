@@ -112,7 +112,7 @@ public class ArticleController extends ABaseController {
     public ResponseVO<Article> getArticleDetail(@RequestHeader(value = "token", required = false) String token,
                                                 @VerifyParam(required = true) Integer articleId) {
         Article article = this.articleService.getArticleByArticleId(articleId);
-        if (article == null || !article.getStatus().equals(PostStatusEnum.IS_POST.getStatus()))
+        if (article == null || article.getStatus().equals(PostStatusEnum.NO_POST.getStatus()))
             return getBusinessErrorResponseVO(new BusinessException("文章不存在或未发布"), null);
         this.articleService.updateReadCountById(articleId);
         article.setReadCount(article.getReadCount() + 1);

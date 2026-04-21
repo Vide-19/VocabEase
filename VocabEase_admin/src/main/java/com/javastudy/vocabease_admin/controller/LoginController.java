@@ -45,7 +45,7 @@ public class LoginController extends ABaseController {
      */
     @RequestMapping("/login")
     @GlobalInterceptor(checkLogin = false)
-    public ResponseVO login(HttpSession session,
+    public ResponseVO<SessionUserAdminDto> login(HttpSession session,
                             @VerifyParam(regex = VerifyRegexEnum.PHONE) String phone,
                             @VerifyParam(required = true) String password,
                             @VerifyParam(required = true) String checkCode) throws BusinessException {

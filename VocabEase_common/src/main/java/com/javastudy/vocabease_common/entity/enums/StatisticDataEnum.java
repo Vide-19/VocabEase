@@ -1,13 +1,14 @@
 package com.javastudy.vocabease_common.entity.enums;
 
 public enum StatisticDataEnum {
-    APP_READ(0, "小程序浏览"),
-    REGISTER_USER(1, "注册用户"),
+    APP_READ(0, "用户登录"),
+    REGISTER_USER(1, "新用户"),
     ARTICLE(2, "文章"),
     WORD(3, "单词"),
     QUESTION(4, "问题"),
     SHARE(5, "笔记"),
-    FEEDBACK(6, "反馈");
+    FEEDBACK(6, "反馈"),
+    EXAM(7, "测试");
 
     private Integer code;
     private String description;

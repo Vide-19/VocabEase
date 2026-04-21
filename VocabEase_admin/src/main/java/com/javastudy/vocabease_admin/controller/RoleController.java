@@ -59,7 +59,7 @@ public class RoleController extends ABaseController {
      */
     @RequestMapping("/getRoleByRoleId")
     @GlobalInterceptor(permissionCode = PermissionCodeEnum.SETTINGS_ROLE_LIST)
-    public ResponseVO getRoleByRoleId(@VerifyParam(required = true) Integer roleId) {
+    public ResponseVO<Role> getRoleByRoleId(@VerifyParam(required = true) Integer roleId) {
         Role role = roleService.getRoleByRoleId(roleId);
         return getSuccessResponseVO(role);
     }

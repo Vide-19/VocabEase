@@ -48,7 +48,7 @@ public class Word2categoryServiceImpl implements Word2categoryService {
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
 		param.setSimplePage(page);
 		List<Word2category> list = this.findListByParam(param);
-		PaginationResultVO<Word2category> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+		PaginationResultVO<Word2category> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
 	/**

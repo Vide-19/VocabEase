@@ -54,7 +54,7 @@ public class AppFeedbackServiceImpl implements AppFeedbackService {
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
 		param.setSimplePage(page);
 		List<AppFeedback> list = this.findListByParam(param);
-		PaginationResultVO<AppFeedback> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+		PaginationResultVO<AppFeedback> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
 	/**

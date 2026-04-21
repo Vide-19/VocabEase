@@ -8,31 +8,59 @@ public class StatisticDataDto {
      */
     private String statisticName;
     /**
-     * 统计数
+     * 总统计数
      */
-    private Integer count;
+    private Integer totalCount;
     /**
-     *前一天统计数
+     * 今天统计数
      */
-    private Integer preCount;
+    private Integer todayCount;
+    /**
+     * 前一天统计数
+     */
+    private Integer yesterdayCount;
     /**
      *
      */
     private List<Integer> dataList;
 
-    public String getStatisticName() {return statisticName;}
+    public Integer getTotalCount() {
+        return totalCount;
+    }
 
-    public void setStatisticName(String statisticName) {this.statisticName = statisticName;}
+    public void setTotalCount(Integer totalCount) {
+        this.totalCount = totalCount;
+    }
 
-    public Integer getCount() {return count;}
+    public Integer getTodayCount() {
+        return todayCount;
+    }
 
-    public void setCount(Integer count) {this.count = count;}
+    public void setTodayCount(Integer todayCount) {
+        this.todayCount = todayCount;
+    }
 
-    public Integer getPreCount() {return preCount;}
+    public String getStatisticName() {
+        return statisticName;
+    }
 
-    public void setPreCount(Integer preCount) {this.preCount = preCount;}
+    public void setStatisticName(String statisticName) {
+        this.statisticName = statisticName;
+    }
 
-    public List<Integer> getDataList() {return dataList;}
+    public Integer getYesterdayCount() {
+        return yesterdayCount;
+    }
 
-    public void setDataList(List<Integer> dataList) {this.dataList = dataList;}
+    public void setYesterdayCount(Integer yesterdayCount) {
+        this.yesterdayCount = yesterdayCount;
+    }
+
+    public List<Integer> getDataList() {
+        return dataList;
+    }
+
+    public void setDataList(List<Integer> dataList) {
+        this.dataList = dataList;
+    }
 }

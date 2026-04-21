@@ -44,7 +44,7 @@ public class FileController extends ABaseController{
 
     @RequestMapping("/uploadFile")
     @GlobalInterceptor
-    public ResponseVO uploadFile(MultipartFile file, Integer type) {
+    public ResponseVO<String> uploadFile(MultipartFile file, Integer type) {
         FileTypeEnum fileType = FileTypeEnum.getType(type);
         String mouth = DateUtil.format(new Date(), DateTimePatternEnum.YY_MM.getPattern());
         String folderName = appConfig.getProjectFolder() + mouth;

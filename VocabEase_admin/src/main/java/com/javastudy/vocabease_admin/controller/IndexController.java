@@ -42,4 +42,11 @@ public class IndexController extends ABaseController {
     public ResponseVO<StatisticWeekDataDto> getWeekContentData() {
         return getSuccessResponseVO(this.statisticDataService.getWeekContentData());
     }
+    @RequestMapping("/dashboard")
+    @GlobalInterceptor(permissionCode = PermissionCodeEnum.HOME) // 假设也需要 HOME 权限
+    public ResponseVO<Void> dashboard() {
+        // TODO: 这里你需要返回仪表盘需要的数据
+        // 如果暂时没数据，可以先返回 null 或者一个空对象，先让页面不报错
+        return getSuccessResponseVO(null);
+    }
 }

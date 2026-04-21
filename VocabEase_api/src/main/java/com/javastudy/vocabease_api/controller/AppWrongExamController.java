@@ -44,7 +44,7 @@ public class AppWrongExamController extends ABaseController{
 	 * 新增
 	 */
 	@RequestMapping("/add")
-	public ResponseVO add(AppWrongExam bean) {
+	public ResponseVO<Void> add(AppWrongExam bean) {
 		appWrongExamService.add(bean);
 		return getSuccessResponseVO(null);
 	}
@@ -53,7 +53,7 @@ public class AppWrongExamController extends ABaseController{
 	 * 批量新增
 	 */
 	@RequestMapping("/addBatch")
-	public ResponseVO addBatch(@RequestBody List<AppWrongExam> listBean) {
+	public ResponseVO<Void> addBatch(@RequestBody List<AppWrongExam> listBean) {
 		appWrongExamService.addBatch(listBean);
 		return getSuccessResponseVO(null);
 	}
@@ -62,7 +62,7 @@ public class AppWrongExamController extends ABaseController{
 	 * 批量新增/修改
 	 */
 	@RequestMapping("/addOrUpdateBatch")
-	public ResponseVO addOrUpdateBatch(@RequestBody List<AppWrongExam> listBean) {
+	public ResponseVO<Void> addOrUpdateBatch(@RequestBody List<AppWrongExam> listBean) {
 		appWrongExamService.addBatch(listBean);
 		return getSuccessResponseVO(null);
 	}
@@ -71,7 +71,7 @@ public class AppWrongExamController extends ABaseController{
 	 * 根据Id查询对象
 	 */
 	@RequestMapping("/getAppWrongExamById")
-	public ResponseVO getAppWrongExamById(Integer id) {
+	public ResponseVO<AppWrongExam> getAppWrongExamById(Integer id) {
 		return getSuccessResponseVO(appWrongExamService.getAppWrongExamById(id));
 	}
 
@@ -79,7 +79,7 @@ public class AppWrongExamController extends ABaseController{
 	 * 根据Id修改对象
 	 */
 	@RequestMapping("/updateAppWrongExamById")
-	public ResponseVO updateAppWrongExamById(AppWrongExam bean,Integer id) {
+	public ResponseVO<Void> updateAppWrongExamById(AppWrongExam bean,Integer id) {
 		appWrongExamService.updateAppWrongExamById(bean,id);
 		return getSuccessResponseVO(null);
 	}

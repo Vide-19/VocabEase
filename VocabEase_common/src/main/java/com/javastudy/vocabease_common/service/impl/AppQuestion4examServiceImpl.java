@@ -50,7 +50,7 @@ public class AppQuestion4examServiceImpl implements AppQuestion4examService {
 		SimplePage page = new SimplePage(param.getPageNo(), count, pageSize);
 		param.setSimplePage(page);
 		List<AppQuestion4exam> list = this.findListByParam(param);
-		PaginationResultVO<AppQuestion4exam> result = new PaginationResultVO(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
+		PaginationResultVO<AppQuestion4exam> result = new PaginationResultVO<>(count, page.getPageSize(), page.getPageNo(), page.getPageTotal(), list);
 		return result;
 	}
 

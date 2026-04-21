@@ -62,6 +62,22 @@ public class DateUtil {
         return Date.from(instant);
     }
 
+    // 获取 N天前 的 00:00:00
+    public static Date getPreDateStart(Integer day) {
+        LocalDateTime localDateTime = LocalDateTime.now().minusDays(day).withHour(0).withMinute(0).withSecond(0);
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDateTime.atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
+    // 获取 N天前 的 23:59:59
+    public static Date getPreDateEnd(Integer day) {
+        LocalDateTime localDateTime = LocalDateTime.now().minusDays(day).withHour(23).withMinute(59).withSecond(59);
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = localDateTime.atZone(zone).toInstant();
+        return Date.from(instant);
+    }
+
     public static List<String> getBetweenDate(Date dateStart, Date dateEnd) {
         LocalDate localDateStart = fromLocalDate2String(dateStart);
         LocalDate localDateEnd = fromLocalDate2String(dateEnd);
